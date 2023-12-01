@@ -4,7 +4,7 @@
 	require_once __DIR__ . "/php/util/dbInteraction.php";
 
 
-    echo "Test Connection to the DB";
+    echo "<b>Test Connection to the DB:</b><br>";
 
 	$resultQuery = getUsers();
 
