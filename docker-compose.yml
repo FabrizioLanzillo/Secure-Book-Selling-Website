@@ -4,12 +4,12 @@ services:
         container_name: web-server   
         restart: always  
         build:          
-            context: ./src/php          
+            context: .         
             dockerfile: ../../WebServer_Dockerfile        
         depends_on:         
         - mysql-server       
         volumes:        
-        - ./src/php:/var/www/html/        
+        - ./src:/var/www/html/        
         ports:         
         - "8000:80"    
     mysql-server:      
