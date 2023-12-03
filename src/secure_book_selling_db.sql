@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: mysql-server
--- Creato il: Nov 30, 2023 alle 16:51
+-- Creato il: Dic 03, 2023 alle 22:59
 -- Versione del server: 8.2.0
 -- Versione PHP: 8.2.8
 
@@ -20,8 +20,6 @@ SET time_zone = "+00:00";
 --
 -- Database: `secure_book_selling_db`
 --
-CREATE DATABASE IF NOT EXISTS `secure_book_selling_db` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
-USE `secure_book_selling_db`;
 
 -- --------------------------------------------------------
 
@@ -85,24 +83,28 @@ INSERT INTO `orders` (`id`, `id_user`, `id_book`, `amount`, `status`, `payment_m
 
 CREATE TABLE IF NOT EXISTS `user` (
   `id` smallint NOT NULL AUTO_INCREMENT,
-  `username` varchar(32) NOT NULL,
+  `username` varchar(32) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin NOT NULL,
   `password` varchar(64) NOT NULL,
+  `salt` varchar(64) NOT NULL,
   `email` varchar(64) NOT NULL,
   `name` varchar(64) NOT NULL,
   `surname` varchar(64) NOT NULL,
   `date_of_birth` date NOT NULL,
+  `isAdmin` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `user_unique` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  UNIQUE KEY `user_unique_email` (`email`),
+  UNIQUE KEY `user_unique_username` (`username`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dump dei dati per la tabella `user`
 --
 
-INSERT INTO `user` (`id`, `username`, `password`, `email`, `name`, `surname`, `date_of_birth`) VALUES
-(1, 'Fablan', '9939df98691a15415c5fb6b875abe01eb014e632374fa4e61c55e24e1d391f50', 'f.lanzillo@studenti.unipi.it', 'Fabrizio', 'Lanzillo', '1998-04-25'),
-(2, 'Tommib', 'a800b7790368425cd3f341a67d86b4906232ad4e681531cff2766694c700b358', 't.bertini4@studenti.unipi.it', 'Tommaso ', 'Bertini', '1998-04-01'),
-(3, 'Hfjqpowfjpq', 'cffa07d2ed62ecb040d57c6f4927f4672871c37bd7cbb09840529f7a306bd109', 'g.marrucci4@studenti.unipi.it', 'Giovanni', 'Marrucci', '1999-11-29');
+INSERT INTO `user` (`id`, `username`, `password`, `salt`, `email`, `name`, `surname`, `date_of_birth`, `isAdmin`) VALUES
+(1, 'Fablan', 'fc698653e8a0556f417fd5edb6b195126b152ec6c87dd1da70cc0db00d55dbb8', '5f1d635bb003ac40556ed6e9518984b081a011dadc1c1570d6bd32ad9e82584b', 'f.lanzillo@studenti.unipi.it', 'Fabrizio', 'Lanzillo', '1998-04-25', 1),
+(2, 'Tommib', 'd0dc8824d9f9464e031c1081fa1f6abb85f8b2b27f53b5f2ca7cf80f15cb22f5', 'ecbada38d5adabc2dc3dc308888a8005ada39c4b693e80c2a42e07c7009c960b', 't.bertini4@studenti.unipi.it', 'Tommaso ', 'Bertini', '1998-04-01', 1),
+(3, 'Hfjqpowfjpq', 'ae3460e953a01a24c393f0a2b0742c4353c72c1a87cb379130903566904a62c2', '616762931bda4395cf7b3f211496224f299fa05cabb020b97e2da943717d2ad7', 'g.marrucci4@studenti.unipi.it', 'Giovanni', 'Marrucci', '1999-11-29', 1),
+(4, 'NperNedo', 'ecb961192524aefc85a70d169cf5dfa33aa44796de670bb034907ff64bd23074', '0ec28037a19b7098460a560dc3ebc6e171584eeba7ec092ec7f250f5f94a1114', 'f.montini1@studenti.unipi.it', 'Federico', 'Montini', '1998-05-17', 0);
 
 --
 -- Limiti per le tabelle scaricate
