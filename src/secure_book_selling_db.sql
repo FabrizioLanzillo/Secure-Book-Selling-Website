@@ -17,6 +17,13 @@ SET time_zone = "+00:00";
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
 /*!40101 SET NAMES utf8mb4 */;
 
+CREATE DATABASE IF NOT EXISTS secure_book_selling_db;
+-- CREATE USER 'SNH'@'%' IDENTIFIED BY 'password';
+GRANT ALL PRIVILEGES ON *.* TO 'SNH'@'%' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
+
+use secure_book_selling_db;
+
 --
 -- Database: `secure_book_selling_db`
 --
