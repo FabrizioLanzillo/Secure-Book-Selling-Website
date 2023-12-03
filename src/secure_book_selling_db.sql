@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: mysql-server
--- Creato il: Nov 30, 2023 alle 16:51
+-- Creato il: Dic 02, 2023 alle 19:00
 -- Versione del server: 8.2.0
 -- Versione PHP: 8.2.8
 
@@ -17,11 +17,16 @@ SET time_zone = "+00:00";
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
 /*!40101 SET NAMES utf8mb4 */;
 
+CREATE DATABASE IF NOT EXISTS secure_book_selling_db;
+-- CREATE USER 'SNH'@'%' IDENTIFIED BY 'password';
+GRANT ALL PRIVILEGES ON *.* TO 'SNH'@'%' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
+
+use secure_book_selling_db;
+
 --
 -- Database: `secure_book_selling_db`
 --
-CREATE DATABASE IF NOT EXISTS `secure_book_selling_db` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
-USE `secure_book_selling_db`;
 
 -- --------------------------------------------------------
 
@@ -85,24 +90,27 @@ INSERT INTO `orders` (`id`, `id_user`, `id_book`, `amount`, `status`, `payment_m
 
 CREATE TABLE IF NOT EXISTS `user` (
   `id` smallint NOT NULL AUTO_INCREMENT,
-  `username` varchar(32) NOT NULL,
+  `username` varchar(32) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin NOT NULL,
   `password` varchar(64) NOT NULL,
   `email` varchar(64) NOT NULL,
   `name` varchar(64) NOT NULL,
   `surname` varchar(64) NOT NULL,
   `date_of_birth` date NOT NULL,
+  `isAdmin` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `user_unique` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  UNIQUE KEY `user_unique_email` (`email`),
+  UNIQUE KEY `user_unique_username` (`username`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dump dei dati per la tabella `user`
 --
 
-INSERT INTO `user` (`id`, `username`, `password`, `email`, `name`, `surname`, `date_of_birth`) VALUES
-(1, 'Fablan', '9939df98691a15415c5fb6b875abe01eb014e632374fa4e61c55e24e1d391f50', 'f.lanzillo@studenti.unipi.it', 'Fabrizio', 'Lanzillo', '1998-04-25'),
-(2, 'Tommib', 'a800b7790368425cd3f341a67d86b4906232ad4e681531cff2766694c700b358', 't.bertini4@studenti.unipi.it', 'Tommaso ', 'Bertini', '1998-04-01'),
-(3, 'Hfjqpowfjpq', 'cffa07d2ed62ecb040d57c6f4927f4672871c37bd7cbb09840529f7a306bd109', 'g.marrucci4@studenti.unipi.it', 'Giovanni', 'Marrucci', '1999-11-29');
+INSERT INTO `user` (`id`, `username`, `password`, `email`, `name`, `surname`, `date_of_birth`, `isAdmin`) VALUES
+(1, 'Fablan', 'prova', 'f.lanzillo@studenti.unipi.it', 'Fabrizio', 'Lanzillo', '1998-04-25', 1),
+(2, 'Tommib', 'a800b7790368425cd3f341a67d86b4906232ad4e681531cff2766694c700b358', 't.bertini4@studenti.unipi.it', 'Tommaso ', 'Bertini', '1998-04-01', 1),
+(3, 'Hfjqpowfjpq', 'cffa07d2ed62ecb040d57c6f4927f4672871c37bd7cbb09840529f7a306bd109', 'g.marrucci4@studenti.unipi.it', 'Giovanni', 'Marrucci', '1999-11-29', 1),
+(4, 'NperNedo', '25af0924cf998b6c8c31f87999df481dc51ab94d92f81baee43a02aa5cdafb86', 'f.montini1@studenti.unipi.it', 'Federico', 'Montini', '1998-05-17', 0);
 
 --
 -- Limiti per le tabelle scaricate
