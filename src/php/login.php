@@ -5,24 +5,23 @@
     require_once __DIR__ . "/util/sessionManager.php";
     require_once __DIR__ . "./../config.php";
 
-    echo "<b>Test Connection to the DB:</b><br>";
-
-
     function login ($email, $password){
         if($email != null && $password != null){
-            
-            $resultQuery = authenticate($email, $password);
+
+            $salt = getAccessInformation($email);
+
+            $resultQuery = authenticate($email, hash('sha256', $password . $salt));
             if($resultQuery !== false){
 
                 if($resultQuery !== null && extract($resultQuery) == 4){	
                     if(!isset ($_SESSION)){
                         session_start();
                     }
-                    echo "id: ".$id."<br>";
-                    echo "username: ".$username."<br>";
-                    echo "name: ".$name."<br>";
-                    echo "isAdmin: ".$isAdmin."<br>";
                     setSession($id, $username, $name, $isAdmin);
+                    // echo "<script>alert('userId: ".$_SESSION['userId']."')</script>";
+                    // echo "<script>alert('username: ".$_SESSION['username']."')</script>";
+                    // echo "<script>alert('name: ".$_SESSION['name']."')</script>";
+                    // echo "<script>alert('isAdmin: ".$_SESSION['isAdmin']."')</script>";
                     return null;
                 }
                 else{
@@ -38,6 +37,10 @@
         }
     }
 
+    if(isLogged()){
+        pathRedirection();
+    }
+
     $error = null;
 
     if(isset($_POST['email']) && isset($_POST['password'])){
@@ -45,15 +48,12 @@
         $email = $_POST['email'];
     	$password = $_POST['password'];
         
-        $error = login("f.lanzillo@studenti.unipi.it", "prova");
-    }
-
-    if ($error !== null){
-        echo '<script>
-                 alert("'.$error.'");
-                //   window.location.assign("//'.SERVER_ROOT.'/php/login.php")
-              </script>';
-            
+        $error = login($email, $password);
+    
+        if($error === null){
+            pathRedirection();
+        }
+    
     }
     
 ?>
@@ -76,5 +76,14 @@
                 <button type="submit">Login</button>
             </div>
         </form>
+        <?php
+            if ($error !== null){
+                echo '<script>
+                         alert("'.$error.'");
+                        //   window.location.assign("//'.SERVER_ROOT.'/php/login.php")
+                      </script>';
+                    
+            }
+        ?>
     </body>
 </html>

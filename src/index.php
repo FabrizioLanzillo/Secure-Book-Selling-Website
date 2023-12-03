@@ -20,5 +20,10 @@
 		echo "<script>alert('Error retrieving users data');</script>";
 	}
 
+	// $username = 'insert';
+	// echo "username: ". $username . "<br>";
+	// $salt = bin2hex(random_bytes(32));
+	// echo "salt: ". $salt . "<br>";
+	// echo "hash: ".hash('sha256', $username . $salt);
 ?>
 

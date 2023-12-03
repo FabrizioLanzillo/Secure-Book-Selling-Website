@@ -15,4 +15,15 @@
 			return false;
 		}
 	}
+
+	function pathRedirection(){
+		if($_SESSION['isAdmin'] == '1'){
+			echo "<script>alert('".$_SESSION['username']." is Admin')</script>";
+			// TODO: call to the admin homepage with header function
+		}
+		else{
+			echo "<script>alert('".$_SESSION['username']." is a normal user')</script>";
+			// TODO: call to the user homepage with header function    
+		}
+	}
 ?>

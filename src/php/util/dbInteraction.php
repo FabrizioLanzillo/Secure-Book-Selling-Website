@@ -23,6 +23,7 @@
     }
 
     function authenticate($email, $password){
+
         global $SecureBookSellingDB;
         
         try{
@@ -54,6 +55,29 @@
 			return false;
         } 
 	}	
+
+    function getAccessInformation($email){
+
+        global $SecureBookSellingDB;
+
+        try{
+            $email=$SecureBookSellingDB->sqlInjectionFilter($email);
+
+            $query = "SELECT salt
+                        FROM user
+                        WHERE email = '".$email."';";
+
+            $result = $SecureBookSellingDB->performQuery($query);
+			
+            $SecureBookSellingDB->closeConnection($query);
+			$result = $result->fetch_assoc();
+		    return $result['salt'];
+        }
+        catch(Exception $e){
+			echo "Error getting access information: ". $e->getCode() . $e->getMessage();
+			return false;
+        }  
+    }
 
 
 ?> 
