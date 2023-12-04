@@ -5,7 +5,7 @@ services:
         restart: always  
         build:          
             context: .         
-            dockerfile: ../../WebServer_Dockerfile        
+            dockerfile: WebServer_Dockerfile        
         depends_on:         
         - mysql-server       
         volumes:        
