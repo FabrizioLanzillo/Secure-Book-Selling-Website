@@ -18,11 +18,11 @@
 
 	function pathRedirection(){
 		if($_SESSION['isAdmin'] == '1'){
-			echo "<script>alert('".$_SESSION['username']." is Admin')</script>";
+			echo "<script>alert('".$_SESSION['userId']." is Admin')</script>";
 			// TODO: call to the admin homepage with header function
 		}
 		else{
-			echo "<script>alert('".$_SESSION['username']." is a normal user')</script>";
+			echo "<script>alert('".$_SESSION['userId']." is a normal user')</script>";
 			// TODO: call to the user homepage with header function    
 		}
 	}

@@ -69,6 +69,11 @@
 
             $result = $SecureBookSellingDB->performQuery($query);
 			
+            $numbRow = mysqli_num_rows($result);
+            if($numbRow != 1){
+                return null;
+            }
+
             $SecureBookSellingDB->closeConnection($query);
 			$result = $result->fetch_assoc();
 		    return $result['salt'];
