@@ -1,12 +1,14 @@
 <?php	
 
     require_once __DIR__ . "/dbManager.php";	
+    require_once __DIR__ . "./../../config.php";
 
     /************************************* User Function ***********************************/
     
     function getUsers(){
 
         global $SecureBookSellingDB;
+        global $logger;
 
         try{
             $query = "SELECT username, name, surname, email, date_of_birth, isAdmin FROM user;";
@@ -17,7 +19,8 @@
 			return $result;
         }
         catch(Exception $e){
-			echo "Error performing the query: ". $e->getCode() . $e->getMessage();
+            $message = "Error performing the query: ". $e->getCode() . $e->getMessage();
+            $logger->writeLog('ERROR', $message);
 			return false;
         }  
     }
@@ -25,6 +28,7 @@
     function authenticate($email, $password){
 
         global $SecureBookSellingDB;
+        global $logger;
         
         try{
             $email=$SecureBookSellingDB->sqlInjectionFilter($email);
@@ -51,7 +55,8 @@
             return $dataRow;
         }
         catch(Exception $e){
-			echo "Error performing the authentication: ". $e->getCode() . $e->getMessage();
+            $message = "Error performing the authentication: ". $e->getCode() . $e->getMessage();
+            $logger->writeLog('ERROR', $message);
 			return false;
         } 
 	}	
@@ -59,6 +64,7 @@
     function getAccessInformation($email){
 
         global $SecureBookSellingDB;
+        global $logger;
 
         try{
             $email=$SecureBookSellingDB->sqlInjectionFilter($email);
@@ -79,10 +85,9 @@
 		    return $result['salt'];
         }
         catch(Exception $e){
-			echo "Error getting access information: ". $e->getCode() . $e->getMessage();
+            $message = "Error getting access information: ". $e->getCode() . $e->getMessage();
+            $logger->writeLog('ERROR', $message);
 			return false;
         }  
     }
-
-
-?> 
+?>
