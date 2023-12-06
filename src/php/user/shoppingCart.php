@@ -1,8 +1,7 @@
 <?php
     session_start();
-	require_once __DIR__ . "./../util/dbInteraction.php";
-    require_once __DIR__ . "./../util/sessionManager.php";
     require_once __DIR__ . "./../../config.php";
+    require_once __DIR__ . "./../util/dbInteraction.php";
 ?>
 
 <!DOCTYPE html>

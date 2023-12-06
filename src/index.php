@@ -1,11 +1,8 @@
 <?php
 
 	session_start();
-	require_once __DIR__ . "/php/util/dbInteraction.php";
-	require_once __DIR__ . "/php/util/sessionManager.php";
 	require_once __DIR__ . "/config.php";
-
-    echo "<b>Test Connection to the DB:</b><br>";
+	require_once __DIR__ . "/php/util/dbInteraction.php";
 
 	$resultQuery = getUsers();
 	
@@ -28,7 +25,7 @@
 	// $salt = bin2hex(random_bytes(32));
 	// echo "salt: ". $salt . "<br>";
 	// echo "hash: ".hash('sha256', $username . $salt);
-	include "./php/layout/header.php";
+
 ?>
 <!DOCTYPE html>
 <html>
@@ -36,5 +33,8 @@
         <link rel="stylesheet" type="text/css" href="./css/index.css">
     </head>
 	<body>
+<?php
+		include "./php/layout/header.php";
+?>
 	</body>
 </html>

@@ -15,13 +15,34 @@
             }
 ?>
             <!-- This is the container for the first button and it can be -->
-            <!-- The Home button for all the page -->
+            <!-- The Index page for not logged user -->
+            <!-- The User home page for logged user -->
+            <!-- The Admin home page for logged admin -->
             <div class="container button-container">
-                <a href="//<?php echo SERVER_ROOT. '/index.php'?>">
-                    <button class="button_header">
-                        Home
-                    </button>
-                </a>
+<?php
+                if(!isLogged()){
+               
+?>
+                    <a href="//<?php echo SERVER_ROOT. '/index.php'?>">
+<?php
+                }
+                else{
+                    if($_SESSION['isAdmin'] == 0){
+?>
+                        <a href="//<?php echo SERVER_ROOT. '/php/user/homeUser.php'?>">
+<?php
+                    }
+                    else{
+?>
+                        <a href="//<?php echo SERVER_ROOT. '/php/admin/homeAdmin.php'?>">
+<?php                        
+                    }
+                }
+?>      
+                        <button class="button_header">
+                            Home
+                        </button>
+                    </a>
             </div>
             <!-- This is the container for the second button and it can be -->
             <!-- The Profile Button for every page, excluding the login and the signup page -->
