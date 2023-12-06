@@ -28,9 +28,10 @@
 
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
         <link rel="stylesheet" type="text/css" href="./css/index.css">
+        <title>Book Selling - Home</title>
     </head>
 	<body>
 <?php

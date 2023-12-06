@@ -15,7 +15,7 @@
 
             $result = $SecureBookSellingDB->performQuery($query);
 			
-            $SecureBookSellingDB->closeConnection($query);
+            $SecureBookSellingDB->closeConnection();
 			return $result;
         }
         catch(Exception $e){
@@ -51,8 +51,7 @@
             }
             $SecureBookSellingDB -> closeConnection();
 
-            $dataRow = $result -> fetch_assoc();
-            return $dataRow;
+            return $result -> fetch_assoc();
         }
         catch(Exception $e){
             $message = "Error performing the authentication: ". $e->getCode() . $e->getMessage();
@@ -80,7 +79,7 @@
                 return null;
             }
 
-            $SecureBookSellingDB->closeConnection($query);
+            $SecureBookSellingDB->closeConnection();
 			$result = $result->fetch_assoc();
 		    return $result['salt'];
         }
@@ -90,4 +89,3 @@
 			return false;
         }  
     }
-?>

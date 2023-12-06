@@ -1,6 +1,6 @@
 <?php
 
-	function setSession($userId, $username, $name, $isAdmin){
+	function setSession($userId, $username, $name, $isAdmin): void{
 		$_SESSION['userId'] = $userId;
         $_SESSION['username'] = $username;
 		$_SESSION['name'] = $name;
@@ -15,4 +15,3 @@
 			return false;
 		}
 	}
-?>

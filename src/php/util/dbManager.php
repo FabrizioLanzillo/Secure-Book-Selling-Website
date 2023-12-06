@@ -13,8 +13,11 @@
 		private $user;
 		private $password;
 		private $dbName;
-        
-		function __construct($host, $user, $password, $dbName){	
+
+        /**
+         * @throws Exception
+         */
+        function __construct($host, $user, $password, $dbName){
 			$this->host = $host;
 			$this->user = $user;
 			$this->password = $password;
@@ -22,7 +25,10 @@
 			$this->openConnection();
 		}
 
-		function openConnection(){
+        /**
+         * @throws Exception
+         */
+        function openConnection(){
 			if(!$this->isOpened()){		
 				$this->mysqli_connection = new mysqli($this->host, $this->user, $this->password);
 				if($this->mysqli_connection->connect_error){
@@ -32,11 +38,14 @@
 			}
 		}
 
-		function isOpened(){
+		function isOpened(): bool{
        		return ($this->mysqli_connection != null);
     	}
 
-		function performQuery($querytext){				
+        /**
+         * @throws Exception
+         */
+        function performQuery($querytext){
 			if(!$this->isOpened()){
 				$this->openConnection();
 			}
@@ -49,8 +58,11 @@
 			return $result;
 		}
 
-        // function that filter the parameter in order to avoid cases of sqlinjection
-		function sqlInjectionFilter($parameter){
+        /**
+         * function that filter the parameter in order to avoid cases of sql injection
+         * @throws Exception
+         */
+        function sqlInjectionFilter($parameter){
 			if(!$this->isOpened()){
 				$this->openConnection();
 			}
@@ -58,11 +70,8 @@
 			return $this->mysqli_connection->real_escape_string($parameter);
 		}
 		
-		function closeConnection(){
-			if($this->mysqli_connection !== NULL){
-				$this->mysqli_connection->close();
-			}
+		function closeConnection(): void{
+            $this->mysqli_connection?->close();
 			$this->mysqli_connection = NULL;
 		}
 	}
-?>

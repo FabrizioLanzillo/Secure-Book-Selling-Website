@@ -4,7 +4,7 @@
     require_once __DIR__ . "./../config.php";
     require_once __DIR__ . "/util/dbInteraction.php";
 
-    function login ($email, $password){
+    function login ($email, $password): ?string{
         if($email != null && $password != null){
 
             $salt = getAccessInformation($email);
@@ -17,10 +17,6 @@
                         session_start();
                     }
                     setSession($id, $username, $name, $isAdmin);
-                    // echo "<script>alert('userId: ".$_SESSION['userId']."')</script>";
-                    // echo "<script>alert('username: ".$_SESSION['username']."')</script>";
-                    // echo "<script>alert('name: ".$_SESSION['name']."')</script>";
-                    // echo "<script>alert('isAdmin: ".$_SESSION['isAdmin']."')</script>";
                     return null;
                 }
                 else{
@@ -72,9 +68,10 @@
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
         <link rel="stylesheet" type="text/css" href="../css/login.css">
+        <title>Book Selling</title>
     </head>
     <body>
         <?php
@@ -83,11 +80,13 @@
         <h2>Login Form</h2>
         <form name = "login" action="//<?php echo SERVER_ROOT. '/php/login.php'?>" method="POST">
             <div class="container">
-                <label for="email"><b>Email</b></label>
-                <input class="login_form_input" type="text" placeholder="Enter Email" name="email" required>
+                <label><b>Email</b>
+                    <input class="login_form_input" type="text" placeholder="Enter Email" name="email" required>
+                </label>
 
-                <label for="password"><b>Password</b></label>
-                <input class="login_form_input" type="password" placeholder="Enter Password" name="password" required>
+                <label><b>Password</b>
+                    <input class="login_form_input" type="password" placeholder="Enter Password" name="password" required>
+                </label>
 
                 <button class="login_form_button" type="submit">Login</button>
             </div>

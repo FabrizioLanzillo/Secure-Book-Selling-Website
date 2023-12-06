@@ -3,9 +3,10 @@
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
         <link rel="stylesheet" type="text/css" href="./../../css/header.css">
+        <title>Book Selling Header</title>
     </head>
     <body>
         <header>
@@ -86,7 +87,7 @@
                 else{
                     if($_SESSION['isAdmin'] == 0){
 ?>
-                        <a href="//<?php echo SERVER_ROOT. '/php/shoppingCart.php'?>">
+                        <a href="//<?php echo SERVER_ROOT. '/php/user/shoppingCart.php'?>">
                             <button class="button_header">
                                 Shopping Cart
                             </button>
