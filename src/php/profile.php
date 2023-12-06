@@ -5,10 +5,10 @@
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
         <!-- <link rel="stylesheet" type="text/css" href="./css/profile.css"> -->
-    </head>
+        <title>Book Selling - Profile</title></head>
 	<body>
 <?php
         include "./layout/header.php";

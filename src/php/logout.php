@@ -7,5 +7,3 @@
     unset($_SESSION['isAdmin']);
 
 	header("Location: ./../index.php");
-
-?>

@@ -8,4 +8,3 @@
     
     define("PROJECT_ROOT", $_SERVER["DOCUMENT_ROOT"]);
     define("SERVER_ROOT", $_SERVER["SERVER_NAME"].":".$listeningPort);
-?>
