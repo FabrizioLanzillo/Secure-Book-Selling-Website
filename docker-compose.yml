@@ -11,7 +11,7 @@ services:
         volumes:        
         - ./src:/var/www/html/        
         ports:         
-        - "8000:80"  
+        - "127.0.0.1:8000:80"
         networks:
             network:
                 ipv4_address: 10.5.0.2  
@@ -25,7 +25,7 @@ services:
             MYSQL_USER: SNH       
             MYSQL_PASSWORD: password   
         ports:      
-        - "9906:3306"
+        - "127.0.0.1:9906:3306"
         volumes:        
         # - ./mysql_server/mysql_volume:/var/lib/mysql/
         - ./mysql_server/my/custom:/etc/mysql/conf.d
@@ -35,7 +35,7 @@ services:
     phpmyadmin:         
         image: phpmyadmin/phpmyadmin    
         ports:      
-        - "8080:80"    
+        - "127.0.0.1:8080:80"
         restart: always    
         environment:      
             PMA_HOST: mysql-server    

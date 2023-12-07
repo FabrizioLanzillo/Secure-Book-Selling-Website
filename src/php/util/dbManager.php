@@ -2,7 +2,7 @@
 
     require_once __DIR__ . "/dbConfig.php";	
 
-    $SecureBookSellingDB = new DbManager($host, $user, $password, $dbName);
+    $SecureBookSellingDB = new DbManager($host, $user, $password, $dbName, $port);
 
     /**
      * Class that handle the connection with the mysql server and the queries
@@ -13,15 +13,17 @@
 		private $user;
 		private $password;
 		private $dbName;
+        private $port;
 
         /**
          * @throws Exception
          */
-        function __construct($host, $user, $password, $dbName){
+        function __construct($host, $user, $password, $dbName, $port){
 			$this->host = $host;
 			$this->user = $user;
 			$this->password = $password;
-			$this->dbName =	$dbName;	 					
+			$this->dbName =	$dbName;
+            $this->port =	$port;
 			$this->openConnection();
 		}
 
@@ -30,7 +32,7 @@
          */
         function openConnection(){
 			if(!$this->isOpened()){		
-				$this->mysqli_connection = new mysqli($this->host, $this->user, $this->password);
+				$this->mysqli_connection = new mysqli($this->host, $this->user, $this->password, $this->dbName, $this->port);
 				if($this->mysqli_connection->connect_error){
 					throw new Exception('Connection Error ('. $this->mysqli_connection->connect_errno.') '. $this->mysqli_connection->connect_error);
 				}
