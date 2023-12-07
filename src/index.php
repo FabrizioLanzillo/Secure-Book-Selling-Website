@@ -6,7 +6,7 @@
 
 	$resultQuery = getUsers();
 	
-	if($resultQuery != false){
+	if($resultQuery){
 		while($user = $resultQuery->fetch_assoc()){
 			foreach($user as $key => $value){
 				
@@ -18,15 +18,8 @@
 	else{
 		echo "<script>alert('Error retrieving users data');</script>";
 	}
-
-
-	// $username = 'insert';
-	// echo "username: ". $username . "<br>";
-	// $salt = bin2hex(random_bytes(32));
-	// echo "salt: ". $salt . "<br>";
-	// echo "hash: ".hash('sha256', $username . $salt);
-
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -36,6 +29,10 @@
 	<body>
 <?php
 		include "./php/layout/header.php";
+
+        if(isLogged()){
+            echo "<b>Ciao:".$_SESSION['name']."</b><br>";
+        }
 ?>
 	</body>
 </html>

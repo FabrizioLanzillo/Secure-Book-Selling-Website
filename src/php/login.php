@@ -34,7 +34,7 @@
 
     if(isLogged()){
         if($_SESSION['isAdmin'] == '0'){
-            header('Location: //'.SERVER_ROOT.'/php/user/homeUser.php');
+            header('Location: //'.SERVER_ROOT.'index.php');
             exit;
         }
         else{
@@ -54,7 +54,7 @@
     
         if($error === null){
             if($_SESSION['isAdmin'] == '0'){
-                header('Location: //'.SERVER_ROOT.'/php/user/homeUser.php');
+                header('Location: //'.SERVER_ROOT.'/index.php');
                 exit;
             }
             else{
@@ -62,9 +62,7 @@
                 exit;
             }
         }
-    
     }
-    
 ?>
 
 <!DOCTYPE html>
