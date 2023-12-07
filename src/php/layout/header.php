@@ -15,46 +15,15 @@
                 session_start();
             }
 ?>
-            <!-- This is the container for the first button and it can be -->
-            <!-- The Index page for not logged user -->
-            <!-- The User home page for logged user -->
-            <!-- The Admin home page for logged admin -->
-            <div class="container button-container">
-<?php
-                if(!isLogged()){
-               
-?>
-                    <a href="//<?php echo SERVER_ROOT. '/index.php'?>">
-<?php
-                }
-                else{
-                    if($_SESSION['isAdmin'] == 0){
-?>
-                        <a href="//<?php echo SERVER_ROOT. '/php/user/homeUser.php'?>">
-<?php
-                    }
-                    else{
-?>
-                        <a href="//<?php echo SERVER_ROOT. '/php/admin/homeAdmin.php'?>">
-<?php                        
-                    }
-                }
-?>      
-                        <button class="button_header">
-                            Home
-                        </button>
-                    </a>
-            </div>
-            <!-- This is the container for the second button and it can be -->
-            <!-- The Profile Button for every page, excluding the login and the signup page -->
+            <!-- This is the container for the first button and it can be: -->
+            <!-- The Profile button for every page of a logged user/admin-->
             <div class="container button-container">
 <?php
                 if(isLogged()){
-               
 ?>
                     <a href="//<?php echo SERVER_ROOT. '/php/profile.php'?>">
                         <button class="button_header">
-                            Profile
+                            Hello, <?php echo $_SESSION['name']?>
                         </button>
                     </a>
 <?php
@@ -62,30 +31,46 @@
 ?>
             </div>
 
-            <div class="container flex-container"></div>
-            <div class="container logo-container">
-                <h1>Book Selling</h1>
-            </div>
-            <div class="container flex-container"></div>
-            <!-- This is the container for the third button and it can be -->
-            <!-- The Signup Button for index page -->
-            <!-- The cart Button for every page of the user -->
-            <!-- The  Button for every page of the admin -->
+            <!-- This is the container for the second button and it can be: -->
+            <!-- The Orders Button for all the user pages -->
             <div class="container button-container">
 <?php
-                if(!isLogged()){
-                    if((strcmp($currentFile, SERVER_ROOT.'/index.php') == 0)){                     
+                if(isLogged() and $_SESSION['isAdmin'] == 0){
 ?>
-                        <a href="//<?php echo SERVER_ROOT. '/php/signup.php'?>">
+                        <a href="//<?php echo SERVER_ROOT. '/php/user/orders.php'?>">
                             <button class="button_header">
-                                Sign Up
+                                Orders
                             </button>
                         </a>
 <?php
-                    }
+                }
+?>
+            </div>
+            <div class="container flex-container"></div>
+            <div class="container logo-container">
+<?php
+                if(isLogged() and ($_SESSION['isAdmin'] == 1)){
+?>
+                    <a href="//<?php echo SERVER_ROOT. '/php/admin/homeAdmin.php'?>">
+<?php
                 }
                 else{
-                    if($_SESSION['isAdmin'] == 0){
+?>
+                    <a href="//<?php echo SERVER_ROOT. '/index.php'?>">
+<?php
+                }
+?>
+                        <img src="./../../img/book_selling_logo.png" alt="logo">
+                    </a>
+            </div>
+            <div class="container flex-container"></div>
+
+            <!-- This is the container for the third button and it can be: -->
+            <!-- The cart Button for every page of the user and for the anonymous user -->
+            <div class="container button-container">
+<?php
+                if((!isLogged() and (strcmp($currentFile, SERVER_ROOT.'/index.php') == 0)) or
+                    ((isLogged()) and ($_SESSION['isAdmin'] == 0))){
 ?>
                         <a href="//<?php echo SERVER_ROOT. '/php/user/shoppingCart.php'?>">
                             <button class="button_header">
@@ -93,28 +78,18 @@
                             </button>
                         </a>
 <?php
-                    }
-                    else{
-?>
-                        <a>
-                            <button class="button_header">
-                                TODEFINE
-                            </button>
-                        </a>
-<?php
-                    }
                 }
 ?>
             </div>
-            <!-- This is the container for the fourth button and it can be -->
-            <!-- The login Button for index page -->
+
+            <!-- This is the container for the fourth button and it can be: -->
+            <!-- The login Button for every page of an anonymous user, with the exception for the login page -->
             <!-- The signup Button for the login page -->
             <!-- The logout Button for every other page -->
             <div class="container button-container">
 <?php
                 if(!isLogged()){
-                    if((strcmp($currentFile, SERVER_ROOT.'/index.php') == 0) || 
-                        (strcmp($currentFile, SERVER_ROOT.'/php/signup.php') == 0)){                  
+                    if(strcmp($currentFile, SERVER_ROOT.'/php/login.php') != 0){
 ?>
                         <a href="//<?php echo SERVER_ROOT. '/php/login.php'?>">
                             <button class="button_header">
@@ -123,7 +98,7 @@
                         </a>
 <?php
                     }
-                    elseif((strcmp($currentFile, SERVER_ROOT.'/php/login.php') == 0)){
+                    else{
 ?>
                         <a href="//<?php echo SERVER_ROOT. '/php/signup.php'?>">
                             <button class="button_header">

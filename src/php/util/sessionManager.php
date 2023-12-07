@@ -1,5 +1,4 @@
 <?php
-
 	function setSession($userId, $username, $name, $isAdmin): void{
 		$_SESSION['userId'] = $userId;
         $_SESSION['username'] = $username;
