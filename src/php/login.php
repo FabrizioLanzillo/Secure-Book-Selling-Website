@@ -42,7 +42,7 @@
 
     if(isLogged()){
         if($_SESSION['isAdmin'] == '0'){
-            header('Location: //'.SERVER_ROOT.'index.php');
+            header('Location: //'.SERVER_ROOT.'/index.php');
             exit;
         }
         else{
