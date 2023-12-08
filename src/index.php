@@ -29,7 +29,6 @@
 	<body>
 <?php
 		include "./php/layout/header.php";
-
         if(isLogged()){
             echo "<b>Ciao:".$_SESSION['name']."</b><br>";
         }
