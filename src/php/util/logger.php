@@ -16,7 +16,7 @@
             $timestamp = date("Y-m-d H:i:s");
             $logFile = fopen($this->filePath, 'a');
 
-            fwrite($logFile, "+[$logType]($timestamp) = $message\n");
+            fwrite($logFile, "+[$logType] $timestamp = $message\n");
             fclose($logFile);
         }
     }

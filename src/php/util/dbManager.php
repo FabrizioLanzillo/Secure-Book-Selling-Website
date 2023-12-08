@@ -30,7 +30,7 @@
         /**
          * @throws Exception
          */
-        function openConnection(){
+        function openConnection(): void{
 			if(!$this->isOpened()){		
 				$this->mysqli_connection = new mysqli($this->host, $this->user, $this->password, $this->dbName, $this->port);
 				if($this->mysqli_connection->connect_error){

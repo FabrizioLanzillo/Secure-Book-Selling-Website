@@ -5,21 +5,29 @@
     require_once __DIR__ . "/util/dbInteraction.php";
 
     function login ($email, $password): ?string{
+        global $logger;
+        global $debug;
+
         if($email != null && $password != null){
 
-            $salt = getAccessInformation($email);
-
-            $resultQuery = authenticate($email, hash('sha256', $password . $salt));
+            $resultQuery = authenticate($email, $password);
             if($resultQuery !== false){
 
                 if($resultQuery !== null && extract($resultQuery) == 4){	
                     if(!isset ($_SESSION)){
                         session_start();
                     }
+
                     setSession($id, $username, $name, $isAdmin);
+                    $message = "Login of the user: ".$email.", Succeeded";
+                    $logger->writeLog('INFO', $message);
                     return null;
                 }
                 else{
+                    $file = $debug ? "[File: ".$_SERVER['SCRIPT_NAME']."] " : "";
+                    $errorCode = $debug ? "[Error: LoginFunc]" : "";
+                    $message = $file . $errorCode . " - Email and/or password of the user: ".$email.", are not valid";
+                    $logger->writeLog('ERROR', $message);
                     return 'Email and/or password are not valid, please try again';
                 }
             }
@@ -48,19 +56,24 @@
     if(isset($_POST['email']) && isset($_POST['password'])){
     	
         $email = $_POST['email'];
-    	$password = $_POST['password'];
-        
-        $error = login($email, $password);
-    
-        if($error === null){
-            if($_SESSION['isAdmin'] == '0'){
-                header('Location: //'.SERVER_ROOT.'/index.php');
-                exit;
+        $salt = getAccessInformation($email);
+        if($salt !== false) {
+
+            $password = hash('sha256', $_POST['password'] . $salt);
+            $error = login($email, $password);
+
+            if ($error === null) {
+                if ($_SESSION['isAdmin'] == '0') {
+                    header('Location: //' . SERVER_ROOT . '/index.php');
+                    exit;
+                } else {
+                    header('Location: //' . SERVER_ROOT . '/php/admin/homeAdmin.php');
+                    exit;
+                }
             }
-            else{
-                header('Location: //'.SERVER_ROOT.'/php/admin/homeAdmin.php');
-                exit;
-            }
+        }
+        else{
+            return "Error retrieving access information";
         }
     }
 ?>

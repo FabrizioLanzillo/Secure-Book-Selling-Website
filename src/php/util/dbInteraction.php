@@ -9,6 +9,7 @@
 
         global $SecureBookSellingDB;
         global $logger;
+        global $debug;
 
         try{
             $query = "SELECT username, name, surname, email, date_of_birth, isAdmin FROM user;";
@@ -19,7 +20,9 @@
 			return $result;
         }
         catch(Exception $e){
-            $message = "Error performing the query: ". $e->getCode() . $e->getMessage();
+            $file = $debug ? "[File: ".$_SERVER['SCRIPT_NAME']."] " : "";
+            $errorCode = $debug ? "[Error: MySQL - Code: ".$e->getCode()."]" : "";
+            $message = $file . $errorCode ."[File: ".$_SERVER['SCRIPT_NAME']."] [Error: MySQL - Code: ".$e->getCode()."] - Error performing the query to retrieve all the users";
             $logger->writeLog('ERROR', $message);
 			return false;
         }  
@@ -29,6 +32,7 @@
 
         global $SecureBookSellingDB;
         global $logger;
+        global $debug;
         
         try{
             $email=$SecureBookSellingDB->sqlInjectionFilter($email);
@@ -54,7 +58,10 @@
             return $result -> fetch_assoc();
         }
         catch(Exception $e){
-            $message = "Error performing the authentication: ". $e->getCode() . $e->getMessage();
+
+            $file = $debug ? "[File: ".$_SERVER['SCRIPT_NAME']."] " : "";
+            $errorCode = $debug ? "[Error: MySQL - Code: ".$e->getCode()."]" : "";
+            $message = $file . $errorCode ." - Error during the authentication of the user: ".$email;
             $logger->writeLog('ERROR', $message);
 			return false;
         } 
@@ -64,6 +71,7 @@
 
         global $SecureBookSellingDB;
         global $logger;
+        global $debug;
 
         try{
             $email=$SecureBookSellingDB->sqlInjectionFilter($email);
@@ -84,7 +92,9 @@
 		    return $result['salt'];
         }
         catch(Exception $e){
-            $message = "Error getting access information: ". $e->getCode() . $e->getMessage();
+            $file = $debug ? "[File: ".$_SERVER['SCRIPT_NAME']."] " : "";
+            $errorCode = $debug ? "[Error: MySQL - Code: ".$e->getCode()."]" : "";
+            $message = $file . $errorCode ."[File: ".$_SERVER['SCRIPT_NAME']."] [Error: MySQL - Code: ".$e->getCode()."] - Error getting the salt for the user: ".$email;
             $logger->writeLog('ERROR', $message);
 			return false;
         }  
