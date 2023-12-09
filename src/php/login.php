@@ -88,9 +88,10 @@
         <?php
             include "./layout/header.php";
         ?>
-        <h2>Login Form</h2>
-        <form name = "login" action="//<?php echo SERVER_ROOT. '/php/login.php'?>" method="POST">
-            <div class="container">
+
+        <div class="login_container">
+            <h2>Login</h2>
+            <form name = "login" action="//<?php echo SERVER_ROOT. '/php/login.php'?>" method="POST">
                 <label><b>Email</b>
                     <input class="login_form_input" type="text" placeholder="Enter Email" name="email" required>
                 </label>
@@ -100,8 +101,8 @@
                 </label>
 
                 <button class="login_form_button" type="submit">Login</button>
-            </div>
-        </form>
+            </form>
+        </div>
         <?php
             if ($error !== null){
                 echo '<script>
