@@ -2,8 +2,8 @@
     require_once __DIR__ . "/php/util/sessionManager.php";
     require_once __DIR__ . "/php/util/logger.php";
 
-    $logger = new Logger(__DIR__ .'/logs/web_server_logs.txt');
     $debug = true;
+    $logger = new Logger(__DIR__ .'/logs/web_server_logs.txt', $debug);
 
     $listeningPort = 8000;
     
