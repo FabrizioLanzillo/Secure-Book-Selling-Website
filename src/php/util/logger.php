@@ -23,13 +23,13 @@
                 $debugFile = $this->debug ? "[File: ".$file."] " : "";
             }
             if($errorCode != null){
-                $debugLogErrorCode = $this->debug ? "[Error: ".$errorCode."] -" : "";
+                $debugLogErrorCode = $this->debug ? "[Error: ".$errorCode."] - " : "";
             }
 
             $timestamp = date("Y-m-d H:i:s");
             $logFile = fopen($this->filePath, 'a');
 
-            fwrite($logFile, "+[$logType] $timestamp = $debugFile $debugLogErrorCode $message\n");
+            fwrite($logFile, "+[$logType] $timestamp = $debugFile$debugLogErrorCode$message\n");
             fclose($logFile);
         }
     }

@@ -1,1 +1,4 @@
 log
++[INFO] 2023-12-17 18:26:38 = Login of the user: f.lanzillo@studenti.unipi.it, Succeeded
++[INFO] 2023-12-17 18:29:18 = Login of the user: f.lanzillo@studenti.unipi.it, Succeeded
++[INFO] 2023-12-17 18:33:53 = Login of the user: f.lanzillo@studenti.unipi.it, Succeeded
