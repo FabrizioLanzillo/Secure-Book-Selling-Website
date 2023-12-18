@@ -1,22 +1,23 @@
 version: '3.8'    
 services:      
     web-server:        
-        container_name: web-server   
-        restart: always  
-        build:          
-            context: .         
-            dockerfile: WebServer_Dockerfile        
+        container_name: web-server
+        image: php:8.2-apache
+        restart: always
         depends_on:         
         - mysql-server       
         volumes:        
         - ./src:/var/www/html/
-        - ./ssl_conf/certificates:/etc/ssl/ssl_certificates
-        - ./ssl_conf/sites-available:/etc/apache2/sites-available
+        - ./apache_conf/ssl_conf/certificates:/etc/ssl/ssl_certificates
+        - ./apache_conf/ssl_conf/sites-available:/etc/apache2/sites-available
+        - ./apache_conf/config_system.sh:/config_system.sh
+        command: /bin/bash -c "/config_system.sh"
         ports:         
         - "127.0.0.1:8000:80"
+        - "127.0.0.1:8443:443"
         networks:
             network:
-                ipv4_address: 10.5.0.2  
+                ipv4_address: 10.5.0.2
     mysql-server:      
         container_name: mysql-server      
         image: mysql      
@@ -29,8 +30,8 @@ services:
         ports:      
         - "127.0.0.1:9906:3306"
         volumes:        
-        # - ./mysql_server/mysql_volume:/var/lib/mysql/
-        - ./mysql_server/my/custom:/etc/mysql/conf.d
+        # - ./mysql_conf/mysql_volume:/var/lib/mysql/
+        - ./mysql_conf/my/custom:/etc/mysql/conf.d
         networks:
             network:
                 ipv4_address: 10.5.0.5
