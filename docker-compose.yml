@@ -9,7 +9,9 @@ services:
         depends_on:         
         - mysql-server       
         volumes:        
-        - ./src:/var/www/html/        
+        - ./src:/var/www/html/
+        - ./ssl_conf/certificates:/etc/ssl/ssl_certificates
+        - ./ssl_conf/sites-available:/etc/apache2/sites-available
         ports:         
         - "127.0.0.1:8000:80"
         networks:
