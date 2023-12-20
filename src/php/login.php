@@ -1,6 +1,5 @@
 <?php
 
-	session_start();
     require_once __DIR__ . "./../config.php";
     require_once __DIR__ . "/util/dbInteraction.php";
 
@@ -13,21 +12,17 @@
             $resultQuery = authenticate($email, $password);
             if($resultQuery !== false){
 
-                if($resultQuery !== null && extract($resultQuery) == 4){	
-                    if(!isset ($_SESSION)){
-                        session_start();
-                    }
-
+                if($resultQuery !== null && extract($resultQuery) == 4){
+                    // creation of the session variables
                     setSession($id, $username, $name, $isAdmin);
-                    $message = "Login of the user: ".$email.", Succeeded";
-                    $logger->writeLog('INFO', $message);
+                    // generation of a new php session id in order to avoid the session fixation attack
+                    session_regenerate_id(true);
+
+                    $logger->writeLog('INFO', "Login of the user: ".$email.", Succeeded");
                     return null;
                 }
                 else{
-                    $file = $debug ? "[File: ".$_SERVER['SCRIPT_NAME']."] " : "";
-                    $errorCode = $debug ? "[Error: LoginFunc]" : "";
-                    $message = $file . $errorCode . " - Email and/or password of the user: ".$email.", are not valid";
-                    $logger->writeLog('ERROR', $message);
+                    $logger->writeLog('ERROR', "Email and/or password of the user: ".$email.", are not valid.", $_SERVER['SCRIPT_NAME'], "LoginFunc");
                     return 'Email and/or password are not valid, please try again';
                 }
             }
@@ -40,6 +35,7 @@
         }
     }
 
+    // check if the user is logged or not, if the user is logged, it can't access to the login page
     if(isLogged()){
         if($_SESSION['isAdmin'] == '0'){
             header('Location: //'.SERVER_ROOT.'/index.php');
@@ -53,12 +49,14 @@
 
     $error = null;
 
+    // this block is executed only after the submit of the POST form
     if(isset($_POST['email']) && isset($_POST['password'])){
     	
         $email = $_POST['email'];
+        // retrieve from the db the salt of the user
         $salt = getAccessInformation($email);
         if($salt !== false) {
-
+            // hash 256 enc of the password concatenated with the salt
             $password = hash('sha256', $_POST['password'] . $salt);
             $error = login($email, $password);
 

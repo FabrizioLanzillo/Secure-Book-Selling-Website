@@ -10,11 +10,6 @@
     </head>
     <body>
         <header>
-<?php	
-            if(!isset($_SESSION)){
-                session_start();
-            }
-?>
             <!-- This is the container for the first button and it can be: -->
             <!-- The Profile button for every page of a logged user/admin-->
             <div class="container button-container">

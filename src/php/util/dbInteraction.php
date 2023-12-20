@@ -20,10 +20,7 @@
 			return $result;
         }
         catch(Exception $e){
-            $file = $debug ? "[File: ".$_SERVER['SCRIPT_NAME']."] " : "";
-            $errorCode = $debug ? "[Error: MySQL - Code: ".$e->getCode()."]" : "";
-            $message = $file . $errorCode ."[File: ".$_SERVER['SCRIPT_NAME']."] [Error: MySQL - Code: ".$e->getCode()."] - Error performing the query to retrieve all the users";
-            $logger->writeLog('ERROR', $message);
+            $logger->writeLog('ERROR', "Error performing the query to retrieve all the users", $_SERVER['SCRIPT_NAME'], "MySQL - Code: ".$e->getCode());
 			return false;
         }  
     }
@@ -58,11 +55,7 @@
             return $result -> fetch_assoc();
         }
         catch(Exception $e){
-
-            $file = $debug ? "[File: ".$_SERVER['SCRIPT_NAME']."] " : "";
-            $errorCode = $debug ? "[Error: MySQL - Code: ".$e->getCode()."]" : "";
-            $message = $file . $errorCode ." - Error during the authentication of the user: ".$email;
-            $logger->writeLog('ERROR', $message);
+            $logger->writeLog('ERROR', "Error during the authentication of the user: ".$email, $_SERVER['SCRIPT_NAME'], "MySQL - Code: ".$e->getCode());
 			return false;
         } 
 	}	
@@ -92,10 +85,7 @@
 		    return $result['salt'];
         }
         catch(Exception $e){
-            $file = $debug ? "[File: ".$_SERVER['SCRIPT_NAME']."] " : "";
-            $errorCode = $debug ? "[Error: MySQL - Code: ".$e->getCode()."]" : "";
-            $message = $file . $errorCode ."[File: ".$_SERVER['SCRIPT_NAME']."] [Error: MySQL - Code: ".$e->getCode()."] - Error getting the salt for the user: ".$email;
-            $logger->writeLog('ERROR', $message);
+            $logger->writeLog('ERROR', "Error getting the salt for the user", $_SERVER['SCRIPT_NAME'], "MySQL - Code: ".$e->getCode());
 			return false;
         }  
     }
