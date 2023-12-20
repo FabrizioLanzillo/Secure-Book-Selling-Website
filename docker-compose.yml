@@ -1,49 +1,49 @@
-version: '3.8'    
-services:      
-    web-server:        
+version: '3.8'
+services:
+    web-server:
         container_name: web-server
         image: php:8.2-apache
         restart: always
-        depends_on:         
-        - mysql-server       
-        volumes:        
-        - ./src:/var/www/html/
-        - ./apache_conf/ssl_conf/certificates:/etc/ssl/ssl_certificates
-        - ./apache_conf/ssl_conf/sites-available:/etc/apache2/sites-available
-        - ./apache_conf/config_system.sh:/config_system.sh
+        depends_on:
+            - mysql-server
+        volumes:
+            - ./src:/var/www/html/
+            #        - ./apache_conf/ssl_conf/certificates:/etc/ssl/ssl_certificates
+            #        - ./apache_conf/ssl_conf/sites-available:/etc/apache2/sites-available
+            - ./apache_conf/config_system.sh:/config_system.sh
         command: /bin/bash -c "/config_system.sh"
-        ports:         
-        - "127.0.0.1:8000:80"
-        - "127.0.0.1:8443:443"
+        ports:
+            - "127.0.0.1:8000:80"
+        #        - "127.0.0.1:8443:443"
         networks:
             network:
                 ipv4_address: 10.5.0.2
-    mysql-server:      
-        container_name: mysql-server      
-        image: mysql      
-        restart: always      
-        environment:        
-            MYSQL_ROOT_PASSWORD: password        
-            MYSQL_DATABASE: secure_book_selling_db        
-            MYSQL_USER: SNH       
-            MYSQL_PASSWORD: password   
-        ports:      
-        - "127.0.0.1:9906:3306"
-        volumes:        
-        # - ./mysql_conf/mysql_volume:/var/lib/mysql/
-        - ./mysql_conf/my/custom:/etc/mysql/conf.d
+    mysql-server:
+        container_name: mysql-server
+        image: mysql
+        restart: always
+        environment:
+            MYSQL_ROOT_PASSWORD: password
+            MYSQL_DATABASE: secure_book_selling_db
+            MYSQL_USER: SNH
+            MYSQL_PASSWORD: password
+        ports:
+            - "127.0.0.1:9906:3306"
+        volumes:
+            # - ./mysql_conf/mysql_volume:/var/lib/mysql/
+            - ./mysql_conf/my/custom:/etc/mysql/conf.d
         networks:
             network:
                 ipv4_address: 10.5.0.5
-    phpmyadmin:         
-        image: phpmyadmin/phpmyadmin    
-        ports:      
-        - "127.0.0.1:8800:80"
-        restart: always    
-        environment:      
-            PMA_HOST: mysql-server    
-        depends_on:      
-        - mysql-server
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin
+        ports:
+            - "127.0.0.1:8800:80"
+        restart: always
+        environment:
+            PMA_HOST: mysql-server
+        depends_on:
+            - mysql-server
         networks:
             network:
                 ipv4_address: 10.5.0.4

@@ -1,6 +1,5 @@
 <?php
 
-	session_start();
     require_once __DIR__ . "./../config.php";
     require_once __DIR__ . "/util/dbInteraction.php";
 
@@ -13,10 +12,7 @@
             $resultQuery = authenticate($email, $password);
             if($resultQuery !== false){
 
-                if($resultQuery !== null && extract($resultQuery) == 4){	
-                    if(!isset ($_SESSION)){
-                        session_start();
-                    }
+                if($resultQuery !== null && extract($resultQuery) == 4){
                     // creation of the session variables
                     setSession($id, $username, $name, $isAdmin);
                     // generation of a new php session id in order to avoid the session fixation attack

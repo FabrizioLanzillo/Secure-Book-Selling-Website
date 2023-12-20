@@ -7,4 +7,5 @@
     unset($_SESSION['isAdmin']);
 
     session_regenerate_id(true);
+
 	header("Location: ./../index.php");

@@ -6,11 +6,11 @@
 		$_SESSION['isAdmin'] = $isAdmin;
 	}
 
-	function isLogged(){
+	function isLogged(): int{
 		if(isset($_SESSION['userId']) && isset($_SESSION['username'])){
-			return $_SESSION['userId'];
+			return 1;
 		}
 		else{
-			return false;
+			return 0;
 		}
 	}
