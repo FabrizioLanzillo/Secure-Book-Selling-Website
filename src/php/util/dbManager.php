@@ -47,16 +47,29 @@
         /**
          * @throws Exception
          */
-        function performQuery($querytext){
+        function performQuery($querytext, $parameters, $types){
 			if(!$this->isOpened()){
 				$this->openConnection();
 			}
 
-			$result = $this->mysqli_connection->query($querytext);
-			if ($result === false) {
-				throw new Exception('Error ('. $this->mysqli_connection->connect_errno.') '. $this->mysqli_connection->connect_error);
-			}
-	
+            $statement = $this->mysqli_connection->prepare($querytext);
+            if (!$statement) {
+                throw new Exception('Prepare failed ('. $this->mysqli_connection->connect_errno.') '. $this->mysqli_connection->connect_error);
+            }
+
+            if (!$statement->bind_param($types, ...$parameters)) {
+                throw new Exception('Bind failed ('. $statement->connect_errno.') '. $statement->connect_error);
+            }
+
+            if (!$statement->execute()) {
+                throw new Exception('Execute failed ('. $statement->connect_errno.') '. $statement->connect_error);
+            }
+
+            $result = $statement->get_result();
+            if (!$result) {
+                throw new Exception('Get Result failed ('. $statement->connect_errno.') '. $statement->connect_error);
+            }
+
 			return $result;
 		}
 
