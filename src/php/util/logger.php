@@ -13,23 +13,28 @@
         /**
          * Function that write INFO, ERROR or WARNING type of message
          * in the /src/logs/web_server_logs.txt file
+         * the message has more detail if the variable debug is enabled
          */
-        public function writeLog($logType, $message, $file = null, $errorCode = null): void{
+        public function writeLog($logType, $message, $file = null, $errorCode = null, $details = null): void{
 
             $debugFile = null;
-            $debugLogErrorCode = null;
+            $debugErrorCode = null;
+            $debugDetails = null;
 
             if($file != null){
-                $debugFile = $this->debug ? "[File: ".$file."] " : "";
+                $debugFile = $this->debug ? "[File: ".$file."] - " : "";
             }
             if($errorCode != null){
-                $debugLogErrorCode = $this->debug ? "[Error: ".$errorCode."] - " : "";
+                $debugErrorCode = $this->debug ? " - [Error: ".$errorCode."]" : "";
+            }
+            if($details != null){
+                $debugDetails = $this->debug ? " [Details: ".$details."]" : "";
             }
 
             $timestamp = date("Y-m-d H:i:s");
             $logFile = fopen($this->filePath, 'a');
 
-            fwrite($logFile, "+[$logType] $timestamp = $debugFile$debugLogErrorCode$message\n");
+            fwrite($logFile, "+[$logType] $timestamp = $debugFile$message$debugErrorCode$debugDetails\n");
             fclose($logFile);
         }
     }
