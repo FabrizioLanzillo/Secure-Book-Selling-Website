@@ -3,9 +3,11 @@
     require_once __DIR__ . "./../config.php";
     require_once __DIR__ . "/util/dbInteraction.php";
 
+    global $logger;
+
     function login ($email, $password): ?string{
+
         global $logger;
-        global $debug;
 
         if($email != null && $password != null){
 
@@ -17,8 +19,8 @@
                     setSession($id, $username, $name, $isAdmin);
                     // generation of a new php session id in order to avoid the session fixation attack
                     session_regenerate_id(true);
+                    $logger->writeLog('INFO', "SessionID changed in order to avoid Session Fixation attacks ");
 
-                    $logger->writeLog('INFO', "Login of the user: ".$email.", Succeeded");
                     return null;
                 }
                 else{
@@ -61,6 +63,8 @@
             $error = login($email, $password);
 
             if ($error === null) {
+                $logger->writeLog('INFO', "Login of the user: ".$email.", Succeeded");
+
                 if ($_SESSION['isAdmin'] == '0') {
                     header('Location: //' . SERVER_ROOT . '/index.php');
                     exit;
