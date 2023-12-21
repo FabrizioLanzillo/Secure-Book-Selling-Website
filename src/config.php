@@ -4,8 +4,6 @@
 
     $debug = true;
     $logger = new Logger(__DIR__ .'/logs/web_server_logs.txt', $debug);
-
-    $listeningPort = 8000;
     
     define("PROJECT_ROOT", $_SERVER["DOCUMENT_ROOT"]);
-    define("SERVER_ROOT", $_SERVER["SERVER_NAME"].":".$listeningPort);
+    define("SERVER_ROOT", $_SERVER["SERVER_NAME"]);
