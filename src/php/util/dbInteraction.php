@@ -98,3 +98,49 @@
 			return false;
         }  
     }
+
+    function getBooks(){
+
+        global $SecureBookSellingDB;
+        global $logger;
+        global $debug;
+
+        try{
+            $query = "SELECT id, title, author, price FROM book;";
+
+            $result = $SecureBookSellingDB->performQuery($query);
+			
+            $SecureBookSellingDB->closeConnection();
+			return $result;
+        }
+        catch(Exception $e){
+            $file = $debug ? "[File: ".$_SERVER['SCRIPT_NAME']."] " : "";
+            $errorCode = $debug ? "[Error: MySQL - Code: ".$e->getCode()."]" : "";
+            $message = $file . $errorCode ."[File: ".$_SERVER['SCRIPT_NAME']."] [Error: MySQL - Code: ".$e->getCode()."] - Error performing the query to retrieve all the users";
+            $logger->writeLog('ERROR', $message);
+			return false;
+        }  
+    }
+
+    function getBookDetails($bookId){
+
+        global $SecureBookSellingDB;
+        global $logger;
+        global $debug;
+
+        try{
+            $query = "SELECT title, author, publisher, price, category, stocks_number FROM book WHERE id = ?;";
+
+            $result = $SecureBookSellingDB->performQuery($query, [$bookId], "s");
+			
+            $SecureBookSellingDB->closeConnection();
+			return $result;
+        }
+        catch(Exception $e){
+            $file = $debug ? "[File: ".$_SERVER['SCRIPT_NAME']."] " : "";
+            $errorCode = $debug ? "[Error: MySQL - Code: ".$e->getCode()."]" : "";
+            $message = $file . $errorCode ."[File: ".$_SERVER['SCRIPT_NAME']."] [Error: MySQL - Code: ".$e->getCode()."] - Error performing the query to retrieve all the users";
+            $logger->writeLog('ERROR', $message);
+			return false;
+        }  
+    }
