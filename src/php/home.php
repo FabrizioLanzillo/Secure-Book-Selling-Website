@@ -2,7 +2,13 @@
 require_once __DIR__ . "./../config.php";
 require_once __DIR__ . "/util/dbInteraction.php";
 
-$resultQuery = getBooks();
+// Check if the search form is submitted
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["search_query"])) {
+    $searchQuery = $_POST["search_query"];
+    $resultQuery = searchBooks($searchQuery);
+} else {
+    $resultQuery = getBooks();
+}
 ?>
 
 <!DOCTYPE html>
@@ -20,11 +26,11 @@ $resultQuery = getBooks();
     ?>
 
     <div class="search_container">
-        <form name = "search" action="//<?php echo SERVER_ROOT. '/php/home.php'?>" method="POST">
+        <form name="search" action="//<?php echo SERVER_ROOT . '/php/home.php'?>" method="POST">
             <label>
-                <input class="search_form_input" type="text" placeholder="Enter book name" required>
+                <input class="search_form_input" type="text" name="search_query" placeholder="Enter book name" required>
             </label>
-            <button class="search_form_button" type="submit">Search</button>
+            <button class="search_button" type="submit">Search</button>
         </form>
     </div>
 
