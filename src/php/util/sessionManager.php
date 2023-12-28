@@ -6,11 +6,18 @@
 		$_SESSION['isAdmin'] = $isAdmin;
 	}
 
-	function isLogged(){
+    function unsetSession(): void{
+        unset($_SESSION['userId']);
+        unset($_SESSION['username']);
+        unset($_SESSION['name']);
+        unset($_SESSION['isAdmin']);
+    }
+
+	function isLogged(): int{
 		if(isset($_SESSION['userId']) && isset($_SESSION['username'])){
-			return $_SESSION['userId'];
+			return 1;
 		}
 		else{
-			return false;
+			return 0;
 		}
 	}

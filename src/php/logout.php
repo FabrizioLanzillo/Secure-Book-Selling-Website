@@ -1,10 +1,12 @@
 <?php
-	session_start();
+    require_once __DIR__ . "./../config.php";
 
-	unset($_SESSION['userId']);
-	unset($_SESSION['username']);
-	unset($_SESSION['name']);
-    unset($_SESSION['isAdmin']);
+    global $logger;
+
+    unsetSession();
 
     session_regenerate_id(true);
+    $logger->writeLog('INFO', "SessionID changed in order to avoid Session Fixation attacks ");
+    $logger->writeLog('INFO', "Logout of the user succeeded");
+
 	header("Location: ./../index.php");

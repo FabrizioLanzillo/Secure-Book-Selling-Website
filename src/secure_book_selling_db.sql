@@ -52,7 +52,19 @@ CREATE TABLE IF NOT EXISTS `book` (
 INSERT INTO `book` (`id`, `title`, `author`, `publisher`, `price`, `category`, `stocks_number`) VALUES
 (1, 'Harry Potter e la PIetra Filosofale', 'J.K. Rowling', 'Salani Editore', 21.99, 'Fantasy', 4),
 (2, 'Harry Potter ed il Principe Mezzosangue', 'J.K. Rowling', 'Salani Editore', 24.99, 'Fantasy', 8),
-(3, 'One Piece vol.102', 'Eiichiro Oda', 'Star Comics', 4.25, 'Manga', 10);
+(3, 'One Piece vol.102', 'Eiichiro Oda', 'Star Comics', 4.25, 'Manga', 10),
+(4, 'To Kill a Mockingbird', 'Harper Lee', 'Harper Perennial', 14.99, 'Fiction', 15),
+(5, '1984', 'George Orwell', 'Penguin Books', 12.50, 'Dystopian', 20),
+(6, 'The Great Gatsby', 'F. Scott Fitzgerald', 'Scribner', 17.99, 'Classic', 12),
+(7, 'The Catcher in the Rye', 'J.D. Salinger', 'Little, Brown and Company', 16.25, 'Fiction', 18),
+(8, 'The Hobbit', 'J.R.R. Tolkien', 'Houghton Mifflin', 19.99, 'Fantasy', 25),
+(9, 'To the Lighthouse', 'Virginia Woolf', 'Harvest Books', 13.75, 'Modernist', 8),
+(10, 'Brave New World', 'Aldous Huxley', 'Harper Perennial Modern Classics', 15.50, 'Dystopian', 22),
+(11, 'Pride and Prejudice', 'Jane Austen', 'Penguin Classics', 11.99, 'Romance', 30),
+(12, 'The Lord of the Rings', 'J.R.R. Tolkien', 'Houghton Mifflin', 29.99, 'Fantasy', 14),
+(13, 'The Odyssey', 'Homer', 'Penguin Classics', 10.75, 'Epic Poetry', 16),
+(14, 'The Road', 'Cormac McCarthy', 'Vintage Books', 18.25, 'Post-apocalyptic', 10),
+(15, 'The Alchemist', 'Paulo Coelho', 'HarperOne', 14.50, 'Fiction', 12);
 
 -- --------------------------------------------------------
 
@@ -65,8 +77,8 @@ CREATE TABLE IF NOT EXISTS `orders` (
   `id_user` smallint NOT NULL,
   `id_book` smallint NOT NULL,
   `amount` float NOT NULL,
-  `status` smallint NOT NULL,
-  `payment_method` smallint NOT NULL,
+  `status` varchar(50) NOT NULL,
+  `payment_method` varchar(50) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `orders_book_id_fk` (`id_book`),
   KEY `orders_user_id_fk` (`id_user`)
@@ -77,10 +89,10 @@ CREATE TABLE IF NOT EXISTS `orders` (
 --
 
 INSERT INTO `orders` (`id`, `id_user`, `id_book`, `amount`, `status`, `payment_method`) VALUES
-(1, 1, 2, 24.99, 2, 0),
-(2, 1, 3, 3.95, 1, 0),
-(3, 2, 3, 4.25, 2, 0),
-(4, 3, 1, 19.99, 0, 0);
+(1, 1, 2, 24.99, 'Delivered', 'Card'),
+(2, 1, 3, 3.95, 'In transit', 'Card'),
+(3, 2, 3, 4.25, 'Delivered', 'Card'),
+(4, 3, 1, 19.99, 'Info received', 'Card');
 
 -- --------------------------------------------------------
 
