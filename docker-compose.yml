@@ -8,8 +8,8 @@ services:
             - mysql-server
         volumes:
             - ./src:/var/www/html/
-            #        - ./apache_conf/ssl_conf/certificates:/etc/ssl/ssl_certificates
-            #        - ./apache_conf/ssl_conf/sites-available:/etc/apache2/sites-available
+            - ./apache_conf/ssl_conf/certificates/bookselling:/etc/ssl/ssl_certificates
+            - ./apache_conf/ssl_conf/sites-available:/etc/apache2/sites-available
             - ./apache_conf/config_system.sh:/config_system.sh
         command: /bin/bash -c "/config_system.sh"
         ports:         

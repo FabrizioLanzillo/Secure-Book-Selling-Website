@@ -117,10 +117,12 @@
 			return $result;
         }
         catch(Exception $e){
-            $file = $debug ? "[File: ".$_SERVER['SCRIPT_NAME']."] " : "";
-            $errorCode = $debug ? "[Error: MySQL - Code: ".$e->getCode()."]" : "";
-            $message = $file . $errorCode ."[File: ".$_SERVER['SCRIPT_NAME']."] [Error: MySQL - Code: ".$e->getCode()."] - Error performing the query to retrieve all the books";
-            $logger->writeLog('ERROR', $message);
+            $logger->writeLog(  "ERROR",
+                                "Error performing the query to retrieve all the books",
+                                $_SERVER['SCRIPT_NAME'],
+                                "MySQL - Code: ".$e->getCode(),
+                                $e->getMessage());
+            $SecureBookSellingDB->closeConnection();
 			return false;
         }  
     }
@@ -146,11 +148,13 @@
 			return $result;
         }
         catch(Exception $e){
-            $file = $debug ? "[File: ".$_SERVER['SCRIPT_NAME']."] " : "";
-            $errorCode = $debug ? "[Error: MySQL - Code: ".$e->getCode()."]" : "";
-            $message = $file . $errorCode ."[File: ".$_SERVER['SCRIPT_NAME']."] [Error: MySQL - Code: ".$e->getCode()."] - Error performing the query to retrieve a searched book";
-            $logger->writeLog('ERROR', $message);
-			return false;
+            $logger->writeLog(  "ERROR",
+                                "Error performing the query to retrieve a searched book",
+                                $_SERVER['SCRIPT_NAME'],
+                                "MySQL - Code: ".$e->getCode(),
+                                $e->getMessage());
+            $SecureBookSellingDB->closeConnection();
+            return false;
         }  
     }
 
@@ -173,11 +177,13 @@
 			return $result;
         }
         catch(Exception $e){
-            $file = $debug ? "[File: ".$_SERVER['SCRIPT_NAME']."] " : "";
-            $errorCode = $debug ? "[Error: MySQL - Code: ".$e->getCode()."]" : "";
-            $message = $file . $errorCode ."[File: ".$_SERVER['SCRIPT_NAME']."] [Error: MySQL - Code: ".$e->getCode()."] - Error performing the query to retrieve all the details of the book";
-            $logger->writeLog('ERROR', $message);
-			return false;
+            $logger->writeLog(  "ERROR",
+                                "Error performing the query to retrieve all the details of the book",
+                                $_SERVER['SCRIPT_NAME'],
+                                "MySQL - Code: ".$e->getCode(),
+                                $e->getMessage());
+            $SecureBookSellingDB->closeConnection();
+            return false;
         }
     }
 
@@ -202,10 +208,12 @@
 			return $result;
         }
         catch(Exception $e){
-            $file = $debug ? "[File: ".$_SERVER['SCRIPT_NAME']."] " : "";
-            $errorCode = $debug ? "[Error: MySQL - Code: ".$e->getCode()."]" : "";
-            $message = $file . $errorCode ."[File: ".$_SERVER['SCRIPT_NAME']."] [Error: MySQL - Code: ".$e->getCode()."] - Error performing the query to retrieve all the orders of a user";
-            $logger->writeLog('ERROR', $message);
-			return false;
+            $logger->writeLog(  "ERROR",
+                                "Error performing the query to retrieve all the orders of a user",
+                                $_SERVER['SCRIPT_NAME'],
+                                "MySQL - Code: ".$e->getCode(),
+                                $e->getMessage());
+            $SecureBookSellingDB->closeConnection();
+            return false;
         }
     }
