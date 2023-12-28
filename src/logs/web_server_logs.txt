@@ -1,2 +1,1 @@
-log
-+[ERROR] 2023-12-28 16:06:40 = [File: /index.php] [Error: MySQL - Code: 1146] - Error performing the query to retrieve all the users
+WEB-SERVER LOGS:
