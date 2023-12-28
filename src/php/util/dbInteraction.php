@@ -192,7 +192,9 @@
         global $debug;
 
         try{
-            $query = "SELECT id, id_book, amount, status, payment_method FROM orders WHERE id_user = ?;";
+            $query = "SELECT o.id, b.title, o.amount, o.status, o.payment_method
+            FROM orders o INNER JOIN book b ON o.id_book = b.id
+            WHERE id_user = ?;";
 
             $result = $SecureBookSellingDB->performQuery($query, [$userId], "s");
 			

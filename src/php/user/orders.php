@@ -1,24 +1,27 @@
 <?php
-require_once __DIR__ . "./../config.php";
-require_once __DIR__ . "/util/dbInteraction.php";
+require_once __DIR__ . "./../../config.php";
+require_once __DIR__ . "./../util/dbInteraction.php";
 
 if (isLogged()) {
+    $logged = true;
     $performedOrders = getUserOrders($_SESSION['userId']);
-} 
+} else {
+    $logged = false;
+}
     
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="stylesheet" type="text/css" href="../css/orders.css">
+    <link rel="stylesheet" type="text/css" href="./../../css/orders.css">
     <title>Book Selling - Orders</title>
 </head>
 <body>
 
     <?php
-    include "./layout/header.php";
-    if (isLogged()) {
+    include "./../layout/header.php";
+    if ($logged) {
         echo "<b>Ciao:" . $_SESSION['name'] . "</b><br>";
 
         // Display orders table
@@ -26,14 +29,14 @@ if (isLogged()) {
         if ($performedOrders) {
             echo '<table>';
             echo '<tr>';
-            echo '<th>ID</th>';
+            echo '<th>Book</th>';
             echo '<th>Amount</th>';
             echo '<th>Status</th>';
             echo '<th>Payment Method</th>';
             echo '</tr>';
             while ($order = $performedOrders->fetch_assoc()) {
                 echo '<tr>';
-                echo '<td>' . $order['id_book'] . '</td>';
+                echo '<td>' . $order['title'] . '</td>';
                 echo '<td>' . $order['amount'] . '</td>';
                 echo '<td>' . $order['status'] . '</td>';
                 echo '<td>' . $order['payment_method'] . '</td>';
