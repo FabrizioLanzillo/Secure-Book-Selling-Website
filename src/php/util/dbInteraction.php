@@ -98,3 +98,114 @@
 			return false;
         }  
     }
+
+    /** This function retrieves all the books in the database
+     * @return values|false
+     */
+    function getBooks(){
+
+        global $SecureBookSellingDB;
+        global $logger;
+        global $debug;
+
+        try{
+            $query = "SELECT id, title, author, price FROM book;";
+
+            $result = $SecureBookSellingDB->performQuery($query);
+			
+            $SecureBookSellingDB->closeConnection();
+			return $result;
+        }
+        catch(Exception $e){
+            $file = $debug ? "[File: ".$_SERVER['SCRIPT_NAME']."] " : "";
+            $errorCode = $debug ? "[Error: MySQL - Code: ".$e->getCode()."]" : "";
+            $message = $file . $errorCode ."[File: ".$_SERVER['SCRIPT_NAME']."] [Error: MySQL - Code: ".$e->getCode()."] - Error performing the query to retrieve all the books";
+            $logger->writeLog('ERROR', $message);
+			return false;
+        }  
+    }
+
+    /** This function retrieves the books that have a title like the one submitted
+     * @param $title string, is the partial or full title of the book 
+     * @return values|false
+     */
+    function searchBooks($title){
+
+        global $SecureBookSellingDB;
+        global $logger;
+        global $debug;
+
+        try{
+            $query = "SELECT id, title, author, price FROM book WHERE title LIKE ?;";
+
+            $titleParam = "%$title%";
+
+            $result = $SecureBookSellingDB->performQuery($query, [$titleParam], "s");
+			
+            $SecureBookSellingDB->closeConnection();
+			return $result;
+        }
+        catch(Exception $e){
+            $file = $debug ? "[File: ".$_SERVER['SCRIPT_NAME']."] " : "";
+            $errorCode = $debug ? "[Error: MySQL - Code: ".$e->getCode()."]" : "";
+            $message = $file . $errorCode ."[File: ".$_SERVER['SCRIPT_NAME']."] [Error: MySQL - Code: ".$e->getCode()."] - Error performing the query to retrieve a searched book";
+            $logger->writeLog('ERROR', $message);
+			return false;
+        }  
+    }
+
+    /** This function retrieves all the information about a book
+     * @param $bookId smallint, is the id of the book
+     * @return values|false
+     */
+    function getBookDetails($bookId){
+
+        global $SecureBookSellingDB;
+        global $logger;
+        global $debug;
+
+        try{
+            $query = "SELECT id, title, author, publisher, price, category, stocks_number FROM book WHERE id = ?;";
+
+            $result = $SecureBookSellingDB->performQuery($query, [$bookId], "s");
+			
+            $SecureBookSellingDB->closeConnection();
+			return $result;
+        }
+        catch(Exception $e){
+            $file = $debug ? "[File: ".$_SERVER['SCRIPT_NAME']."] " : "";
+            $errorCode = $debug ? "[Error: MySQL - Code: ".$e->getCode()."]" : "";
+            $message = $file . $errorCode ."[File: ".$_SERVER['SCRIPT_NAME']."] [Error: MySQL - Code: ".$e->getCode()."] - Error performing the query to retrieve all the details of the book";
+            $logger->writeLog('ERROR', $message);
+			return false;
+        }
+    }
+
+    /** This function retrieves all the orders of a user
+     * @param $userId smallint, is the id of the user
+     * @return values|false
+     */
+    function getUserOrders($userId){
+
+        global $SecureBookSellingDB;
+        global $logger;
+        global $debug;
+
+        try{
+            $query = "SELECT o.id, b.title, o.amount, o.status, o.payment_method
+            FROM orders o INNER JOIN book b ON o.id_book = b.id
+            WHERE id_user = ?;";
+
+            $result = $SecureBookSellingDB->performQuery($query, [$userId], "s");
+			
+            $SecureBookSellingDB->closeConnection();
+			return $result;
+        }
+        catch(Exception $e){
+            $file = $debug ? "[File: ".$_SERVER['SCRIPT_NAME']."] " : "";
+            $errorCode = $debug ? "[Error: MySQL - Code: ".$e->getCode()."]" : "";
+            $message = $file . $errorCode ."[File: ".$_SERVER['SCRIPT_NAME']."] [Error: MySQL - Code: ".$e->getCode()."] - Error performing the query to retrieve all the orders of a user";
+            $logger->writeLog('ERROR', $message);
+			return false;
+        }
+    }

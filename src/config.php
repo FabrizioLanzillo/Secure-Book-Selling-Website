@@ -5,8 +5,6 @@
     $debug = true;
     $logger = new Logger(__DIR__ .'/logs/web_server_logs.txt', $debug);
 
-    $listeningPort = 8000;
-
     // This sets the lifetime of the session cookie to 10800 seconds (3 hour).
     $lifetime = 10800;
     // This sets the path on the server where the cookie will be available.
@@ -30,4 +28,5 @@
     );
 
     define("PROJECT_ROOT", $_SERVER["DOCUMENT_ROOT"]);
-    define("SERVER_ROOT", $_SERVER["SERVER_NAME"].":".$listeningPort);
+    define("SERVER_ROOT", $_SERVER["SERVER_NAME"]);
+

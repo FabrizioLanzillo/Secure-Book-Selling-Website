@@ -12,9 +12,8 @@ services:
             #        - ./apache_conf/ssl_conf/sites-available:/etc/apache2/sites-available
             - ./apache_conf/config_system.sh:/config_system.sh
         command: /bin/bash -c "/config_system.sh"
-        ports:
-            - "127.0.0.1:8000:80"
-        #        - "127.0.0.1:8443:443"
+        ports:         
+        - "127.0.0.1:443:443"
         networks:
             network:
                 ipv4_address: 10.5.0.2
