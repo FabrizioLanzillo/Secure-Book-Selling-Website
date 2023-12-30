@@ -22,9 +22,7 @@ $resultQuery = getBookDetails($bookId);
 
     <div class="book_detail">
         <?php
-        require_once __DIR__ . "./../config.php";
-        require_once __DIR__ . "/util/dbInteraction.php";
-
+    
         if ($resultQuery) {
             $bookDetails = $resultQuery->fetch_assoc();
             if ($bookDetails) {

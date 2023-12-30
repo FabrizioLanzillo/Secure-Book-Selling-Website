@@ -59,7 +59,7 @@ class DbManager{
      * @return mixed
      * @throws Exception
      */
-    function performQuery(string $querytext, array $parameters = [], string $types = ""){
+    function performQuery(string $crudOperation, string $querytext, array $parameters = [], string $types = ""){
         if (!$this->isOpened()) {
             $this->openConnection();
         }
@@ -75,18 +75,23 @@ class DbManager{
                                                             $statement->connect_error);
         }
 
-        if (!$statement->execute()) {
+        $executionReturn = $statement->execute();
+        if (!$executionReturn) {
             throw new Exception('Execute failed (' . $statement->connect_errno . ') ' .
                                                                 $statement->connect_error);
         }
 
-        $result = $statement->get_result();
-        if (!$result) {
-            throw new Exception('Get Result failed (' . $statement->connect_errno . ') ' .
-                                                                    $statement->connect_error);
+        if($crudOperation == "SELECT"){
+            $result = $statement->get_result();
+            if (!$result) {
+                throw new Exception('Get Result failed (' . $statement->connect_errno . ') ' .
+                    $statement->connect_error);
+            }
+            return $result;
         }
-
-        return $result;
+        else{
+            return $executionReturn;
+        }
     }
 
     /** Method that close the connection with the db
