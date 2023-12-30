@@ -15,17 +15,15 @@
     $httponly = true;
 
     // This function starts a new session or resumes an existing one
-    session_start();
-
-    setcookie(
-        session_name(),
-        session_id(),
-        time() + $lifetime,
-        $path,
-        $_SERVER['HTTP_HOST'],
-        $secure,
-        $httponly
-    );
+    session_set_cookie_params([
+        'lifetime' => $lifetime,
+        'path' => $path,
+        'domain' => $_SERVER['HTTP_HOST'],
+        'secure' => $secure,
+        'httponly' => $httponly
+     ]);
+     
+     session_start();
 
     define("PROJECT_ROOT", $_SERVER["DOCUMENT_ROOT"]);
     define("SERVER_ROOT", $_SERVER["SERVER_NAME"]);

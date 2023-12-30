@@ -1,1 +1,14 @@
 WEB-SERVER LOGS:
++[ERROR] 2023-12-29 16:43:40 = [File: /php/login.php] - Email and/or password of the user: g.marrucci4@studenti.unipi.it, are not valid. - [Error: LoginFunc]
++[ERROR] 2023-12-30 12:19:49 = [File: /php/signup.php] - Error performing the query to insert new user - [Error: MySQL - Code: 1292] [Details: Incorrect date value: '' for column 'date_of_birth' at row 1]
++[ERROR] 2023-12-30 12:20:56 = [File: /php/signup.php] - Error performing the query to insert new user - [Error: MySQL - Code: 0] [Details: Get Result failed () ]
++[ERROR] 2023-12-30 15:34:52 = [File: /php/signup.php] - Error performing the query to insert new user - [Error: MySQL - Code: 0] [Details: Get Result failed () ]
++[ERROR] 2023-12-30 15:37:32 = [File: /php/signup.php] - Error performing the query to insert new user - [Error: MySQL - Code: 0] [Details: Get Result failed () ]
++[INFO] 2023-12-30 16:06:16 = Signup of the user: , Succeeded
++[INFO] 2023-12-30 16:07:16 = Signup of the user: asde, Succeeded
++[INFO] 2023-12-30 16:10:29 = Signup of the user: asdf, Succeeded
++[INFO] 2023-12-30 16:10:36 = SessionID changed in order to avoid Session Fixation attacks 
++[INFO] 2023-12-30 16:10:36 = Login of the user: asdf, Succeeded
++[INFO] 2023-12-30 16:10:49 = SessionID changed in order to avoid Session Fixation attacks 
++[INFO] 2023-12-30 16:10:49 = Logout of the user succeeded
++[ERROR] 2023-12-30 16:11:06 = [File: /php/signup.php] - Error performing the query to insert new user - [Error: MySQL - Code: 1062] [Details: Duplicate entry 'asd' for key 'user.user_unique_email']
