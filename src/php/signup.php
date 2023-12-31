@@ -1,57 +1,55 @@
 <?php
-    require_once __DIR__ . "./../config.php";
-    require_once __DIR__ . "/util/dbInteraction.php";
+require_once __DIR__ . "./../config.php";
+require_once __DIR__ . "/util/dbInteraction.php";
 
-    function checkFormData() {
-        $requiredFields = ['name', 'surname', 'email', 'username', 'password', 'repeat_password', 'birthdate'];
-        foreach ($requiredFields as $field) {
-            if (!isset($_POST[$field]) || empty($_POST[$field])) {
-                return false;
+global $logger;
+global $errorHandler;
+
+function checkFormData(): bool{
+    $requiredFields = ['name', 'surname', 'email', 'username', 'password', 'repeat_password', 'birthdate'];
+    foreach ($requiredFields as $field) {
+        if (!isset($_POST[$field]) || empty($_POST[$field])) {
+            return false;
+        }
+    }
+    return true;
+}
+
+// this block is executed only after the submit of the POST form
+if(checkFormData()){
+    try{
+        if ($_POST['password'] !== $_POST['repeat_password']){
+            throw new Exception('The inserted passwords don\'t match');
+        }
+        else{
+            $salt = bin2hex(random_bytes(32));
+            $hashedPassword = hash('sha256', $_POST['password'] . $salt);
+
+            $userData = array(
+                $_POST['username'],
+                $hashedPassword,
+                $salt,
+                $_POST['email'],
+                $_POST['name'],
+                $_POST['surname'],
+                $_POST['birthdate'],
+                0,
+            );
+
+            $result = insertUser($userData);
+            if($result){
+                $logger->writeLog('INFO', "Signup of the user: ".$userData[4].", Succeeded");
+                header('Location: //' . SERVER_ROOT . '/php/login.php');
+                exit;
+            }
+            else{
+                throw new Exception('Couldn\'t register the user');
             }
         }
-    
-        return true;
+    } catch (Exception $e) {
+        $errorHandler->handleException($e);
     }
-
-    // TABLE: `user` (`id`, `username`, `password`, `salt`, `email`, `name`, `surname`, `date_of_birth`, `isAdmin`)
-    // We need an unique email and username
-    function signup($Data){
-
-        global $logger;
-
-        $insertUser = insertUser($Data);
-        if($insertUser == false) {
-            return "Couldn't register the user";
-        }
-    }
-
-    $error = null;
-
-    // this block is executed only after the submit of the POST form
-    if(checkFormData()){
-        if ($_POST['password'] !== $_POST['repeat_password'])
-                $error = "The inserted passwords don't match";
-        if($error === null) {
-                $salt = bin2hex(random_bytes(32));
-                $hashedPassword = hash('sha256', $_POST['password'] . $salt);
-                $userData = array(
-                    "username" => $_POST['username'],
-                    "password" => $hashedPassword,
-                    "salt" => $salt,
-                    "email" => $_POST['email'],
-                    "name" => $_POST['name'],
-                    "surname" => $_POST['surname'],
-                    "birthdate" => $_POST['birthdate'],
-                );
-                //var_dump($userData);
-                $error = signup($userData);
-                if ($error === null) {
-                        $logger->writeLog('INFO', "Signup of the user: ".$userData['email'].", Succeeded");
-                        header('Location: //' . SERVER_ROOT . '/php/login.php');
-                        exit;
-                }
-        }
-    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -99,13 +97,5 @@
                 <button class="signup_form_button" type="submit">Sign up</button>
             </form>
         </div>
-        <?php
-            if ($error !== null){
-                echo '<script>
-                         alert("'.$error.'");
-                        //   window.location.assign("//'.SERVER_ROOT.'/php/signup.php")
-                      </script>';    
-            }
-        ?>
     </body>
 </html>

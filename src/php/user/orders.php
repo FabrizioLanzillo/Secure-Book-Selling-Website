@@ -3,53 +3,63 @@ require_once __DIR__ . "./../../config.php";
 require_once __DIR__ . "./../util/dbInteraction.php";
 
 if (isLogged()) {
-    $logged = true;
     $performedOrders = getUserOrders($_SESSION['userId']);
-} else {
-    $logged = false;
 }
 
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <link rel="stylesheet" type="text/css" href="./../../css/orders.css">
-    <title>Book Selling - Orders</title>
-</head>
-<body>
+    <head>
+        <link rel="stylesheet" type="text/css" href="./../../css/orders.css">
+        <title>Book Selling - Orders</title>
+    </head>
+    <body>
 
-<?php
-include "./../layout/header.php";
-if ($logged) {
-    echo "<b>Ciao:" . $_SESSION['name'] . "</b><br>";
+    <?php
+    include "./../layout/header.php";
 
-    // Display orders table
-    echo '<h1>Your Orders</h1>';
-    if ($performedOrders) {
-        echo '<table>';
-        echo '<tr>';
-        echo '<th>Book</th>';
-        echo '<th>Amount</th>';
-        echo '<th>Status</th>';
-        echo '<th>Payment Method</th>';
-        echo '</tr>';
-        while ($order = $performedOrders->fetch_assoc()) {
-            echo '<tr>';
-            echo '<td>' . $order['title'] . '</td>';
-            echo '<td>' . $order['amount'] . '</td>';
-            echo '<td>' . $order['status'] . '</td>';
-            echo '<td>' . $order['payment_method'] . '</td>';
-            echo '</tr>';
+    if (isLogged()) {
+    ?>
+        <h1>Your Orders</h1>
+        <?php
+        if ($performedOrders) {
+        ?>
+
+            <table>
+                <tr>
+                    <th>Book</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Payment Method</th>
+                </tr>
+
+            <?php
+            while ($order = $performedOrders->fetch_assoc()) {
+            ?>
+                <tr>
+                    <td><?php echo $order['title']; ?></td>
+                    <td><?php echo $order['amount']; ?></td>
+                    <td><?php echo $order['status']; ?></td>
+                    <td><?php echo $order['payment_method']; ?></td>
+                </tr>
+            <?php
+            }
+            ?>
+            </table>
+        <?php
         }
-        echo '</table>';
-    } else {
-        echo '<p>No orders found.</p>';
+        else {
+        ?>
+            <p>No orders found.</p>
+    <?php
+        }
     }
-} else {
-    echo "<div class='error-message'>No user logged</div>";
-}
-?>
-
-</body>
+    else {
+    ?>
+        <div class='error-message'>No user logged</div>
+    <?php
+    }
+    ?>
+    </body>
 </html>
