@@ -51,7 +51,7 @@
                 }
                 else{
 ?>
-                    <a href="//<?php echo SERVER_ROOT. '/index.php'?>">
+                    <a href="//<?php echo SERVER_ROOT. '/'?>">
 <?php
                 }
 ?>

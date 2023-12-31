@@ -16,13 +16,42 @@
         try{
             $query = "SELECT username, name, surname, email, date_of_birth, isAdmin FROM user;";
 
-            $result = $SecureBookSellingDB->performQuery($query);
+            $result = $SecureBookSellingDB->performQuery("SELECT", $query);
             $SecureBookSellingDB->closeConnection();
 			return $result;
         }
         catch(Exception $e){
             $logger->writeLog(  'ERROR',
                                 "Error performing the query to retrieve all the users",
+                                $_SERVER['SCRIPT_NAME'],
+                                "MySQL - Code: ".$e->getCode(),
+                                $e->getMessage());
+            $SecureBookSellingDB->closeConnection();
+			return false;
+        }
+    }
+
+    /** This function inserts an user into the database
+     * @param $userInfromation Array, are the following params in order: username, password, salt, email, name, surname, date_of_birth
+     * @return true|false
+     */
+    function insertUser($userInformation){
+
+        global $SecureBookSellingDB;
+        global $logger;
+
+        try{
+            $query = "INSERT INTO user (username, password, salt, email, name, surname, date_of_birth, isAdmin) 
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
+
+            $result = $SecureBookSellingDB->performQuery("INSERT", $query, $userInformation, "sssssssi");
+            $SecureBookSellingDB->closeConnection();
+			return true;
+            
+        }
+        catch(Exception $e){
+            $logger->writeLog(  'ERROR',
+                                "Error performing the query to insert new user",
                                 $_SERVER['SCRIPT_NAME'],
                                 "MySQL - Code: ".$e->getCode(),
                                 $e->getMessage());
@@ -47,7 +76,7 @@
                         FROM user
                         WHERE email = ? AND password = ?;";
             
-            $result = $SecureBookSellingDB->performQuery($query, [$email, $password], "ss");
+            $result = $SecureBookSellingDB->performQuery("SELECT", $query, [$email, $password], "ss");
             if ($result->num_rows != 1) {
                 return null;
             }
@@ -80,7 +109,7 @@
                         FROM user
                         WHERE email = ?;";
 
-            $result = $SecureBookSellingDB->performQuery($query, [$email], "s");
+            $result = $SecureBookSellingDB->performQuery("SELECT", $query, [$email], "s");
             if ($result->num_rows != 1) {
                 return null;
             }
@@ -111,7 +140,7 @@
         try{
             $query = "SELECT id, title, author, price FROM book;";
 
-            $result = $SecureBookSellingDB->performQuery($query);
+            $result = $SecureBookSellingDB->performQuery("SELECT", $query);
 			
             $SecureBookSellingDB->closeConnection();
 			return $result;
@@ -142,7 +171,7 @@
 
             $titleParam = "%$title%";
 
-            $result = $SecureBookSellingDB->performQuery($query, [$titleParam], "s");
+            $result = $SecureBookSellingDB->performQuery("SELECT", $query, [$titleParam], "s");
 			
             $SecureBookSellingDB->closeConnection();
 			return $result;
@@ -171,7 +200,7 @@
         try{
             $query = "SELECT id, title, author, publisher, price, category, stocks_number FROM book WHERE id = ?;";
 
-            $result = $SecureBookSellingDB->performQuery($query, [$bookId], "s");
+            $result = $SecureBookSellingDB->performQuery("SELECT", $query, [$bookId], "s");
 			
             $SecureBookSellingDB->closeConnection();
 			return $result;
@@ -202,7 +231,7 @@
             FROM orders o INNER JOIN book b ON o.id_book = b.id
             WHERE id_user = ?;";
 
-            $result = $SecureBookSellingDB->performQuery($query, [$userId], "s");
+            $result = $SecureBookSellingDB->performQuery("SELECT", $query, [$userId], "s");
 			
             $SecureBookSellingDB->closeConnection();
 			return $result;
