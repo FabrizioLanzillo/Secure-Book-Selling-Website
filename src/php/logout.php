@@ -9,4 +9,4 @@
     $logger->writeLog('INFO', "SessionID changed in order to avoid Session Fixation attacks ");
     $logger->writeLog('INFO', "Logout of the user succeeded");
 
-	header("Location: ./../index.php");
+	header("Location: ./../");

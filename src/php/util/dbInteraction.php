@@ -40,20 +40,11 @@
         global $SecureBookSellingDB;
         global $logger;
 
-        $username = $userInformation['username'];
-        $password = $userInformation['password'];
-        $salt = $userInformation['salt'];
-        $email = $userInformation['email'];
-        $name = $userInformation['name'];
-        $surname = $userInformation['surname'];
-        $date_of_birth = $userInformation['birthdate'];
-        $isAdmin = 0;
-
         try{
-            $query = "INSERT INTO user (username, password, salt, email, name, surname, date_of_birth, isAdmin) VALUES
-            ('$username', '$password', '$salt' , '$email', '$name', '$surname', '$date_of_birth', '$isAdmin');";
+            $query = "INSERT INTO user (username, password, salt, email, name, surname, date_of_birth, isAdmin) 
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
 
-            $result = $SecureBookSellingDB->performQuery("INSERT", $query);
+            $result = $SecureBookSellingDB->performQuery("INSERT", $query, $userInformation, "sssssssi");
             $SecureBookSellingDB->closeConnection();
 			return true;
             

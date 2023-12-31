@@ -1,9 +1,11 @@
 <?php
     require_once __DIR__ . "/php/util/sessionManager.php";
-    require_once __DIR__ . "/php/util/logger.php";
+    require_once __DIR__ . "/php/util/Logger.php";
+    require_once __DIR__ . "/php/util/ErrorHandler.php";
 
     $debug = true;
     $logger = new Logger(__DIR__ .'/logs/web_server_logs.txt', $debug);
+    $errorHandler = ErrorHandler::getInstance();
 
     // This sets the lifetime of the session cookie to 10800 seconds (3 hour).
     $lifetime = 10800;
