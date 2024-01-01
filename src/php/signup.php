@@ -56,6 +56,7 @@ if(checkFormData()){
 <html lang="en">
     <head>
         <link rel="stylesheet" type="text/css" href="../css/signup.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/zxcvbn/4.4.2/zxcvbn.js"></script>
         <title>Book Selling - Sign Up</title>
     </head>
     <body>
@@ -83,8 +84,11 @@ if(checkFormData()){
                 </label>
 
                 <label><b>Password</b>
-                    <input class="signup_form_input" type="password" placeholder="Password" name="password" required>
+                    <input class="signup_form_input" type="password" placeholder="Password" name="password" id="password" required oninput="checkPasswordStrength()">
+                    <meter max="4" id="password-strength-meter"></meter>
+                    <p id="password-strength-text"></p>
                 </label>
+
 
                 <label><b>Repeat password</b>
                     <input class="signup_form_input" type="password" placeholder="Repeat Password" name="repeat_password" required>
@@ -97,5 +101,38 @@ if(checkFormData()){
                 <button class="signup_form_button" type="submit">Sign up</button>
             </form>
         </div>
+        <script>
+            function checkPasswordStrength() {
+                var password = document.getElementById("password").value;
+                var result = zxcvbn(password);
+
+                // Update password strength meter
+                document.getElementById("password-strength-meter").value = result.score;
+
+                // Update password strength text
+                var text = "";
+                switch (result.score) {
+                    case 0:
+                        text = "Very Weak";
+                        break;
+                    case 1:
+                        text = "Weak";
+                        break;
+                    case 2:
+                        text = "Moderate";
+                        break;
+                    case 3:
+                        text = "Strong";
+                        break;
+                    case 4:
+                        text = "Very Strong";
+                        break;
+                    default:
+                        break;
+                }
+                document.getElementById("password-strength-text").innerHTML = text;
+            }
+        </script>
+
     </body>
 </html>

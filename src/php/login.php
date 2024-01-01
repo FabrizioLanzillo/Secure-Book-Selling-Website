@@ -13,7 +13,7 @@ function login($email, $password): ?bool{
 
     try {
         if ($email != null && $password != null) {
-
+            
             $resultQuery = authenticate($email, $password);
             if ($resultQuery !== false) {
 
