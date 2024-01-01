@@ -1,6 +1,6 @@
 <?php
 	$host = "mysql-server";
     $port = '3306';
-	$user = "SNH";
-	$password = "password";
-	$dbName = "secure_book_selling_db";
+    $user = getenv("MYSQL_USER");
+    $password = getenv("MYSQL_PASSWORD");
+    $dbName = getenv("MYSQL_DATABASE");
