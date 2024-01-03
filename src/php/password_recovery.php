@@ -6,7 +6,7 @@ global $logger;
 global $errorHandler;
 
 function checkFormData(): bool{
-    $requiredFields = ['name', 'surname', 'email', 'username', 'password', 'repeat_password', 'birthdate'];
+    $requiredFields = ['email', 'otp', 'password', 'repeat_password'];
     foreach ($requiredFields as $field) {
         if (!isset($_POST[$field]) || empty($_POST[$field])) {
             return false;
@@ -18,33 +18,39 @@ function checkFormData(): bool{
 // this block is executed only after the submit of the POST form
 if(checkFormData()){
     try{
-        if ($_POST['password'] !== $_POST['repeat_password']){
+        if ($_POST['password'] !== $_POST['repeat_password']) {
             throw new Exception('The inserted passwords don\'t match');
         }
-        else{
+        else {
+            $resultQuery = getSecurityInfo($_POST['email']);
+            $otpData = $resultQuery->fetch_assoc();
+
+            if($otpData['otp'] === null OR $otpData['lastOtp'] === null)
+                throw new Exception('An error occured in your request');
+
+            $lastOtpTime = strtotime($otpData['lastOtp']);
+            $currentTime = time();
+
+            if(($currentTime-$lastOtpTime) > 300 OR $otpData['otp'] !== $_POST['otp'])
+                throw new Exception('The Otp is incorrect and/or expired');
+
             $salt = bin2hex(random_bytes(32));
             $hashedPassword = hash('sha256', $_POST['password'] . $salt);
 
             $userData = array(
-                $_POST['username'],
                 $hashedPassword,
                 $salt,
                 $_POST['email'],
-                $_POST['name'],
-                $_POST['surname'],
-                $_POST['birthdate'],
-                0,
-                0,
             );
 
-            $result = insertUser($userData);
+            $result = updateUserPassword($userData);
             if($result){
-                $logger->writeLog('INFO', "Signup of the user: ".$userData[4].", Succeeded");
+                $logger->writeLog('INFO', "The password update of the user: ".$userData[2].", Succeeded");
                 header('Location: //' . SERVER_ROOT . '/php/login.php');
                 exit;
             }
             else{
-                throw new Exception('Couldn\'t register the user');
+                throw new Exception('Couldn\'t update the user\'s password');
             }
         }
     } catch (Exception $e) {
@@ -56,50 +62,39 @@ if(checkFormData()){
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <link rel="stylesheet" type="text/css" href="../css/signup.css">
+        <link rel="stylesheet" type="text/css" href="../css/password_recovery.css">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/zxcvbn/4.4.2/zxcvbn.js"></script>
-        <title>Book Selling - Sign Up</title>
+        <title>Book Selling - Password recovery</title>
     </head>
     <body>
         <?php
             include "./layout/header.php";
         ?>
 
-        <div class="signup_container">
-            <h2>Sign up</h2>
-            <form name = "sign_up" action="//<?php echo SERVER_ROOT. '/php/signup.php'?>" method="POST">
-                <label><b>Name</b>
-                    <input class="signup_form_input" type="text" placeholder="Name" name="name" required>
-                </label>
-
-                <label><b>Surname</b>
-                    <input class="signup_form_input" type="text" placeholder="Surname" name="surname" required>
-                </label>
-
+        <div class="pwd_recovery_container">
+            <h2>Password recovery</h2>
+            <form name = "pwd_recovery" action="//<?php echo SERVER_ROOT. '/php/password_recovery.php'?>" method="POST">
                 <label><b>Email</b>
-                    <input class="signup_form_input" type="text" placeholder="Email" name="email" required>
+                    <input class="pwd_recovery_input" type="email" placeholder="Email" name="email" required>
                 </label>
 
-                <label><b>Username</b>
-                    <input class="signup_form_input" type="text" placeholder="Username" name="username" required>
+                <label><b>Otp</b>
+                    <input class="pwd_recovery_input" type="text" placeholder="Otp code" name="otp" required>
                 </label>
 
                 <label><b>Password</b>
-                    <input class="signup_form_input" type="password" placeholder="Password" name="password" id="password" required oninput="checkPasswordStrength()">
+                    <input class="pwd_recovery_input" type="password" placeholder="Password" name="password" id="password" required oninput="checkPasswordStrength()">
                     <meter max="4" id="password-strength-meter"></meter>
                     <p id="password-strength-text"></p>
                 </label>
 
                 <label><b>Repeat password</b>
-                    <input class="signup_form_input" type="password" placeholder="Repeat Password" name="repeat_password" required>
+                    <input class="pwd_recovery_input" type="password" placeholder="Repeat Password" name="repeat_password" required>
                 </label>
 
-                <label><b>Date of birth</b>
-                    <input class="signup_form_input" type="date" name="birthdate" required>
-                </label>
-
-                <button class="signup_form_button" type="submit">Sign up</button>
+                <button class="pwd_recovery_button" type="submit">Change password</button>
             </form>
+            <a href="//<?php echo SERVER_ROOT. '/php/otp_request.php'?>" class="no-otp" >I don't have an Otp</a>
         </div>
         <script>
             function checkPasswordStrength() {

@@ -1,1 +1,34 @@
 WEB-SERVER LOGS:
+
++[INFO] 2024-01-03 09:40:16 = New Otp for the user: marruccigiovanni91@gmail.com has been created successfully
++[INFO] 2024-01-03 09:43:45 = New Otp for the user: marruccigiovanni91@gmail.com has been created successfully
++[INFO] 2024-01-03 10:02:08 = New Otp for the user: g.marrucci4@studenti.unipi.it has been created successfully
++[INFO] 2024-01-03 10:02:42 = New Otp for the user: g.marrucci4@studenti.unipi.it has been created successfully
++[INFO] 2024-01-03 10:03:13 = New Otp for the user: marruccigiovanni91@gmail.com has been created successfully
++[INFO] 2024-01-03 10:04:16 = New Otp for the user: g.marrucci4@studenti.unipi.it has been created successfully
++[INFO] 2024-01-03 10:08:14 = New Otp for the user: g.marrucci4@studenti.unipi.it has been created successfully
++[INFO] 2024-01-03 10:09:09 = New Otp for the user: f.lanzillo@studenti.unipi.it has been created successfully
++[INFO] 2024-01-03 10:09:43 = New Otp for the user: t.bertini4@studenti.unipi.it has been created successfully
++[INFO] 2024-01-03 10:12:09 = New Otp for the user: marruccigiovanni91@gmail.com has been created successfully
++[INFO] 2024-01-03 10:23:04 = New Otp for the user: marruccigiovanni91@gmail.com has been created successfully
++[INFO] 2024-01-03 10:24:05 = New Otp for the user: marruccigiovanni91@gmail.com has been created successfully
++[INFO] 2024-01-03 13:28:09 = New Otp for the user: marruccigiovanni91@gmail.com has been created successfully
++[INFO] 2024-01-03 13:31:28 = SessionID changed in order to avoid Session Fixation attacks 
++[INFO] 2024-01-03 13:31:28 = Login of the user: marruccigiovanni91@gmail.com, Succeeded
++[INFO] 2024-01-03 13:31:33 = SessionID changed in order to avoid Session Fixation attacks 
++[INFO] 2024-01-03 13:31:33 = Logout of the user succeeded
++[ERROR] 2024-01-03 14:08:13 = [File: /php/login.php] - Email and/or password of the user: g.marrucci4@studenti.unipi.it, are not valid. - [Error: LoginFunc]
++[ERROR] 2024-01-03 14:08:23 = [File: /php/login.php] - Email and/or password of the user: g.marrucci4@studenti.unipi.it, are not valid. - [Error: LoginFunc]
++[ERROR] 2024-01-03 14:08:29 = [File: /php/login.php] - Email and/or password of the user: g.marrucci4@studenti.unipi.it, are not valid. - [Error: LoginFunc]
++[ERROR] 2024-01-03 16:32:12 = [File: /php/login.php] - Email and/or password of the user: g.marrucci4@studenti.unipi.it. The user failed login 1 times. - [Error: LoginFunc]
++[ERROR] 2024-01-03 16:32:18 = [File: /php/login.php] - Email and/or password of the user: g.marrucci4@studenti.unipi.it. The user failed login 2 times. - [Error: LoginFunc]
++[ERROR] 2024-01-03 16:32:22 = [File: /php/login.php] - Email and/or password of the user: g.marrucci4@studenti.unipi.it. The user failed login 3 times. - [Error: LoginFunc]
++[ERROR] 2024-01-03 16:32:28 = [File: /php/login.php] - Email and/or password of the user: g.marrucci4@studenti.unipi.it. The user failed login 4 times. - [Error: LoginFunc]
++[ERROR] 2024-01-03 16:32:33 = [File: /php/login.php] - Email and/or password of the user: g.marrucci4@studenti.unipi.it. The user failed login 5 times. - [Error: LoginFunc]
++[INFO] 2024-01-03 16:35:28 = SessionID changed in order to avoid Session Fixation attacks
++[INFO] 2024-01-03 16:35:28 = Login of the user: g.marrucci4@studenti.unipi.it, Succeeded
++[INFO] 2024-01-03 16:35:31 = SessionID changed in order to avoid Session Fixation attacks 
++[INFO] 2024-01-03 16:35:31 = Logout of the user succeeded
++[ERROR] 2024-01-03 16:35:38 = [File: /php/login.php] - Email and/or password of the user: g.marrucci4@studenti.unipi.it. The user failed login 1 times. - [Error: LoginFunc]
++[INFO] 2024-01-03 16:35:47 = SessionID changed in order to avoid Session Fixation attacks
++[INFO] 2024-01-03 16:35:47 = Login of the user: g.marrucci4@studenti.unipi.it, Succeeded

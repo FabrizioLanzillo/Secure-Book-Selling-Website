@@ -41,7 +41,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["search_query"])) {
                 while ($book = $resultQuery->fetch_assoc()) {
                     // Output each book as a card in the grid
             ?>
-                    <div class="book_card">'
+                    <div class="book_card">
                         <img src="/img/book.png" alt="Book Image"> <br>
                         <?php
                         foreach ($book as $key => $value) {
