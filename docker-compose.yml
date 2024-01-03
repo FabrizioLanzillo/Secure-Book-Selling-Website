@@ -6,6 +6,8 @@ services:
         restart: always
         depends_on:
             - mysql-server
+        env_file:
+            - .env
         volumes:
             - ./src:/var/www/html/
             - ./apache_conf/ssl_conf/certificates/bookselling:/etc/ssl/ssl_certificates
@@ -22,10 +24,10 @@ services:
         image: mysql
         restart: always
         environment:
-            MYSQL_ROOT_PASSWORD: password
-            MYSQL_DATABASE: secure_book_selling_db
-            MYSQL_USER: SNH
-            MYSQL_PASSWORD: password
+            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+            MYSQL_DATABASE: ${MYSQL_DATABASE}
+            MYSQL_USER: ${MYSQL_USER}
+            MYSQL_PASSWORD: ${MYSQL_PASSWORD}
         ports:
             - "127.0.0.1:9906:3306"
         volumes:
