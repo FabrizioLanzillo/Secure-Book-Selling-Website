@@ -68,8 +68,7 @@ if (isset($_POST['email']) && isset($_POST['password'])) {
     try {
         $email = $_POST['email'];
         // retrieve from the db the salt of the user
-        $resultQuery = getAccessInformation($email);
-        $result = $resultQuery->fetch_assoc();
+        $result = getAccessInformation($email);
 
         if ($result['blockedUntil'] !== null){
             $blockedTime = strtotime($result['blockedUntil']);

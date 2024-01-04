@@ -1,2 +1,1 @@
 WEB-SERVER LOGS:
-+[INFO] 2024-01-04 16:18:14 = New Otp for the user: f.lanzillo@studenti.unipi.it has been created successfully

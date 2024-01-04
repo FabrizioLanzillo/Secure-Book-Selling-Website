@@ -6,6 +6,8 @@ services:
         restart: always
         depends_on:
             - mysql-server
+        env_file:
+            - .env
         volumes:
             # base directory of the website
             - ./src:/var/www/html/
@@ -25,10 +27,10 @@ services:
         image: mysql
         restart: always
         environment:
-            MYSQL_ROOT_PASSWORD: password
-            MYSQL_DATABASE: secure_book_selling_db
-            MYSQL_USER: SNH
-            MYSQL_PASSWORD: password
+            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+            MYSQL_DATABASE: ${MYSQL_DATABASE}
+            MYSQL_USER: ${MYSQL_USER}
+            MYSQL_PASSWORD: ${MYSQL_PASSWORD}
         ports:
             - "127.0.0.1:9906:3306"
         volumes:

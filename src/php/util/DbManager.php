@@ -1,13 +1,10 @@
 <?php
-require_once __DIR__ . "/dbConfig.php";
-global $host, $user, $password, $dbName, $port;
-
-$SecureBookSellingDB = new DbManager($host, $user, $password, $dbName, $port);
 
 /**
  * Class that handle the connection with the mysql server and the queries
  */
 class DbManager{
+    private static $instance = null;
     private $mysqli_connection = null;
     private $host;
     private $user;
@@ -18,13 +15,21 @@ class DbManager{
     /** Constructor that imports the db configuration and open the connection
      * @throws Exception
      */
-    function __construct($host, $user, $password, $dbName, $port){
-        $this->host = $host;
-        $this->user = $user;
-        $this->password = $password;
-        $this->dbName = $dbName;
-        $this->port = $port;
+    private function __construct(){
+        $this->host = "mysql-server";
+        $this->user = getenv("MYSQL_USER");;
+        $this->password = getenv("MYSQL_PASSWORD");
+        $this->dbName = getenv("MYSQL_DATABASE");
+        $this->port = '3306';
         $this->openConnection();
+    }
+
+    public static function getInstance(): ?DbManager{
+        if (self::$instance == null)
+        {
+            self::$instance = new DbManager();
+        }
+        return self::$instance;
     }
 
     /** Method that create a connection with the db
@@ -67,18 +72,18 @@ class DbManager{
         $statement = $this->mysqli_connection->prepare($querytext);
         if (!$statement) {
             throw new Exception('Prepare failed (' . $this->mysqli_connection->connect_errno . ') ' .
-                                                                $this->mysqli_connection->connect_error);
+                $this->mysqli_connection->connect_error);
         }
 
         if (!empty($parameters) && !$statement->bind_param($types, ...$parameters)) {
             throw new Exception('Bind failed (' . $statement->connect_errno . ') ' .
-                                                            $statement->connect_error);
+                $statement->connect_error);
         }
 
         $executionReturn = $statement->execute();
         if (!$executionReturn) {
             throw new Exception('Execute failed (' . $statement->connect_errno . ') ' .
-                                                                $statement->connect_error);
+                $statement->connect_error);
         }
 
         if($crudOperation == "SELECT"){

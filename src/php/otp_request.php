@@ -1,10 +1,10 @@
 <?php
     require_once __DIR__ . "./../config.php";
     require_once __DIR__ . "/util/dbInteraction.php";
-    require_once __DIR__ . "/util/emailSender.php";
 
     global $logger;
     global $errorHandler;
+    global $emailSender;
     $sentOtpEmail = false;
 
     // this block is executed only after submit of the POST form
@@ -21,8 +21,12 @@
                 if(($currentTime-$lastOtpTime) > 300) {     //5 minutes
                     $newOtp = $salt = bin2hex(random_bytes(32));
                     if (setOtp($email, $newOtp)) {
-                        if (sendOtpEmail($email, $newOtp) !== false){
-                            $logger->writeLog('INFO', "New Otp for the user: " . $email . " has been created successfully");
+                        if ($emailSender->sendEmail($email,
+                                                    "BookSelling - Your OTP code",
+                                                    "OTP Request",
+                                                    "This is the otp: $newOtp requested.", "It will last only for 5 minutes.") !== false){
+
+                            $logger->writeLog('INFO', "2FA check for the user: " . $email . " OTP has been created successfully");
                             $sentOtpEmail = true;
                         } else {
                             throw new Exception("Couldn't send an email to the specified email");

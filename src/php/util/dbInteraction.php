@@ -1,7 +1,8 @@
 <?php	
 
-    require_once __DIR__ . "/dbManager.php";	
+    require_once __DIR__ . "/DbManager.php";
     require_once __DIR__ . "./../../config.php";
+    $SecureBookSellingDB = DbManager::getInstance();
 
     /************************************************ User Function ***************************************************/
 
@@ -98,7 +99,7 @@
      * @param $email string, is the email to select the user
      * @return string|false
      */
-    function getAccessInformation($email){
+    function getAccessInformation(string $email){
 
         global $SecureBookSellingDB;
         global $logger;
@@ -114,7 +115,7 @@
                 return null;
             }
             $SecureBookSellingDB -> closeConnection();
-			return $result;
+			return $result ->fetch_assoc();
         }
         catch(Exception $e){
             $logger->writeLog(  'ERROR',
