@@ -7,11 +7,14 @@ services:
         depends_on:
             - mysql-server
         volumes:
+            # base directory of the website
             - ./src:/var/www/html/
+            # https config files
             - ./apache_conf/ssl_conf/certificates/bookselling:/etc/ssl/ssl_certificates
             - ./apache_conf/ssl_conf/sites-available:/etc/apache2/sites-available
-            - ./apache_conf/config_system.sh:/config_system.sh
-        command: /bin/bash -c "/config_system.sh"
+            # web server configuration files
+            - ./apache_conf/config_system.sh:/home/bookselling/config_system.sh
+        command: /bin/bash -c "/home/bookselling/config_system.sh"
         ports:         
         - "127.0.0.1:443:443"
         networks:

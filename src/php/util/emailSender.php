@@ -3,7 +3,7 @@
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-require '/var/www/html/vendor/autoload.php';
+require '/home/bookselling/composer/vendor/autoload.php';
 
 function sendOtpEmail($email, $otp) {
     $mail = new PHPMailer(true);

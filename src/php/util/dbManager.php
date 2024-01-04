@@ -1,6 +1,6 @@
 <?php
-
 require_once __DIR__ . "/dbConfig.php";
+global $host, $user, $password, $dbName, $port;
 
 $SecureBookSellingDB = new DbManager($host, $user, $password, $dbName, $port);
 
