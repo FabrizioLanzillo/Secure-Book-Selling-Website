@@ -6,7 +6,7 @@
 
 
     $debug = true;
-    $logger = new Logger(__DIR__ .'/logs/web_server_logs.txt', $debug);
+    $logger = Logger::getInstance(__DIR__ .'/logs/web_server_logs.txt', $debug);
     $errorHandler = ErrorHandler::getInstance();
     $emailSender = EmailSender::getInstance();
 
