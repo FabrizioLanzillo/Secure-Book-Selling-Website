@@ -90,6 +90,7 @@ if (isset($_POST['email']) && isset($_POST['password'])) {
 <html lang="en">
     <head>
         <link rel="stylesheet" type="text/css" href="../css/login.css">
+        <!--<link rel="stylesheet" type="text/css" href="../css/bootstrap/bootstrap.min.css">-->
         <title>Book Selling</title>
     </head>
     <body>
