@@ -18,8 +18,8 @@
             $currentTime = time();
 
             if ($lastOtpTime !== false) {
-                if(($currentTime-$lastOtpTime) > 300) {     //5 minutes
-                    $newOtp = $salt = bin2hex(random_bytes(32));
+                if(($currentTime-$lastOtpTime) > 90) {     // 1 minute and 30 sec
+                    $newOtp = generateRandomString(8);
                     if (setOtp($email, $newOtp)) {
                         if ($emailSender->sendEmail($email,
                                                     "BookSelling - Your OTP code",
@@ -48,27 +48,40 @@
 <html lang="en">
     <head>
         <link rel="stylesheet" type="text/css" href="../css/otp_request.css">
-        <title>Book Selling - Otp Request</title></head>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <title>Book Selling - Otp Request</title>
+    </head>
 	<body>
         <?php
                 include "./layout/header.php";
         ?>
-        
+
         <div class="otp_request_container">
             <h2>Insert your email to receive an Otp</h2>
-            <form name = "otp_request" action="//<?php echo SERVER_ROOT. '/php/otp_request.php'?>" method="POST">
-                <label><b>Email</b>
-                    <input class="email_input" type="email" placeholder="Email" name="email" required>
-                </label>
+            <label><b>Email</b>
+                <input class="email_input" type="email" placeholder="Email" name="email" required>
+            </label>
 
-                <button class="gen_otp_button" type="submit">Generate otp</button>
-                <?php if ($sentOtpEmail): ?>
-                    <div class="message">
-                        <p>Your OTP has been sent successfully!</p>
-                    </div>
-                <?php endif; ?>
-            </form>
+            <button class="gen_otp_button" type="button">Generate OTP</button>
+<!--        <div class="message"></div>-->
             <a href="//<?php echo SERVER_ROOT. '/php/password_recovery.php'?>" class="already-otp" >I already have an Otp</a>
         </div>
+        <script>
+            $(document).ready(function(){
+                $(".gen_otp_button").click(function(){
+                    const email = $(".email_input").val();
+                    $(".gen_otp_button").prop("disabled", true).css("background-color", "grey").css("pointer-events", "none");
+                    $.post( "//<?php echo SERVER_ROOT. '/php/otp_request.php'?>",
+                            {email: email},
+                            function(){
+                                // $(".message").html("<p>Your OTP has been sent successfully!</p>");
+                                alert("Your OTP has been sent successfully!");
+                                $(".email_input").val("");
+                                $(".gen_otp_button").prop("disabled", true).css("background-color", "#1982cf").css("pointer-events", "none");
+                            }
+                    );
+                });
+            });
+        </script>
 	</body>
 </html>

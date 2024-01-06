@@ -1,6 +1,7 @@
 <?php
     require_once __DIR__ . "./../../config.php";
     require_once __DIR__ . "./../util/dbInteraction.php";
+    global $sessionHandler;
 ?>
 
 <!DOCTYPE html>
@@ -14,7 +15,7 @@
 ?>
         <b>Shopping Cart:</b><br>
 <?php
-        if(isLogged()){
+        if($sessionHandler->isLogged()){
             echo "<b>Ciao:".$_SESSION['name']."</b><br>";
         }
 ?>

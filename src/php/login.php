@@ -5,11 +5,13 @@ require_once __DIR__ . "/util/dbInteraction.php";
 
 global $logger;
 global $errorHandler;
+global $sessionHandler;
 
 function login($email, $password, $failedAccesses): ?bool{
 
     global $logger;
     global $errorHandler;
+    global $sessionHandler;
 
     try {
         if ($email != null && $password != null) {
@@ -21,7 +23,7 @@ function login($email, $password, $failedAccesses): ?bool{
                     //Resets the failed accesses
                     updateFailedAccesses($email, 0);
                     // creation of the session variables
-                    setSession($id, $username, $name, $isAdmin);
+                    $sessionHandler->setSession($id, $username, $name, $isAdmin);
                     // generation of a new php session id in order to avoid the session fixation attack
                     session_regenerate_id(true);
                     $logger->writeLog('INFO', "SessionID changed in order to avoid Session Fixation attacks");
@@ -31,28 +33,43 @@ function login($email, $password, $failedAccesses): ?bool{
                 else {
                     $failedAccesses = $failedAccesses + 1;
                     if (updateFailedAccesses($email, $failedAccesses)) {
-                        $logger->writeLog('ERROR', "Email and/or password of the user: " . $email . ". The user failed login ". $failedAccesses ." times.", $_SERVER['SCRIPT_NAME'], "LoginFunc");
-                        throw new Exception('Email and/or password are not valid');
+                        throw new Exception('Email and/or password are not valid.', $failedAccesses);
                     } else {
-                        throw new Exception('Something went wrong');
+                        throw new Exception('Something went wrong.');
                     }
                 }
             }
             else {
-                throw new Exception("Error performing the authentication");
+                throw new Exception("Error performing the authentication.");
             }
         }
         else {
-            throw new Exception('Error retrieving inserted data');
+            throw new Exception('Error retrieving inserted data.');
         }
-    } catch (Exception $e) {
+    }
+    catch (Exception $e) {
         $errorHandler->handleException($e);
+        $errorCode = $e->getCode();
+        if ($errorCode > 0) {
+            $logger->writeLog('ERROR',
+                "Failed Login for the user: " . $email,
+                $_SERVER['SCRIPT_NAME'],
+                "LoginFunc",
+                $e->getMessage() . " The user failed login " . $failedAccesses . " times");
+        }
+        else{
+            $logger->writeLog('ERROR',
+                "Failed Login for the user: " . $email,
+                $_SERVER['SCRIPT_NAME'],
+                "LoginFunc",
+                $e->getMessage());
+        }
         return false;
     }
 }
 
 // check if the user is logged or not, if the user is logged, it can't access to the login page
-if (isLogged()) {
+if ($sessionHandler->isLogged()) {
     if ($_SESSION['isAdmin'] == '0') {
         header('Location: //' . SERVER_ROOT . '/');
         exit;

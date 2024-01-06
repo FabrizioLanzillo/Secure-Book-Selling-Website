@@ -1,4 +1,4 @@
-function checkPasswordStrength() {
+function checkPasswordStrength(buttonId) {
     var password = document.getElementById("password").value;
     var result = zxcvbn(password);
 
@@ -23,20 +23,10 @@ function checkPasswordStrength() {
             break;
         case 4:
             text = "Very Strong";
-            document.getElementById("suggestions").innerHTML = "";
             break;
         default:
             break;
     }
 
-    if (result.score < 3){
-        if (result.feedback.suggestions.length > 0) {
-            // Mostra all'utente i suggerimenti per migliorare la password
-            result.feedback.suggestions.forEach(function(suggestion) {
-                suggestion = ("Advice: " + suggestion);
-                document.getElementById("suggestions").innerHTML = suggestion;
-            });
-        }
-    }
     document.getElementById("password-strength-text").innerHTML = text;
 }

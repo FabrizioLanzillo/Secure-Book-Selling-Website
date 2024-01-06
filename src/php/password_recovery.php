@@ -84,7 +84,9 @@ if(checkFormData()){
                 </label>
 
                 <label><b>Password</b>
-                    <input class="pwd_recovery_input" type="password" placeholder="Password" name="password" id="password" required oninput="checkPasswordStrength()">
+                    <input class="pwd_recovery_input" type="password" placeholder="Password" name="password" id="password"
+                           pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{9,}" title="Deve contenere almeno un numero, una lettera maiuscola, una lettera minuscola e almeno 8 o più caratteri"
+                           required oninput="checkPasswordStrength('change_psw_button')">
                     <meter max="4" id="password-strength-meter"></meter>
                     <p id="password-strength-text"></p>
                     <p id="suggestions"></p>
@@ -94,7 +96,7 @@ if(checkFormData()){
                     <input class="pwd_recovery_input" type="password" placeholder="Repeat Password" name="repeat_password" required>
                 </label>
 
-                <button class="pwd_recovery_button" type="submit">Change password</button>
+                <button class="pwd_recovery_button" id="change_psw_button" type="submit">Change password</button>
             </form>
             <a href="//<?php echo SERVER_ROOT. '/php/otp_request.php'?>" class="no-otp" >I don't have an Otp</a>
         </div>

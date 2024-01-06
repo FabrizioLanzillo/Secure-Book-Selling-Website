@@ -8,6 +8,7 @@ fi
 case $1 in
     start)
         sudo docker-compose up -d
+        chmod o+w src/logs/web_server_logs.txt
         ;;
     stop)
         sudo docker stop $(sudo docker ps -a -q)

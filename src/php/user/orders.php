@@ -2,7 +2,9 @@
 require_once __DIR__ . "./../../config.php";
 require_once __DIR__ . "./../util/dbInteraction.php";
 
-if (isLogged()) {
+global $sessionHandler;
+
+if ($sessionHandler->isLogged()) {
     $performedOrders = getUserOrders($_SESSION['userId']);
 }
 
@@ -19,7 +21,7 @@ if (isLogged()) {
     <?php
     include "./../layout/header.php";
 
-    if (isLogged()) {
+    if ($sessionHandler->isLogged()) {
     ?>
         <h1>Your Orders</h1>
         <?php
