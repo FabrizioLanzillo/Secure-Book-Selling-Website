@@ -14,7 +14,7 @@
 ?>
         <b>Home Admin:</b><br>
 <?php
-        if(isLogged()){
+        if($sessionHandler->isLogged()){
             echo "<b>Ciao:".$_SESSION['name']."</b><br>";
         }
 ?>

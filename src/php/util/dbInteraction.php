@@ -1,7 +1,8 @@
 <?php	
 
-    require_once __DIR__ . "/dbManager.php";	
+    require_once __DIR__ . "/DbManager.php";
     require_once __DIR__ . "./../../config.php";
+    $SecureBookSellingDB = DbManager::getInstance();
 
     /************************************************ User Function ***************************************************/
 
@@ -41,10 +42,10 @@
         global $logger;
 
         try{
-            $query = "INSERT INTO user (username, password, salt, email, name, surname, date_of_birth, isAdmin) 
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
+            $query = "INSERT INTO user (username, password, salt, email, name, surname, date_of_birth, isAdmin, failedAccesses, lastOtp) 
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW());";
 
-            $result = $SecureBookSellingDB->performQuery("INSERT", $query, $userInformation, "sssssssi");
+            $result = $SecureBookSellingDB->performQuery("INSERT", $query, $userInformation, "sssssssii");
             $SecureBookSellingDB->closeConnection();
 			return true;
             
@@ -94,18 +95,18 @@
         } 
 	}
 
-    /** THis function get the salt of a given user
+    /** This function get the salt, failedAccesses and blockedUntil of a given user
      * @param $email string, is the email to select the user
      * @return string|false
      */
-    function getAccessInformation($email){
+    function getAccessInformation(string $email){
 
         global $SecureBookSellingDB;
         global $logger;
 
         try{
 
-            $query = "SELECT salt
+            $query = "SELECT salt, failedAccesses, blockedUntil
                         FROM user
                         WHERE email = ?;";
 
@@ -114,8 +115,7 @@
                 return null;
             }
             $SecureBookSellingDB -> closeConnection();
-			$result = $result->fetch_assoc();
-		    return $result['salt'];
+			return $result ->fetch_assoc();
         }
         catch(Exception $e){
             $logger->writeLog(  'ERROR',
@@ -126,6 +126,170 @@
             $SecureBookSellingDB->closeConnection();
 			return false;
         }  
+    }
+
+    /** This function increments or set to 0 the failed attempts of login of a user and eventually blocks it
+     * @param $email string, is the email to select the user
+     * @param $failedAccesses int, is the number of failed logins
+     * @return true|false
+     */
+    function updateFailedAccesses($email, $failedAccesses){
+
+        global $SecureBookSellingDB;
+        global $logger;
+
+        try{
+            
+            if ($failedAccesses >= 5) {
+                $query = "UPDATE user
+                        SET failedAccesses = ? , blockedUntil = DATE_ADD(NOW(),interval 30 minute)
+                        WHERE email = ?;";
+            } else {
+                $query = "UPDATE user
+                        SET failedAccesses = ?
+                        WHERE email = ?;";
+            }
+            
+
+            $result = $SecureBookSellingDB->performQuery("UPDATE", $query, [$failedAccesses, $email], "is");
+            $SecureBookSellingDB->closeConnection();
+            return true;
+        }
+        catch(Exception $e){
+            $logger->writeLog(  'ERROR',
+                                "Error incrementing the failed accesse of the user",
+                                $_SERVER['SCRIPT_NAME'],
+                                "MySQL - Code: ".$e->getCode(),
+                                $e->getMessage());
+            $SecureBookSellingDB->closeConnection();
+			return false;
+        }  
+    }
+
+    /** This function get the Time of the last Otp generated
+     * @param $email string, is the email to select the user
+     * @return string|false
+     */
+    function getOtpTimeInformation($email){
+
+        global $SecureBookSellingDB;
+        global $logger;
+
+        try{
+
+            $query = "SELECT lastOtp
+                        FROM user
+                        WHERE email = ?;";
+
+            $result = $SecureBookSellingDB->performQuery("SELECT", $query, [$email], "s");
+            if ($result->num_rows != 1) {
+                return null;
+            }
+            $SecureBookSellingDB -> closeConnection();
+			$result = $result->fetch_assoc();
+		    return $result['lastOtp'];
+        }
+        catch(Exception $e){
+            $logger->writeLog(  'ERROR',
+                                "Error getting the lastOtp for the user",
+                                $_SERVER['SCRIPT_NAME'],
+                                "MySQL - Code: ".$e->getCode(),
+                                $e->getMessage());
+            $SecureBookSellingDB->closeConnection();
+			return false;
+        }  
+    }
+
+    /** This function updates the user table with the new otp
+     * @param $email string, is the email to select the user
+     * @param $newOtp string, is the new Otp for the user
+     * @return string|false
+     */
+    function setOtp($email, $newOtp){
+
+        global $SecureBookSellingDB;
+        global $logger;
+
+        try{
+
+            $query = "UPDATE user
+                        SET otp = ? , lastOtp = NOW()
+                        WHERE email = ?;";
+
+            $result = $SecureBookSellingDB->performQuery("UPDATE", $query, [$newOtp, $email], "ss");
+            $SecureBookSellingDB->closeConnection();
+            return true;
+        }
+        catch(Exception $e){
+            $logger->writeLog(  'ERROR',
+                                "Error updating otp for the user",
+                                $_SERVER['SCRIPT_NAME'],
+                                "MySQL - Code: ".$e->getCode(),
+                                $e->getMessage());
+            $SecureBookSellingDB->closeConnection();
+			return false;
+        }  
+    }
+
+    /** This function retrieves all the security information of a specific user
+     * * @param $email string, is the email to select the user
+     * @return values|false
+     */
+    function getSecurityInfo($email){
+
+        global $SecureBookSellingDB;
+        global $logger;
+        global $debug;
+
+        try{
+            $query = "SELECT otp, lastOtp
+                        FROM user
+                        WHERE email = ?;";
+
+            $result = $SecureBookSellingDB->performQuery("SELECT", $query, [$email], "s");
+			
+            $SecureBookSellingDB->closeConnection();
+			return $result;
+        }
+        catch(Exception $e){
+            $logger->writeLog(  "ERROR",
+                                "Error performing the query to retrieve security information of a user",
+                                $_SERVER['SCRIPT_NAME'],
+                                "MySQL - Code: ".$e->getCode(),
+                                $e->getMessage());
+            $SecureBookSellingDB->closeConnection();
+			return false;
+        }  
+    }
+
+    /** This function updates an user's password and all the other parameters linked to it
+     * @param $userInfromation Array, are the following params in order: password, salt, $_POST['email']
+     * @return true|false
+     */
+    function updateUserPassword($userInformation){
+
+        global $SecureBookSellingDB;
+        global $logger;
+
+        try{
+            $query = "UPDATE user
+                        SET password = ?, salt = ?, otp = NULL
+                        WHERE email = ?;";
+
+            $result = $SecureBookSellingDB->performQuery("INSERT", $query, $userInformation, "sss");
+            $SecureBookSellingDB->closeConnection();
+			return true;
+            
+        }
+        catch(Exception $e){
+            $logger->writeLog(  'ERROR',
+                                "Error performing the query to insert new user",
+                                $_SERVER['SCRIPT_NAME'],
+                                "MySQL - Code: ".$e->getCode(),
+                                $e->getMessage());
+            $SecureBookSellingDB->closeConnection();
+			return false;
+        }
     }
 
     /** This function retrieves all the books in the database

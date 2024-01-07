@@ -5,47 +5,71 @@ require_once __DIR__ . "/util/dbInteraction.php";
 
 global $logger;
 global $errorHandler;
+global $sessionHandler;
 
-function login($email, $password): ?bool{
+function login($email, $password, $failedAccesses): ?bool{
 
     global $logger;
     global $errorHandler;
+    global $sessionHandler;
 
     try {
         if ($email != null && $password != null) {
-
+            
             $resultQuery = authenticate($email, $password);
             if ($resultQuery !== false) {
 
                 if ($resultQuery !== null && extract((array)$resultQuery) == 4) {
+                    //Resets the failed accesses
+                    updateFailedAccesses($email, 0);
                     // creation of the session variables
-                    setSession($id, $username, $name, $isAdmin);
+                    $sessionHandler->setSession($id, $username, $name, $isAdmin);
                     // generation of a new php session id in order to avoid the session fixation attack
                     session_regenerate_id(true);
-                    $logger->writeLog('INFO', "SessionID changed in order to avoid Session Fixation attacks ");
+                    $logger->writeLog('INFO', "SessionID changed in order to avoid Session Fixation attacks");
 
                     return true;
                 }
                 else {
-                    $logger->writeLog('ERROR', "Email and/or password of the user: " . $email . ", are not valid.", $_SERVER['SCRIPT_NAME'], "LoginFunc");
-                    throw new Exception('Email and/or password are not valid, please try again');
+                    $failedAccesses = $failedAccesses + 1;
+                    if (updateFailedAccesses($email, $failedAccesses)) {
+                        throw new Exception('Email and/or password are not valid.', $failedAccesses);
+                    } else {
+                        throw new Exception('Something went wrong.');
+                    }
                 }
             }
             else {
-                throw new Exception("Error performing the authentication");
+                throw new Exception("Error performing the authentication.");
             }
         }
         else {
-            throw new Exception('Error retrieving inserted data');
+            throw new Exception('Error retrieving inserted data.');
         }
-    } catch (Exception $e) {
+    }
+    catch (Exception $e) {
         $errorHandler->handleException($e);
+        $errorCode = $e->getCode();
+        if ($errorCode > 0) {
+            $logger->writeLog('ERROR',
+                "Failed Login for the user: " . $email,
+                $_SERVER['SCRIPT_NAME'],
+                "LoginFunc",
+                $e->getMessage() . " The user failed login " . $failedAccesses . " times");
+        }
+        else{
+            $logger->writeLog('ERROR',
+                "Failed Login for the user: " . $email,
+                $_SERVER['SCRIPT_NAME'],
+                "LoginFunc",
+                $e->getMessage());
+        }
         return false;
     }
 }
 
 // check if the user is logged or not, if the user is logged, it can't access to the login page
-if (isLogged()) {
+if ($sessionHandler->isLogged()) {
     if ($_SESSION['isAdmin'] == '0') {
         header('Location: //' . SERVER_ROOT . '/');
         exit;
@@ -61,12 +85,20 @@ if (isset($_POST['email']) && isset($_POST['password'])) {
     try {
         $email = $_POST['email'];
         // retrieve from the db the salt of the user
-        $salt = getAccessInformation($email);
-        if ($salt !== false) {
-            // hash 256 enc of the password concatenated with the salt
-            $password = hash('sha256', $_POST['password'] . $salt);
+        $result = getAccessInformation($email);
 
-            if (login($email, $password)) {
+        if ($result['blockedUntil'] !== null){
+            $blockedTime = strtotime($result['blockedUntil']);
+            $currentTime = time();
+            if (($currentTime-$blockedTime) < 0)
+                throw new Exception('Your account is currently blocked');
+        }
+                
+        if ($result['salt'] !== false) {
+            // hash 256 enc of the password concatenated with the salt
+            $password = hash('sha256', $_POST['password'] . $result['salt']);
+
+            if (login($email, $password, $result['failedAccesses'])) {
                 $logger->writeLog('INFO', "Login of the user: " . $email . ", Succeeded");
 
                 if ($_SESSION['isAdmin'] == '0') {
@@ -110,6 +142,7 @@ if (isset($_POST['email']) && isset($_POST['password'])) {
 
                 <button class="login_form_button" type="submit">Login</button>
             </form>
+            <a href="//<?php echo SERVER_ROOT. '/php/otp_request.php'?>" class="forgot-pwd" >Forgot Password?</a>
         </div>
     </body>
 </html>

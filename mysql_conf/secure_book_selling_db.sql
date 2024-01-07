@@ -110,6 +110,10 @@ CREATE TABLE IF NOT EXISTS `user` (
   `surname` varchar(64) NOT NULL,
   `date_of_birth` date NOT NULL,
   `isAdmin` tinyint(1) NOT NULL,
+  `failedAccesses` smallint NOT NULL,
+  `blockedUntil` timestamp,
+  `otp` varchar(64),
+  `lastOtp` timestamp,
   PRIMARY KEY (`id`),
   UNIQUE KEY `user_unique_email` (`email`),
   UNIQUE KEY `user_unique_username` (`username`)
@@ -119,11 +123,11 @@ CREATE TABLE IF NOT EXISTS `user` (
 -- Dump dei dati per la tabella `user`
 --
 
-INSERT INTO `user` (`id`, `username`, `password`, `salt`, `email`, `name`, `surname`, `date_of_birth`, `isAdmin`) VALUES
-(1, 'Fablan', 'fc698653e8a0556f417fd5edb6b195126b152ec6c87dd1da70cc0db00d55dbb8', '5f1d635bb003ac40556ed6e9518984b081a011dadc1c1570d6bd32ad9e82584b', 'f.lanzillo@studenti.unipi.it', 'Fabrizio', 'Lanzillo', '1998-04-25', 0),
-(2, 'Tommib', 'd0dc8824d9f9464e031c1081fa1f6abb85f8b2b27f53b5f2ca7cf80f15cb22f5', 'ecbada38d5adabc2dc3dc308888a8005ada39c4b693e80c2a42e07c7009c960b', 't.bertini4@studenti.unipi.it', 'Tommaso ', 'Bertini', '1998-04-01', 0),
-(3, 'Hfjqpowfjpq', 'ae3460e953a01a24c393f0a2b0742c4353c72c1a87cb379130903566904a62c2', '616762931bda4395cf7b3f211496224f299fa05cabb020b97e2da943717d2ad7', 'g.marrucci4@studenti.unipi.it', 'Giovanni', 'Marrucci', '1999-11-29', 0),
-(4, 'NperNedo', 'ecb961192524aefc85a70d169cf5dfa33aa44796de670bb034907ff64bd23074', '0ec28037a19b7098460a560dc3ebc6e171584eeba7ec092ec7f250f5f94a1114', 'f.montini1@studenti.unipi.it', 'Federico', 'Montini', '1998-05-17', 1);
+INSERT INTO `user` (`id`, `username`, `password`, `salt`, `email`, `name`, `surname`, `date_of_birth`, `isAdmin`, `failedAccesses`, `lastOtp`) VALUES
+(1, 'Fablan', 'fc698653e8a0556f417fd5edb6b195126b152ec6c87dd1da70cc0db00d55dbb8', '5f1d635bb003ac40556ed6e9518984b081a011dadc1c1570d6bd32ad9e82584b', 'f.lanzillo@studenti.unipi.it', 'Fabrizio', 'Lanzillo', '1998-04-25', 0, 0, now()),
+(2, 'Tommib', 'd0dc8824d9f9464e031c1081fa1f6abb85f8b2b27f53b5f2ca7cf80f15cb22f5', 'ecbada38d5adabc2dc3dc308888a8005ada39c4b693e80c2a42e07c7009c960b', 't.bertini4@studenti.unipi.it', 'Tommaso ', 'Bertini', '1998-04-01', 0, 0, now()),
+(3, 'Hfjqpowfjpq', 'ae3460e953a01a24c393f0a2b0742c4353c72c1a87cb379130903566904a62c2', '616762931bda4395cf7b3f211496224f299fa05cabb020b97e2da943717d2ad7', 'g.marrucci4@studenti.unipi.it', 'Giovanni', 'Marrucci', '1999-11-29', 0, 0, now()),
+(4, 'NperNedo', 'ecb961192524aefc85a70d169cf5dfa33aa44796de670bb034907ff64bd23074', '0ec28037a19b7098460a560dc3ebc6e171584eeba7ec092ec7f250f5f94a1114', 'f.montini1@studenti.unipi.it', 'Federico', 'Montini', '1998-05-17', 1, 0, now());
 
 --
 -- Limiti per le tabelle scaricate

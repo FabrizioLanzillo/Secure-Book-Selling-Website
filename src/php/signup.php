@@ -34,6 +34,7 @@ if(checkFormData()){
                 $_POST['surname'],
                 $_POST['birthdate'],
                 0,
+                0,
             );
 
             $result = insertUser($userData);
@@ -56,6 +57,8 @@ if(checkFormData()){
 <html lang="en">
     <head>
         <link rel="stylesheet" type="text/css" href="../css/signup.css">
+        <script src="../js/utilityFunction.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/zxcvbn/4.4.2/zxcvbn.js"></script>
         <title>Book Selling - Sign Up</title>
     </head>
     <body>
@@ -83,7 +86,11 @@ if(checkFormData()){
                 </label>
 
                 <label><b>Password</b>
-                    <input class="signup_form_input" type="password" placeholder="Password" name="password" required>
+                    <input class="signup_form_input" type="password" placeholder="Password" name="password" id="password"
+                           pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{9,}" title="Deve contenere almeno un numero, una lettera maiuscola, una lettera minuscola e almeno 8 o più caratteri"
+                           required oninput="checkPasswordStrength('signup_button')">
+                    <meter max="4" id="password-strength-meter"></meter>
+                    <p id="password-strength-text"></p>
                 </label>
 
                 <label><b>Repeat password</b>
@@ -94,7 +101,7 @@ if(checkFormData()){
                     <input class="signup_form_input" type="date" name="birthdate" required>
                 </label>
 
-                <button class="signup_form_button" type="submit">Sign up</button>
+                <button class="signup_form_button" id="signup_button" type="submit" >Sign up</button>
             </form>
         </div>
     </body>
