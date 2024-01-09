@@ -1,11 +1,11 @@
 <?php
 
-require_once __DIR__ . "./../config.php";
-require_once __DIR__ . "/util/dbInteraction.php";
+require_once __DIR__ . "/../config.php";
 
 global $logger;
 global $errorHandler;
 global $sessionHandler;
+global $shoppingCartHandler;
 
 function login($email, $password, $failedAccesses): ?bool{
 
@@ -23,7 +23,7 @@ function login($email, $password, $failedAccesses): ?bool{
                     //Resets the failed accesses
                     updateFailedAccesses($email, 0);
                     // creation of the session variables
-                    $sessionHandler->setSession($id, $username, $name, $isAdmin);
+                    $sessionHandler->setSession($id, $username, $email, $name, $isAdmin);
                     // generation of a new php session id in order to avoid the session fixation attack
                     session_regenerate_id(true);
                     $logger->writeLog('INFO', "SessionID changed in order to avoid Session Fixation attacks");
@@ -100,6 +100,7 @@ if (isset($_POST['email']) && isset($_POST['password'])) {
 
             if (login($email, $password, $result['failedAccesses'])) {
                 $logger->writeLog('INFO', "Login of the user: " . $email . ", Succeeded");
+                $shoppingCartHandler->checkAndUpdateShoppingCartDB();
 
                 if ($_SESSION['isAdmin'] == '0') {
                     header('Location: //' . SERVER_ROOT . '/');

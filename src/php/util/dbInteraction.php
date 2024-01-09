@@ -1,7 +1,7 @@
-<?php	
-
+<?php
+    require_once __DIR__ . "/../../config.php";
     require_once __DIR__ . "/DbManager.php";
-    require_once __DIR__ . "./../../config.php";
+
     $SecureBookSellingDB = DbManager::getInstance();
 
     /************************************************ User Function ***************************************************/
@@ -292,6 +292,8 @@
         }
     }
 
+    /************************************************ Books Function **************************************************/
+
     /** This function retrieves all the books in the database
      * @return values|false
      */
@@ -359,7 +361,6 @@
 
         global $SecureBookSellingDB;
         global $logger;
-        global $debug;
 
         try{
             $query = "SELECT id, title, author, publisher, price, category, stocks_number FROM book WHERE id = ?;";
@@ -379,6 +380,138 @@
             return false;
         }
     }
+
+    /******************************************** Shopping Cart Function **********************************************/
+
+    function checkBookAvailability($bookId, $quantity){
+        global $SecureBookSellingDB;
+        global $logger;
+
+        try{
+
+            $query = "SELECT *
+                        FROM book
+                        WHERE   id = ?
+                                AND
+                                ? <= book.stocks_number;";
+
+            $result = $SecureBookSellingDB->performQuery("SELECT", $query, [$bookId, $quantity], "ii");
+            if ($result->num_rows != 1) {
+                return null;
+            }
+            $SecureBookSellingDB -> closeConnection();
+            return $result;
+        }
+        catch(Exception $e){
+            $logger->writeLog(  'ERROR',
+                "Error getting the price of the book",
+                $_SERVER['SCRIPT_NAME'],
+                "MySQL - Code: ".$e->getCode(),
+                $e->getMessage());
+            $SecureBookSellingDB->closeConnection();
+            return false;
+        }
+    }
+
+    function insertOrUpdateItems($shoppingCartInformation, $email, $increment){
+        global $SecureBookSellingDB;
+        global $logger;
+
+        try {
+            if($increment) {
+                $query = "INSERT INTO shopping_cart (email, id_book, title, author, publisher, price, quantity) 
+                       VALUES (?, ?, ?, ?, ?, ?, ?)
+                       ON DUPLICATE KEY UPDATE quantity = quantity + VALUES(quantity);";
+            }
+            else{
+                $query = "INSERT INTO shopping_cart (email, id_book, title, author, publisher, price, quantity) 
+                       VALUES (?, ?, ?, ?, ?, ?, ?)
+                       ON DUPLICATE KEY UPDATE quantity = VALUES(quantity);";
+            }
+            foreach ($shoppingCartInformation as $itemId => $itemDetails) {
+                $parameters = array(
+                    $email,
+                    $itemId,
+                    $itemDetails['title'],
+                    $itemDetails['author'],
+                    $itemDetails['publisher'],
+                    $itemDetails['price'],
+                    $itemDetails['quantity']
+                );
+
+                $result = $SecureBookSellingDB->performQuery("INSERT", $query, $parameters, "sisssdi");
+            }
+
+            $SecureBookSellingDB->closeConnection();
+            return true;
+        }
+        catch (Exception $e) {
+            $logger->writeLog('ERROR',
+                "Error performing the query to insert/update of the shopping cart",
+                $_SERVER['SCRIPT_NAME'],
+                "MySQL - Code: " . $e->getCode(),
+                $e->getMessage());
+            $SecureBookSellingDB->closeConnection();
+            return false;
+        }
+    }
+
+    function removeItems($bookID, $quantity, $email) {
+        global $SecureBookSellingDB;
+        global $logger;
+
+        try {
+
+            if ( $quantity <= 0) {
+                // Se la quantità è 0 o inferiore, elimina la riga corrispondente
+                $deleteQuery = "DELETE FROM shopping_cart WHERE id_book = ? AND email = ?";
+                $SecureBookSellingDB->performQuery("DELETE", $deleteQuery, [$bookID, $email], "is");
+            }
+            else {
+                // Altrimenti, decrementa la quantità
+                $updateQuery = "UPDATE shopping_cart SET quantity = ? WHERE id_book = ? AND email = ?";
+                $SecureBookSellingDB->performQuery("UPDATE", $updateQuery, [$quantity, $bookID, $email], "iis");
+            }
+
+            $SecureBookSellingDB->closeConnection();
+            return true;
+        } catch (Exception $e) {
+            $logger->writeLog('ERROR',
+                "Error performing the query to remove items from the shopping cart",
+                $_SERVER['SCRIPT_NAME'],
+                "MySQL - Code: " . $e->getCode(),
+                $e->getMessage());
+            $SecureBookSellingDB->closeConnection();
+            return false;
+        }
+    }
+
+    function getShoppingCartBooks($email){
+            global $SecureBookSellingDB;
+            global $logger;
+
+            try{
+
+                $query = "SELECT *
+                            FROM shopping_cart
+                            WHERE email = ?;";
+
+                $result = $SecureBookSellingDB->performQuery("SELECT", $query, [$email], "s");
+
+                $SecureBookSellingDB -> closeConnection();
+                return $result;
+            }
+            catch(Exception $e){
+                $logger->writeLog(  'ERROR',
+                    "Error getting the books from the shopping cart",
+                    $_SERVER['SCRIPT_NAME'],
+                    "MySQL - Code: ".$e->getCode(),
+                    $e->getMessage());
+                $SecureBookSellingDB->closeConnection();
+                return false;
+            }
+        }
+    /************************************************ Orders Function *************************************************/
 
     /** This function retrieves all the orders of a user
      * @param $userId smallint, is the id of the user

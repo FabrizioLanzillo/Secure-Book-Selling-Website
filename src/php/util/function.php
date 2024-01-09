@@ -7,3 +7,7 @@ function generateRandomString($length) {
     }
     return $randomString;
 }
+
+function showInfoMessage($textMessage){
+    echo '<script>alert("'.$textMessage.'");</script>';
+}

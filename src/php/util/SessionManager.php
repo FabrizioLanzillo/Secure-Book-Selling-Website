@@ -33,13 +33,20 @@ class SessionManager {
         ]);
 
         session_start();
+
+        //Need to set the session token to avoid CSRF on login form!
+        if (!isset($_SESSION['token'])){
+            $_SESSION['token'] = md5(uniqid(mt_rand(), true));
+        }
     }
 
-    public function setSession($userId, $username, $name, $isAdmin): void {
+    public function setSession($userId, $username, $email, $name, $isAdmin): void {
         $_SESSION['userId'] = $userId;
         $_SESSION['username'] = $username;
+        $_SESSION['email'] = $email;
         $_SESSION['name'] = $name;
         $_SESSION['isAdmin'] = $isAdmin;
+        $_SESSION['token'] = md5(uniqid(mt_rand(), true));
     }
 
     public function unsetSession(): bool {
@@ -59,7 +66,7 @@ class SessionManager {
     }
 
     public function isLogged(): int {
-        if(isset($_SESSION['userId']) && isset($_SESSION['username']) && isset($_SESSION['name']) && isset($_SESSION['isAdmin'])){
+        if(isset($_SESSION['userId']) && isset($_SESSION['username']) && isset($_SESSION['email']) && isset($_SESSION['name']) && isset($_SESSION['isAdmin'])){
             return 1;
         }
         else{
