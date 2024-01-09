@@ -1,11 +1,22 @@
 <?php
-require_once __DIR__ . "./../config.php";
-require_once __DIR__ . "/util/dbInteraction.php";
+require_once __DIR__ . "/../config.php";
+
+global $shoppingCartHandler;
+global $errorHandler;
 
 $bookId = $_GET['book_id'] ?? null;
-$cartAdded = $_GET['cart_added'] ?? null;
 $resultQuery = getBookDetails($bookId);
 
+try{
+    if (isset($_POST['bookId'])) {
+        if($shoppingCartHandler->addItem($_POST['bookId'], 1)){
+            showInfoMessage("Book Successfully added to the shopping cart!");
+        }
+    }
+}
+catch (Exception $e) {
+    $errorHandler->handleException($e);
+}
 ?>
 
 <!DOCTYPE html>
@@ -13,6 +24,7 @@ $resultQuery = getBookDetails($bookId);
     <head>
         <link rel="stylesheet" type="text/css" href="../css/book_details.css">
         <title>Book Selling - Book Details</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     </head>
     <body>
 
@@ -25,9 +37,9 @@ $resultQuery = getBookDetails($bookId);
             if ($resultQuery) {
                 $bookDetails = $resultQuery->fetch_assoc();
                 if ($bookDetails) {
-            ?>
+                    ?>
                     <h1>Book Details</h1>
-                    <div class="book-image"><img src="../img/book.png"></div>
+                    <div class="book-image"><img src="../img/book.png" alt="Book_image"></div>
                     <div class="detail-item"><strong>Title:</strong> <?php echo $bookDetails['title']; ?></div>
                     <div class="detail-item"><strong>Author:</strong> <?php echo $bookDetails['author']; ?></div>
                     <div class="detail-item"><strong>Publisher:</strong> <?php echo $bookDetails['publisher']; ?></div>
@@ -36,20 +48,24 @@ $resultQuery = getBookDetails($bookId);
                     <div class="detail-item"><strong>In stock:</strong> <?php echo $bookDetails['stocks_number']; ?></div>
 
                     <a href="../" class="back-button">Back to Home</a>
-                    <a href="#" class="add-button" onclick="addToCart()">Add to Cart</a>
+
+                    <form action="//<?php echo SERVER_ROOT . '/php/book_details.php?book_id='.$bookId ?>" method="POST">
+                        <input type="hidden" name="bookId" value="<?php echo $bookId; ?>">
+                        <button type="submit" class="back-button">Add to Cart</button>
+                    </form>
 
                     <?php
                 }
                 else {
-            ?>
-                    <div class='error-message'>Error retrieving book details</div>
-            <?php
+                    ?>
+                    <div class='error-message'>Book not found in the database</div>
+                    <?php
                 }
             }
             else {
-            ?>
-                <div class='error-message'>Invalid book ID</div>
-            <?php
+                ?>
+                <div class='error-message'>Error retrieving book details</div>
+                <?php
             }
             ?>
         </div>
@@ -59,6 +75,7 @@ $resultQuery = getBookDetails($bookId);
                 alert('Item has been added to the cart!');
             }
         </script>
+
 
     </body>
 </html>
