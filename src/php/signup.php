@@ -16,38 +16,46 @@ function checkFormData(): bool{
 
 // this block is executed only after the submit of the POST form
 if(checkFormData()){
-    try{
-        if ($_POST['password'] !== $_POST['repeat_password']){
-            throw new Exception('The inserted passwords don\'t match');
-        }
-        else{
-            $salt = bin2hex(random_bytes(32));
-            $hashedPassword = hash('sha256', $_POST['password'] . $salt);
+    $token = htmlspecialchars($_POST['token'], ENT_QUOTES, 'UTF-8');
 
-            $userData = array(
-                $_POST['username'],
-                $hashedPassword,
-                $salt,
-                $_POST['email'],
-                $_POST['name'],
-                $_POST['surname'],
-                $_POST['birthdate'],
-                0,
-                0,
-            );
-
-            $result = insertUser($userData);
-            if($result){
-                $logger->writeLog('INFO', "Signup of the user: ".$userData[4].", Succeeded");
-                header('Location: //' . SERVER_ROOT . '/php/login.php');
-                exit;
+    if (!$token || $token !== $_SESSION['token']) {
+        // return 405 http status code
+        header($_SERVER['SERVER_PROTOCOL'] . ' 405 Method Not Allowed');
+        exit;
+    } else {
+        try{
+            if ($_POST['password'] !== $_POST['repeat_password']){
+                throw new Exception('The inserted passwords don\'t match');
             }
             else{
-                throw new Exception('Couldn\'t register the user');
+                $salt = bin2hex(random_bytes(32));
+                $hashedPassword = hash('sha256', $_POST['password'] . $salt);
+    
+                $userData = array(
+                    $_POST['username'],
+                    $hashedPassword,
+                    $salt,
+                    $_POST['email'],
+                    $_POST['name'],
+                    $_POST['surname'],
+                    $_POST['birthdate'],
+                    0,
+                    0,
+                );
+    
+                $result = insertUser($userData);
+                if($result){
+                    $logger->writeLog('INFO', "Signup of the user: ".$userData[4].", Succeeded");
+                    header('Location: //' . SERVER_ROOT . '/php/login.php');
+                    exit;
+                }
+                else{
+                    throw new Exception('Couldn\'t register the user');
+                }
             }
+        } catch (Exception $e) {
+            $errorHandler->handleException($e);
         }
-    } catch (Exception $e) {
-        $errorHandler->handleException($e);
     }
 }
 ?>
@@ -99,6 +107,9 @@ if(checkFormData()){
                 <label><b>Date of birth</b>
                     <input class="signup_form_input" type="date" name="birthdate" required>
                 </label>
+
+                <!-- Hidden token to protect against CSRF -->
+                <input type="hidden" name="token" value="<?php echo $_SESSION['token'] ?? '' ?>">
 
                 <button class="signup_form_button" id="signup_button" type="submit" >Sign up</button>
             </form>

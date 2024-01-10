@@ -16,44 +16,52 @@ function checkFormData(): bool{
 
 // this block is executed only after the submit of the POST form
 if(checkFormData()){
-    try{
-        if ($_POST['password'] !== $_POST['repeat_password']) {
-            throw new Exception('The inserted passwords don\'t match');
-        }
-        else {
-            $resultQuery = getSecurityInfo($_POST['email']);
-            $otpData = $resultQuery->fetch_assoc();
+    $token = htmlspecialchars($_POST['token'], ENT_QUOTES, 'UTF-8');
 
-            if($otpData['otp'] === null OR $otpData['lastOtp'] === null)
-                throw new Exception('An error occured in your request');
-
-            $lastOtpTime = strtotime($otpData['lastOtp']);
-            $currentTime = time();
-
-            if(($currentTime-$lastOtpTime) > 300 OR $otpData['otp'] !== $_POST['otp'])
-                throw new Exception('The Otp is incorrect and/or expired');
-
-            $salt = bin2hex(random_bytes(32));
-            $hashedPassword = hash('sha256', $_POST['password'] . $salt);
-
-            $userData = array(
-                $hashedPassword,
-                $salt,
-                $_POST['email'],
-            );
-
-            $result = updateUserPassword($userData);
-            if($result){
-                $logger->writeLog('INFO', "The password update of the user: ".$userData[2].", Succeeded");
-                header('Location: //' . SERVER_ROOT . '/php/login.php');
-                exit;
+    if (!$token || $token !== $_SESSION['token']) {
+        // return 405 http status code
+        header($_SERVER['SERVER_PROTOCOL'] . ' 405 Method Not Allowed');
+        exit;
+    } else {
+        try{
+            if ($_POST['password'] !== $_POST['repeat_password']) {
+                throw new Exception('The inserted passwords don\'t match');
             }
-            else{
-                throw new Exception('Couldn\'t update the user\'s password');
+            else {
+                $resultQuery = getSecurityInfo($_POST['email']);
+                $otpData = $resultQuery->fetch_assoc();
+    
+                if($otpData['otp'] === null OR $otpData['lastOtp'] === null)
+                    throw new Exception('An error occured in your request');
+    
+                $lastOtpTime = strtotime($otpData['lastOtp']);
+                $currentTime = time();
+    
+                if(($currentTime-$lastOtpTime) > 300 OR $otpData['otp'] !== $_POST['otp'])
+                    throw new Exception('The Otp is incorrect and/or expired');
+    
+                $salt = bin2hex(random_bytes(32));
+                $hashedPassword = hash('sha256', $_POST['password'] . $salt);
+    
+                $userData = array(
+                    $hashedPassword,
+                    $salt,
+                    $_POST['email'],
+                );
+    
+                $result = updateUserPassword($userData);
+                if($result){
+                    $logger->writeLog('INFO', "The password update of the user: ".$userData[2].", Succeeded");
+                    header('Location: //' . SERVER_ROOT . '/php/login.php');
+                    exit;
+                }
+                else{
+                    throw new Exception('Couldn\'t update the user\'s password');
+                }
             }
+        } catch (Exception $e) {
+            $errorHandler->handleException($e);
         }
-    } catch (Exception $e) {
-        $errorHandler->handleException($e);
     }
 }
 ?>
@@ -94,6 +102,9 @@ if(checkFormData()){
                 <label><b>Repeat password</b>
                     <input class="pwd_recovery_input" type="password" placeholder="Repeat Password" name="repeat_password" required>
                 </label>
+
+                <!-- Hidden token to protect against CSRF -->
+                <input type="hidden" name="token" value="<?php echo $_SESSION['token'] ?? '' ?>">
 
                 <button class="pwd_recovery_button" id="change_psw_button" type="submit">Change password</button>
             </form>

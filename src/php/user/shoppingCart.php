@@ -7,19 +7,26 @@
 
     $items = $shoppingCartHandler->getBooks();
 
-    $bookId = $_GET['book_id'] ?? null;
-    if($bookId){
-        try{
-            if($shoppingCartHandler->removeItem($bookId)){
-                header('Location: //' . SERVER_ROOT . '/php/user/shoppingCart.php');
-                exit;
+    if (isset($_POST['itemId'])){
+        $token = htmlspecialchars($_POST['token'], ENT_QUOTES, 'UTF-8');
+        $bookId = htmlspecialchars($_POST['itemId'], ENT_QUOTES, 'UTF-8');
+
+        if (!$token || $token !== $_SESSION['token']) {
+            // return 405 http status code
+            header($_SERVER['SERVER_PROTOCOL'] . ' 405 Method Not Allowed');
+            exit;
+        } else {
+            try{
+                if($shoppingCartHandler->removeItem($bookId)){
+                    header('Location: //' . SERVER_ROOT . '/php/user/shoppingCart.php');
+                    exit;
+                }
+            }
+            catch (Exception $e) {
+                $errorHandler->handleException($e);
             }
         }
-        catch (Exception $e) {
-            $errorHandler->handleException($e);
-        }
     }
-
 ?>
 
 <!DOCTYPE html>
@@ -78,9 +85,12 @@
                                             <td class="text-center font-weight-semibold align-middle p-4"><?= $itemDetails['quantity'] ?></td>
                                             <td class="text-center font-weight-semibold align-middle p-4">$<?= $itemDetails['price'] * $itemDetails['quantity'] ?></td>
                                             <td class="text-center align-middle px-0">
-                                                <a href="//<?php echo SERVER_ROOT . '/php/user/shoppingCart.php?book_id='.$itemId ?>">
+                                                <form action="//<?php echo SERVER_ROOT . '/php/user/shoppingCart.php' ?>" method="POST">
+                                                    <input type="hidden" name="itemId" value="<?php echo $itemId; ?>">
+                                                    <!-- Hidden token to protect against CSRF -->
+                                                    <input type="hidden" name="token" value="<?php echo $_SESSION['token'] ?? '' ?>">
                                                     <button class="btn btn-danger btn-sm ml-1"><i class="fas fa-trash">×</i></button>
-                                                </a>
+                                                </form>
                                             </td>
                                         </tr>
                                     <?php

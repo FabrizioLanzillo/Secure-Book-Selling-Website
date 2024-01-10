@@ -1,1 +1,3 @@
 WEB-SERVER LOGS:
++[INFO] 2024-01-10 00:34:33 = SessionID changed in order to avoid Session Fixation attacks
++[INFO] 2024-01-10 00:34:33 = Login of the user: g.marrucci4@studenti.unipi.it, Succeeded

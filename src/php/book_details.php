@@ -9,8 +9,16 @@ $resultQuery = getBookDetails($bookId);
 
 try{
     if (isset($_POST['bookId'])) {
-        if($shoppingCartHandler->addItem($_POST['bookId'], 1)){
-            showInfoMessage("Book Successfully added to the shopping cart!");
+        $token = htmlspecialchars($_POST['token'], ENT_QUOTES, 'UTF-8');
+
+        if (!$token || $token !== $_SESSION['token']) {
+            // return 405 http status code
+            header($_SERVER['SERVER_PROTOCOL'] . ' 405 Method Not Allowed');
+            exit;
+        } else {
+            if($shoppingCartHandler->addItem($_POST['bookId'], 1)){
+                showInfoMessage("Book Successfully added to the shopping cart!");
+            }
         }
     }
 }
@@ -51,6 +59,8 @@ catch (Exception $e) {
 
                     <form action="//<?php echo SERVER_ROOT . '/php/book_details.php?book_id='.$bookId ?>" method="POST">
                         <input type="hidden" name="bookId" value="<?php echo $bookId; ?>">
+                        <!-- Hidden token to protect against CSRF -->
+                        <input type="hidden" name="token" value="<?php echo $_SESSION['token'] ?? '' ?>">
                         <button type="submit" class="back-button">Add to Cart</button>
                     </form>
 
