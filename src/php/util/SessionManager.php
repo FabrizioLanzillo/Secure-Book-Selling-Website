@@ -73,5 +73,11 @@ class SessionManager {
             return 0;
         }
     }
+
+    public function isAdmin(): bool {
+        return $_SESSION['isAdmin'] == '1';
+
+    }
+
 }
 

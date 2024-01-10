@@ -74,7 +74,7 @@ if ($sessionHandler->isLogged()) {
         header('Location: //' . SERVER_ROOT . '/');
         exit;
     } else {
-        header('Location: //' . SERVER_ROOT . '/php/admin/homeAdmin.php');
+        header('Location: //' . SERVER_ROOT . '/php/admin/bookList.php');
         exit;
     }
 }
@@ -106,7 +106,7 @@ if (isset($_POST['email']) && isset($_POST['password'])) {
                     header('Location: //' . SERVER_ROOT . '/');
                     exit;
                 } else {
-                    header('Location: //' . SERVER_ROOT . '/php/admin/homeAdmin.php');
+                    header('Location: //' . SERVER_ROOT . '/php/admin/bookList.php');
                     exit;
                 }
             }
