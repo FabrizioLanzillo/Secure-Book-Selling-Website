@@ -16,7 +16,7 @@
             exit;
         } else {
             try {
-                $email = $_POST['email'];
+                $email = htmlspecialchars($_POST['email'], ENT_QUOTES, 'UTF-8');
                 $retrievedTime = getOtpTimeInformation($email);
                 if ($retrievedTime === null)
                     throw new Exception('Error retrieving the last Otp generated');
@@ -53,48 +53,48 @@
 
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <link rel="stylesheet" type="text/css" href="../css/otp_request.css">
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-        <title>Book Selling - Otp Request</title>
-    </head>
-	<body>
-        <?php
-                include "./layout/header.php";
-        ?>
+<head>
+    <link rel="stylesheet" type="text/css" href="../css/otp_request.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <title>Book Selling - Otp Request</title>
+</head>
+<body>
+    <?php
+        include "./layout/header.php";
+    ?>
 
-        <div class="otp_request_container">
-            <h2>Insert your email to receive an Otp</h2>
-            <label><b>Email</b>
-                <input class="email_input" type="email" placeholder="Email" name="email" required>
-            </label>
+    <div class="otp_request_container">
+        <h2>Insert your email to receive an Otp</h2>
+        <label><b>Email</b>
+            <input class="email_input" type="email" placeholder="Email" name="email" required>
+        </label>
 
-            <!-- Hidden token to protect against CSRF -->
-            <input type="hidden" name="token" value="<?php echo $_SESSION['token'] ?? '' ?>">
+        <!-- Hidden token to protect against CSRF -->
+        <input type="hidden" name="token" value="<?php echo htmlspecialchars($_SESSION['token'] ?? ''); ?>">
 
-            <button class="gen_otp_button" type="button">Generate OTP</button>
-<!--        <div class="message"></div>-->
-            <a href="//<?php echo SERVER_ROOT. '/php/password_recovery.php'?>" class="already-otp" >I already have an Otp</a>
-        </div>
-        <script>
-            $(document).ready(function(){
-                $(".gen_otp_button").click(function(){
-                    const email = $(".email_input").val();
-                    const token = $("[name='token']").val(); // Get the CSRF token from the hidden input
+        <button class="gen_otp_button" type="button">Generate OTP</button>
+        <!-- <div class="message"></div> -->
+        <a href="//<?php echo htmlspecialchars(SERVER_ROOT. '/php/password_recovery.php') ?>" class="already-otp" >I already have an Otp</a>
+    </div>
+    <script>
+        $(document).ready(function(){
+            $(".gen_otp_button").click(function(){
+                const email = $(".email_input").val();
+                const token = $("[name='token']").val(); // Get the CSRF token from the hidden input
 
-                    $(".gen_otp_button").prop("disabled", true).css("background-color", "grey").css("pointer-events", "none");
-                    
-                    $.post(
-                        "//<?php echo SERVER_ROOT. '/php/otp_request.php'?>",
-                        { email: email, token: token }, // Include the CSRF token in the data object
-                        function(){
-                            alert("Your OTP has been sent successfully!");
-                            $(".email_input").val("");
-                            $(".gen_otp_button").prop("disabled", true).css("background-color", "#1982cf").css("pointer-events", "none");
-                        }
-                    );
-                });
+                $(".gen_otp_button").prop("disabled", true).css("background-color", "grey").css("pointer-events", "none");
+                
+                $.post(
+                    "//<?php echo htmlspecialchars(SERVER_ROOT. '/php/otp_request.php') ?>",
+                    { email: email, token: token }, // Include the CSRF token in the data object
+                    function(){
+                        alert("Your OTP has been sent successfully!");
+                        $(".email_input").val("");
+                        $(".gen_otp_button").prop("disabled", true).css("background-color", "#1982cf").css("pointer-events", "none");
+                    }
+                );
             });
-        </script>
-	</body>
+        });
+    </script>
+</body>
 </html>

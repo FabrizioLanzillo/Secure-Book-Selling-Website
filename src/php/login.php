@@ -90,7 +90,9 @@ if (isset($_POST['email']) && isset($_POST['password'])) {
         exit;
     } else {
         try {
-            $email = $_POST['email'];
+            // Protect against XSS
+            $email = htmlspecialchars($_POST['eamil'], ENT_QUOTES, 'UTF-8');
+            $rawPassword = htmlspecialchars($_POST['password'], ENT_QUOTES, 'UTF-8');
             // retrieve from the db the salt of the user
             $result = getAccessInformation($email);
     
@@ -103,7 +105,7 @@ if (isset($_POST['email']) && isset($_POST['password'])) {
                     
             if ($result['salt'] !== false) {
                 // hash 256 enc of the password concatenated with the salt
-                $password = hash('sha256', $_POST['password'] . $result['salt']);
+                $password = hash('sha256', $rawPassword . $result['salt']);
     
                 if (login($email, $password, $result['failedAccesses'])) {
                     $logger->writeLog('INFO', "Login of the user: " . $email . ", Succeeded");
@@ -140,7 +142,7 @@ if (isset($_POST['email']) && isset($_POST['password'])) {
 
         <div class="login_container">
             <h2>Login</h2>
-            <form name="login" action="//<?php echo SERVER_ROOT . '/php/login.php' ?>" method="POST">
+            <form name="login" action="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/login.php'); ?>" method="POST">
                 <label><b>Email</b>
                     <input class="login_form_input" type="text" placeholder="Enter Email" name="email" required>
                 </label>
@@ -150,11 +152,11 @@ if (isset($_POST['email']) && isset($_POST['password'])) {
                 </label>
 
                 <!-- Hidden token to protect against CSRF -->
-                <input type="hidden" name="token" value="<?php echo $_SESSION['token'] ?? '' ?>">
+                <input type="hidden" name="token" value="<?php echo htmlspecialchars($_SESSION['token'] ?? ''); ?>">
 
                 <button class="login_form_button" type="submit">Login</button>
             </form>
-            <a href="//<?php echo SERVER_ROOT. '/php/otp_request.php'?>" class="forgot-pwd" >Forgot Password?</a>
+            <a href="//<?php echo htmlspecialchars(SERVER_ROOT. '/php/otp_request.php'); ?>" class="forgot-pwd">Forgot Password?</a>
         </div>
     </body>
 </html>
