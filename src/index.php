@@ -16,7 +16,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["search_query"])) {
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <link rel="stylesheet" type="text/css" href="./css/home.css">
+        <!--<link rel="stylesheet" type="text/css" href="./css/home.css">-->
+        <link rel="stylesheet" type="text/css" href="./css/bootstrap/bootstrap.min.css">
         <title>Book Selling - Home</title>
     </head>
     <body>
@@ -34,26 +35,33 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["search_query"])) {
         </form>
     </div>
 
-    <div class="book_grid">
+    <div class="container mt-4">
+        <div class="row">
         <?php
         try{
             if ($resultQuery) {
                 while ($book = $resultQuery->fetch_assoc()) {
                     // Output each book as a card in the grid
             ?>
-                    <div class="book_card">
-                        <img src="/img/book.png" alt="Book Image"> <br>
-                        <?php
-                        foreach ($book as $key => $value) {
-                            if ($key != 'id')
-                                echo $key . ": " . $value . "<br>";
-                        }
-                        ?>
-                        <a href="//<?php echo SERVER_ROOT. '/php/book_details.php?book_id='. $book['id']?>">
-                            <button class="view_details_button">
-                                Details
-                            </button>
-                        </a>
+                    <div class="col-lg-4 mb-4">
+                        <div class="card">
+                            <a href="//<?php echo SERVER_ROOT. '/php/book_details.php?book_id='. $book['id']?>">
+                                <img src="/img/book.png" class="card-img-top" alt="Book Image">
+                            </a>    
+                            <div class="card-body">
+                                <?php
+                                foreach ($book as $key => $value) {
+                                    if ($key != 'id')
+                                        echo $key . ": " . $value . "<br>";
+                                }
+                                ?>
+                                <!--<a href="//<?php echo SERVER_ROOT. '/php/book_details.php?book_id='. $book['id']?>">
+                                    <button class="btn btn-primary">
+                                        Details
+                                    </button>
+                                </a>-->
+                            </div>
+                        </div>
                     </div>
             <?php
                 }
@@ -65,6 +73,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["search_query"])) {
             $errorHandler->handleException($e);
         }
         ?>
+        </div>
     </div>
 
     </body>
