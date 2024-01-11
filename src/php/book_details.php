@@ -18,7 +18,7 @@ try{
             header($_SERVER['SERVER_PROTOCOL'] . ' 405 Method Not Allowed');
             exit;
         } else {
-            if($shoppingCartHandler->addItem($book, 1)){
+            if($shoppingCartHandler->addItem($book, $_POST['quantity'])){       /*aggiunta la nuova post qui*/
                 showInfoMessage("Book Successfully added to the shopping cart!");
             }
         }
@@ -65,6 +65,8 @@ catch (Exception $e) {
                     <form action="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/book_details.php?book_id='.$bookId); ?>" method="POST">
                         <input type="hidden" name="bookId" value="<?php echo $bookId; ?>">
                         <!-- Hidden token to protect against CSRF -->
+                        <!-- aggiunto input riga sotto -->
+                        <input type="number" class="form-control" id="quantity" name="quantity" value="1" min="1" max="<?php echo $bookDetails['stocks_number']; ?>" style="max-width: 5rem;">
                         <input type="hidden" name="token" value="<?php echo $_SESSION['token'] ?? '' ?>">
                         <button type="submit" class="back-button">Add to Cart</button>
                     </form>
