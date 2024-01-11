@@ -1,5 +1,5 @@
 <?php
-    $currentFile = SERVER_ROOT.$_SERVER['SCRIPT_NAME'];
+    $currentFile = htmlspecialchars(SERVER_ROOT . $_SERVER['SCRIPT_NAME']);
     global $sessionHandler;
 ?>
 
@@ -17,9 +17,9 @@
 <?php
                 if($sessionHandler->isLogged()){
 ?>
-                    <a href="//<?php echo SERVER_ROOT. '/php/profile.php'?>">
+                    <a href="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/profile.php')?>">
                         <button class="button_header">
-                            Hello, <?php echo $_SESSION['name']?>
+                            Hello, <?php echo htmlspecialchars($_SESSION['name'])?>
                         </button>
                     </a>
 <?php
@@ -33,7 +33,7 @@
 <?php
                 if($sessionHandler->isLogged() and $_SESSION['isAdmin'] == 0){
 ?>
-                        <a href="//<?php echo SERVER_ROOT. '/php/user/orders.php'?>">
+                        <a href="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/user/orders.php')?>">
                             <button class="button_header">
                                 Orders
                             </button>
@@ -47,12 +47,12 @@
 <?php
                 if($sessionHandler->isLogged() and ($_SESSION['isAdmin'] == 1)){
 ?>
-                    <a href="//<?php echo SERVER_ROOT. '/php/admin/homeAdmin.php'?>">
+                    <a href="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/admin/homeAdmin.php')?>">
 <?php
                 }
                 else{
 ?>
-                    <a href="//<?php echo SERVER_ROOT. '/'?>">
+                    <a href="//<?php echo htmlspecialchars(SERVER_ROOT . '/')?>">
 <?php
                 }
 ?>
@@ -65,10 +65,10 @@
             <!-- The cart Button for every page of the user and for the anonymous user -->
             <div class="container button-container">
 <?php
-                if((!$sessionHandler->isLogged() and (strcmp($currentFile, SERVER_ROOT.'/index.php') == 0)) or
+                if((!$sessionHandler->isLogged() and (strcmp($currentFile, htmlspecialchars(SERVER_ROOT . '/index.php')) == 0)) or
                     (($sessionHandler->isLogged()) and ($_SESSION['isAdmin'] == 0))){
 ?>
-                        <a href="//<?php echo SERVER_ROOT. '/php/user/shoppingCart.php'?>">
+                        <a href="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/user/shoppingCart.php')?>">
                             <button class="button_header">
                                 Shopping Cart
                             </button>
@@ -85,9 +85,9 @@
             <div class="container button-container">
 <?php
                 if(!$sessionHandler->isLogged()){
-                    if(strcmp($currentFile, SERVER_ROOT.'/php/login.php') != 0){
+                    if(strcmp($currentFile, htmlspecialchars(SERVER_ROOT . '/php/login.php')) != 0){
 ?>
-                        <a href="//<?php echo SERVER_ROOT. '/php/login.php'?>">
+                        <a href="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/login.php')?>">
                             <button class="button_header">
                                 Log In
                             </button>
@@ -96,7 +96,7 @@
                     }
                     else{
 ?>
-                        <a href="//<?php echo SERVER_ROOT. '/php/signup.php'?>">
+                        <a href="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/signup.php')?>">
                             <button class="button_header">
                                 Sign Up
                             </button>
@@ -106,7 +106,7 @@
                 }
                 else{
 ?>
-                    <a href="//<?php echo SERVER_ROOT. '/php/logout.php'?>">
+                    <a href="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/logout.php')?>">
                         <button class="button_header">
                             Log Out
                         </button>

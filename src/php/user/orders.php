@@ -38,10 +38,10 @@ if ($sessionHandler->isLogged()) {
             while ($order = $performedOrders->fetch_assoc()) {
             ?>
                 <tr>
-                    <td><?php echo $order['title']; ?></td>
-                    <td><?php echo $order['amount']; ?></td>
-                    <td><?php echo $order['status']; ?></td>
-                    <td><?php echo $order['payment_method']; ?></td>
+                    <td><?php echo htmlspecialchars($order['title']); ?></td>
+                    <td><?php echo htmlspecialchars($order['amount']); ?></td>
+                    <td><?php echo htmlspecialchars($order['status']); ?></td>
+                    <td><?php echo htmlspecialchars($order['payment_method']); ?></td>
                 </tr>
             <?php
             }

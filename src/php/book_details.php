@@ -9,8 +9,18 @@ $resultQuery = getBookDetails($bookId);
 
 try{
     if (isset($_POST['bookId'])) {
-        if($shoppingCartHandler->addItem($_POST['bookId'], 1)){
-            showInfoMessage("Book Successfully added to the shopping cart!");
+        // Protect against XSS
+        $token = htmlspecialchars($_POST['token'], ENT_QUOTES, 'UTF-8');
+        $book = htmlspecialchars($_POST['bookId'], ENT_QUOTES, 'UTF-8');
+
+        if (!$token || $token !== $_SESSION['token']) {
+            // return 405 http status code
+            header($_SERVER['SERVER_PROTOCOL'] . ' 405 Method Not Allowed');
+            exit;
+        } else {
+            if($shoppingCartHandler->addItem($book, 1)){
+                showInfoMessage("Book Successfully added to the shopping cart!");
+            }
         }
     }
 }
@@ -39,20 +49,23 @@ catch (Exception $e) {
                 if ($bookDetails) {
                     ?>
                     <h1>Book Details</h1>
+          
                     <div class="book-image">
-                        <img src="../img/books/<?php echo $bookId?>.jpg" alt="Book Image" style="width: 45%; height: auto;">
+                        <img src="../img/books/<?php echo htmlspecialchars($bookId); ?>.jpg" alt="Book Image" style="width: 45%; height: auto;">
                     </div>
-                    <div class="detail-item"><strong>Title:</strong> <?php echo $bookDetails['title']; ?></div>
-                    <div class="detail-item"><strong>Author:</strong> <?php echo $bookDetails['author']; ?></div>
-                    <div class="detail-item"><strong>Publisher:</strong> <?php echo $bookDetails['publisher']; ?></div>
-                    <div class="detail-item"><strong>Price:</strong> $<?php echo $bookDetails['price']; ?></div>
-                    <div class="detail-item"><strong>Genre:</strong> <?php echo $bookDetails['category']; ?></div>
-                    <div class="detail-item"><strong>In stock:</strong> <?php echo $bookDetails['stocks_number']; ?></div>
+                    <div class="detail-item"><strong>Title:</strong> <?php echo htmlspecialchars($bookDetails['title']); ?></div>
+                    <div class="detail-item"><strong>Author:</strong> <?php echo htmlspecialchars($bookDetails['author']); ?></div>
+                    <div class="detail-item"><strong>Publisher:</strong> <?php echo htmlspecialchars($bookDetails['publisher']); ?></div>
+                    <div class="detail-item"><strong>Price:</strong> $<?php echo htmlspecialchars($bookDetails['price']); ?></div>
+                    <div class="detail-item"><strong>Genre:</strong> <?php echo htmlspecialchars($bookDetails['category']); ?></div>
+                    <div class="detail-item"><strong>In stock:</strong> <?php echo htmlspecialchars($bookDetails['stocks_number']); ?></div>
 
                     <a href="../" class="back-button">Back to Home</a>
 
-                    <form action="//<?php echo SERVER_ROOT . '/php/book_details.php?book_id='.$bookId ?>" method="POST">
+                    <form action="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/book_details.php?book_id='.$bookId); ?>" method="POST">
                         <input type="hidden" name="bookId" value="<?php echo $bookId; ?>">
+                        <!-- Hidden token to protect against CSRF -->
+                        <input type="hidden" name="token" value="<?php echo $_SESSION['token'] ?? '' ?>">
                         <button type="submit" class="back-button">Add to Cart</button>
                     </form>
 

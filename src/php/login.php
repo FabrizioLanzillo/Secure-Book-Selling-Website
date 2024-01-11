@@ -81,39 +81,50 @@ if ($sessionHandler->isLogged()) {
 
 // this block is executed only after submit of the POST form
 if(checkFormData(['email', 'password'])){
-    try {
-        $email = $_POST['email'];
-        // retrieve from the db the salt of the user
-        $result = getAccessInformation($email);
 
-        if ($result['blockedUntil'] !== null){
-            $blockedTime = strtotime($result['blockedUntil']);
-            $currentTime = time();
-            if (($currentTime-$blockedTime) < 0)
-                throw new Exception('Your account is currently blocked');
-        }
-                
-        if ($result['salt'] !== false) {
-            // hash 256 enc of the password concatenated with the salt
-            $password = hash('sha256', $_POST['password'] . $result['salt']);
+    $token = htmlspecialchars($_POST['token'], ENT_QUOTES, 'UTF-8');
 
-            if (login($email, $password, $result['failedAccesses'])) {
-                $logger->writeLog('INFO', "Login of the user: " . $email . ", Succeeded");
-                $shoppingCartHandler->checkAndUpdateShoppingCartDB();
-
-                if ($_SESSION['isAdmin'] == '0') {
-                    header('Location: //' . SERVER_ROOT . '/');
-                    exit;
-                } else {
-                    header('Location: //' . SERVER_ROOT . '/php/admin/homeAdmin.php');
-                    exit;
-                }
+    if (!$token || $token !== $_SESSION['token']) {
+        // return 405 http status code
+        header($_SERVER['SERVER_PROTOCOL'] . ' 405 Method Not Allowed');
+        exit;
+    } else {
+        try {
+            // Protect against XSS
+            $email = htmlspecialchars($_POST['eamil'], ENT_QUOTES, 'UTF-8');
+            $rawPassword = htmlspecialchars($_POST['password'], ENT_QUOTES, 'UTF-8');
+            // retrieve from the db the salt of the user
+            $result = getAccessInformation($email);
+    
+            if ($result['blockedUntil'] !== null){
+                $blockedTime = strtotime($result['blockedUntil']);
+                $currentTime = time();
+                if (($currentTime-$blockedTime) < 0)
+                    throw new Exception('Your account is currently blocked');
             }
-        } else {
-            throw new Exception('Error retrieving access information');
+                    
+            if ($result['salt'] !== false) {
+                // hash 256 enc of the password concatenated with the salt
+                $password = hash('sha256', $rawPassword . $result['salt']);
+    
+                if (login($email, $password, $result['failedAccesses'])) {
+                    $logger->writeLog('INFO', "Login of the user: " . $email . ", Succeeded");
+                    $shoppingCartHandler->checkAndUpdateShoppingCartDB();
+    
+                    if ($_SESSION['isAdmin'] == '0') {
+                        header('Location: //' . SERVER_ROOT . '/');
+                        exit;
+                    } else {
+                        header('Location: //' . SERVER_ROOT . '/php/admin/homeAdmin.php');
+                        exit;
+                    }
+                }
+            } else {
+                throw new Exception('Error retrieving access information');
+            }
+        } catch (Exception $e) {
+            $errorHandler->handleException($e);
         }
-    } catch (Exception $e) {
-        $errorHandler->handleException($e);
     }
 }
 ?>
@@ -131,7 +142,7 @@ if(checkFormData(['email', 'password'])){
 
         <div class="login_container">
             <h2>Login</h2>
-            <form name="login" action="//<?php echo SERVER_ROOT . '/php/login.php' ?>" method="POST">
+            <form name="login" action="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/login.php'); ?>" method="POST">
                 <label><b>Email</b>
                     <input class="login_form_input" type="text" placeholder="Enter Email" name="email" required>
                 </label>
@@ -140,9 +151,12 @@ if(checkFormData(['email', 'password'])){
                     <input class="login_form_input" type="password" placeholder="Enter Password" name="password" required>
                 </label>
 
+                <!-- Hidden token to protect against CSRF -->
+                <input type="hidden" name="token" value="<?php echo htmlspecialchars($_SESSION['token'] ?? ''); ?>">
+
                 <button class="login_form_button" type="submit">Login</button>
             </form>
-            <a href="//<?php echo SERVER_ROOT. '/php/otp_request.php'?>" class="forgot-pwd" >Forgot Password?</a>
+            <a href="//<?php echo htmlspecialchars(SERVER_ROOT. '/php/otp_request.php'); ?>" class="forgot-pwd">Forgot Password?</a>
         </div>
     </body>
 </html>

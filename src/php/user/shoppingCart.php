@@ -9,29 +9,38 @@ global $accessControlManager;
 $items = $shoppingCartHandler->getBooks();
 $totalPrice = 0;
 
-$bookId = $_GET['book_id'] ?? null;
-if ($bookId) {
-    try {
-        if ($shoppingCartHandler->removeItem($bookId)) {
-            header('Location: //' . SERVER_ROOT . '/php/user/shoppingCart.php');
-            exit;
+if (isset($_POST['itemId'])){
+    // Protect against XSS
+    $token = htmlspecialchars($_POST['token'], ENT_QUOTES, 'UTF-8');
+    $bookId = htmlspecialchars($_POST['itemId'], ENT_QUOTES, 'UTF-8');
+
+    if (!$token || $token !== $_SESSION['token']) {
+        // return 405 http status code
+        header($_SERVER['SERVER_PROTOCOL'] . ' 405 Method Not Allowed');
+        exit;
+    } else {
+        try{
+            if($shoppingCartHandler->removeItem($bookId)){
+                header('Location: //' . SERVER_ROOT . '/php/user/shoppingCart.php');
+                exit;
+            }
+        }
+        catch (Exception $e) {
+            $errorHandler->handleException($e);
         }
     }
-    catch (Exception $e) {
-        $errorHandler->handleException($e);
-    }
 }
-
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
     <head>
         <link rel="stylesheet" type="text/css" href="../../css/shoppingCart.css">
-        <title>Book Selling - Shopping Cart</title></head>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- CSS di Bootstrap -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+        <title>Book Selling - Shopping Cart</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!-- CSS di Bootstrap -->
+        <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    </head>
     <body>
         <?php
         include "./../layout/header.php";
@@ -49,14 +58,15 @@ if ($bookId) {
                         <div class="table-responsive">
                             <table class="table table-bordered m-0">
                                 <thead>
-                                <tr>
-                                    <!-- Set columns width -->
-                                    <th class="text-center py-3 px-4" style="min-width: 400px;">Books & Details</th>
-                                    <th class="text-center py-3 px-4" style="width: 100px;">Price</th>
-                                    <th class="text-center py-3 px-4" style="width: 120px;">Quantity</th>
-                                    <th class="text-center py-3 px-4" style="width: 100px;">Total</th>
-                                    <th class="text-center align-middle py-3 px-0" style="width: 40px;"></th>
-                                </tr>
+
+                                    <tr>
+                                        <!-- Set columns width -->
+                                        <th class="text-center py-3 px-4" style="min-width: 400px;">Books & Details</th>
+                                        <th class="text-center py-3 px-4" style="width: 100px;">Price</th>
+                                        <th class="text-center py-3 px-4" style="width: 120px;">Quantity</th>
+                                        <th class="text-center py-3 px-4" style="width: 100px;">Total</th>
+                                        <th class="text-center align-middle py-3 px-0" style="width: 40px;"></th>
+                                    </tr>
                                 </thead>
                                 <tbody>
                                 <?php
@@ -68,32 +78,27 @@ if ($bookId) {
                                             <div class="media align-items-center">
                                                 <img src="../../img/books/<?php echo $itemId?>.jpg" class="d-block ui-w-40 ui-bordered mr-4" alt="Book Image">
                                                 <div class="media-body">
-                                                    <a href="#" class="d-block text-dark"><?= $itemDetails['title'] ?></a>
+                                                    <a href="#" class="d-block text-dark"><?= htmlspecialchars($itemDetails['title']) ?></a>
                                                     <small>
-                                                        <span class="text-muted">Author: </span> <?= $itemDetails['author'] ?>
-                                                        &nbsp;
-                                                        <span class="text-muted">Publisher: </span> <?= $itemDetails['publisher'] ?>
-                                                        &nbsp;
+                                                        <span class="text-muted">Author: </span> <?= htmlspecialchars($itemDetails['author']) ?> &nbsp;
+                                                        <span class="text-muted">Publisher: </span> <?= htmlspecialchars($itemDetails['publisher']) ?> &nbsp;
                                                     </small>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td class="text-center font-weight-semibold align-middle p-4">
-                                            $<?= $itemDetails['price'] ?>
-                                        </td>
-                                        <td class="text-center font-weight-semibold align-middle p-4">
-                                            <?= $itemDetails['quantity'] ?>
-                                        </td>
-                                        <td class="text-center font-weight-semibold align-middle p-4">
-                                            $<?= $itemDetails['price'] * $itemDetails['quantity'] ?>
-                                        </td>
+                                        <td class="text-center font-weight-semibold align-middle p-4">$<?= htmlspecialchars($itemDetails['price']) ?></td>
+                                        <td class="text-center font-weight-semibold align-middle p-4"><?= htmlspecialchars($itemDetails['quantity']) ?></td>
+                                        <td class="text-center font-weight-semibold align-middle p-4">$<?= htmlspecialchars($itemDetails['price'] * $itemDetails['quantity']) ?></td>
                                         <td class="text-center align-middle px-0">
-                                            <a href="//<?php echo SERVER_ROOT . '/php/user/shoppingCart.php?book_id=' . $itemId ?>">
+                                            <form action="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/user/shoppingCart.php') ?>" method="POST">
+                                                <input type="hidden" name="itemId" value="<?php echo htmlspecialchars($itemId); ?>">
+                                                <!-- Hidden token to protect against CSRF -->
+                                                <input type="hidden" name="token" value="<?php echo htmlspecialchars($_SESSION['token'] ?? ''); ?>">
                                                 <button class="btn btn-danger btn-sm ml-1"><i class="fas fa-trash">×</i></button>
-                                            </a>
+                                            </form>
                                         </td>
                                     </tr>
-                                    <?php
+                                <?php
                                 }
                                 ?>
                                 </tbody>

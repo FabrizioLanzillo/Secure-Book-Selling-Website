@@ -101,4 +101,11 @@ class SessionManager {
         }
         return 1;
     }
+
+    public function isAdmin(): bool {
+        return $_SESSION['isAdmin'] == '1';
+
+    }
+
 }
+
