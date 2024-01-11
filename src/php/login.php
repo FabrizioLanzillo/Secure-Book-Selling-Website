@@ -80,8 +80,7 @@ if ($sessionHandler->isLogged()) {
 }
 
 // this block is executed only after submit of the POST form
-if (isset($_POST['email']) && isset($_POST['password'])) {
-
+if(checkFormData(['email', 'password'])){
     try {
         $email = $_POST['email'];
         // retrieve from the db the salt of the user

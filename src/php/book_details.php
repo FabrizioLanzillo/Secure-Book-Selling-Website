@@ -39,7 +39,9 @@ catch (Exception $e) {
                 if ($bookDetails) {
                     ?>
                     <h1>Book Details</h1>
-                    <div class="book-image"><img src="../img/book.png" alt="Book_image"></div>
+                    <div class="book-image">
+                        <img src="../img/books/<?php echo $bookId?>.jpg" alt="Book Image" style="width: 45%; height: auto;">
+                    </div>
                     <div class="detail-item"><strong>Title:</strong> <?php echo $bookDetails['title']; ?></div>
                     <div class="detail-item"><strong>Author:</strong> <?php echo $bookDetails['author']; ?></div>
                     <div class="detail-item"><strong>Publisher:</strong> <?php echo $bookDetails['publisher']; ?></div>

@@ -41,7 +41,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["search_query"])) {
                     // Output each book as a card in the grid
             ?>
                     <div class="book_card">
-                        <img src="/img/book.png" alt="Book Image"> <br>
+                        <img src="/img/books/<?php echo $book['id']?>.jpg" alt="Book Image" style="width: 100%; height: auto;"> <br>
                         <?php
                         foreach ($book as $key => $value) {
                             if ($key != 'id')

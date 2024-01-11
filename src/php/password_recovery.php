@@ -4,18 +4,8 @@ require_once __DIR__ . "/../config.php";
 global $logger;
 global $errorHandler;
 
-function checkFormData(): bool{
-    $requiredFields = ['email', 'otp', 'password', 'repeat_password'];
-    foreach ($requiredFields as $field) {
-        if (!isset($_POST[$field]) || empty($_POST[$field])) {
-            return false;
-        }
-    }
-    return true;
-}
-
 // this block is executed only after the submit of the POST form
-if(checkFormData()){
+if(checkFormData(['email', 'otp', 'password', 'repeat_password'])){
     try{
         if ($_POST['password'] !== $_POST['repeat_password']) {
             throw new Exception('The inserted passwords don\'t match');
