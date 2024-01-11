@@ -3,6 +3,7 @@ require_once __DIR__ . "/../config.php";
 
 global $logger;
 global $errorHandler;
+global $sessionHandler;
 
 function checkFormData(): bool{
     $requiredFields = ['email', 'otp', 'password', 'repeat_password'];
@@ -45,7 +46,11 @@ if(checkFormData()){
             $result = updateUserPassword($userData);
             if($result){
                 $logger->writeLog('INFO', "The password update of the user: ".$userData[2].", Succeeded");
-                header('Location: //' . SERVER_ROOT . '/php/login.php');
+                //redirect to profile page if logged user wanted to change password
+                if($sessionHandler->isLogged())
+                    header('Location: //' . SERVER_ROOT . '/php/profile.php');
+                else
+                    header('Location: //' . SERVER_ROOT . '/php/login.php');
                 exit;
             }
             else{
