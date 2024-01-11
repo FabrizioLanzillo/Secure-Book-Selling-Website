@@ -93,7 +93,7 @@ if(checkFormData()){
             </label>
 
             <label><b>Email</b>
-                <input class="signup_form_input" type="text" placeholder="Email" name="email" required>
+                <input class="signup_form_input" type="email" placeholder="Email" name="email" required>
             </label>
 
             <label><b>Username</b>

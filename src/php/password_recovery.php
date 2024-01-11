@@ -3,6 +3,7 @@ require_once __DIR__ . "/../config.php";
 
 global $logger;
 global $errorHandler;
+global $sessionHandler;
 
 function checkFormData(): bool{
     $requiredFields = ['email', 'otp', 'password', 'repeat_password'];

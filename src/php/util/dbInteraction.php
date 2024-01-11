@@ -32,6 +32,67 @@
         }
     }
 
+    /** This function retrieves all the personal data of a user
+     * @param $username
+     * @return values|false
+     */
+    function getUserData($username){
+
+        global $SecureBookSellingDB;
+        global $logger;
+
+        try{
+            $query = "SELECT username, name, surname, email, password, date_of_birth 
+                          FROM user 
+                          WHERE username = ?;";
+
+            $result = $SecureBookSellingDB->performQuery("SELECT", $query, [$username], "s");
+
+            $SecureBookSellingDB->closeConnection();
+            return $result;
+        }
+        catch(Exception $e){
+            $logger->writeLog(  "ERROR",
+                "Error performing the query to retrieve all the personal data of a user",
+                $_SERVER['SCRIPT_NAME'],
+                "MySQL - Code: ".$e->getCode(),
+                $e->getMessage());
+            $SecureBookSellingDB->closeConnection();
+            return false;
+        }
+    }
+
+
+/** Retrieve all customers' data
+ * @return users_info|false
+ */
+function getAllCustomersData(){
+
+    global $SecureBookSellingDB;
+    global $logger;
+
+    try{
+        $query = "SELECT id, name, surname, username, email, date_of_birth 
+                          FROM user
+                          WHERE isAdmin = 0
+                          ORDER BY username;";
+
+        $result = $SecureBookSellingDB->performQuery("SELECT", $query);
+
+        $SecureBookSellingDB->closeConnection();
+        return $result;
+    }
+    catch(Exception $e){
+        $logger->writeLog(  "ERROR",
+            "Error performing the query to retrieve all customers' data",
+            $_SERVER['SCRIPT_NAME'],
+            "MySQL - Code: ".$e->getCode(),
+            $e->getMessage());
+        $SecureBookSellingDB->closeConnection();
+        return false;
+    }
+}
+
     /** This function inserts an user into the database
      * @param $userInfromation Array, are the following params in order: username, password, salt, email, name, surname, date_of_birth
      * @return true|false
@@ -291,6 +352,29 @@
 			return false;
         }
     }
+    function deleteCustomer($customerId): bool{
+
+        global $SecureBookSellingDB;
+        global $logger;
+
+        try{
+            $query = "DELETE FROM user WHERE id = ?;";
+
+            $SecureBookSellingDB->performQuery("DELETE", $query, [$customerId], "i");
+            $SecureBookSellingDB->closeConnection();
+            return true;
+
+        }
+        catch(Exception $e){
+            $logger->writeLog(  'ERROR',
+                "Error performing the query to delete the customer",
+                $_SERVER['SCRIPT_NAME'],
+                "MySQL - Code: ".$e->getCode(),
+                $e->getMessage());
+            $SecureBookSellingDB->closeConnection();
+            return false;
+        }
+    }
 
     /************************************************ Books Function **************************************************/
 
@@ -376,6 +460,123 @@
                                 $_SERVER['SCRIPT_NAME'],
                                 "MySQL - Code: ".$e->getCode(),
                                 $e->getMessage());
+            $SecureBookSellingDB->closeConnection();
+            return false;
+        }
+    }
+
+    /** Retrieve all books' data
+     * @return books|false
+     */
+    function getAllBooksData(){
+
+        global $SecureBookSellingDB;
+        global $logger;
+
+        try{
+            $query = "SELECT id, title, author, publisher, price, category, stocks_number 
+                          FROM book
+                          ORDER BY title;";
+
+            //$result = $SecureBookSellingDB->performQuery("SELECT", $query, [], "isssfsi");
+            $result = $SecureBookSellingDB->performQuery("SELECT", $query);
+
+            $SecureBookSellingDB->closeConnection();
+            return $result;
+        }
+        catch(Exception $e){
+            $logger->writeLog(  "ERROR",
+                "Error performing the query to retrieve all books' data",
+                $_SERVER['SCRIPT_NAME'],
+                "MySQL - Code: ".$e->getCode(),
+                $e->getMessage());
+            $SecureBookSellingDB->closeConnection();
+            return false;
+        }
+    }
+
+    /** Insert new book into database
+     * @param $bookInfo
+     * @return bool
+     */
+    function insertBook($bookInfo): bool{
+
+        global $SecureBookSellingDB;
+        global $logger;
+
+        try{
+            $query = "INSERT INTO book (title, author, publisher, price, category, stocks_number) 
+                            VALUES (?, ?, ?, ?, ?, ?);";
+
+            $SecureBookSellingDB->performQuery("INSERT", $query, $bookInfo, "sssdsi");
+            $SecureBookSellingDB->closeConnection();
+            return true;
+
+        }
+        catch(Exception $e){
+            $logger->writeLog(  'ERROR',
+                "Error performing the query to insert new book",
+                $_SERVER['SCRIPT_NAME'],
+                "MySQL - Code: ".$e->getCode(),
+                $e->getMessage());
+            $SecureBookSellingDB->closeConnection();
+            return false;
+        }
+    }
+
+    /**
+     * @param $bookId
+     * @return bool
+     */
+    function deleteBook($bookId): bool{
+
+        global $SecureBookSellingDB;
+        global $logger;
+
+        try{
+            $query = "DELETE FROM book WHERE id = ?;";
+
+            $SecureBookSellingDB->performQuery("DELETE", $query, [$bookId], "i");
+            $SecureBookSellingDB->closeConnection();
+            return true;
+
+        }
+        catch(Exception $e){
+            $logger->writeLog(  'ERROR',
+                "Error performing the query to delete the book",
+                $_SERVER['SCRIPT_NAME'],
+                "MySQL - Code: ".$e->getCode(),
+                $e->getMessage());
+            $SecureBookSellingDB->closeConnection();
+            return false;
+        }
+    }
+
+    /**
+     * @param $bookInfo
+     * @return bool
+     */
+    function updateBook($bookInfo): bool{
+
+        global $SecureBookSellingDB;
+        global $logger;
+
+        try{
+            $query = "UPDATE book 
+                      SET title = ?, author = ?, publisher = ?, price = ?, category = ?, stocks_number = ? 
+                      WHERE id = ?";
+
+            $SecureBookSellingDB->performQuery("UPDATE", $query, $bookInfo, "sssdsii");
+            $SecureBookSellingDB->closeConnection();
+            return true;
+
+        }
+        catch(Exception $e){
+            $logger->writeLog(  'ERROR',
+                "Error performing the query to update book",
+                $_SERVER['SCRIPT_NAME'],
+                "MySQL - Code: ".$e->getCode(),
+                $e->getMessage());
             $SecureBookSellingDB->closeConnection();
             return false;
         }
@@ -543,3 +744,34 @@
             return false;
         }
     }
+
+/** Retrieve all orders' data
+ * @return orders_info|false
+ */
+function getAllOrdersData(){
+
+    global $SecureBookSellingDB;
+    global $logger;
+
+    try{
+        $query = "SELECT u.username as username, b.title as title, o.amount as amount, o.status as status, o.payment_method as payment_method
+                      FROM orders o 
+                        INNER JOIN user u ON o.id_user = u.id
+                        INNER JOIN book b ON o.id_book = b.id
+                      ORDER BY u.username;";
+
+        $result = $SecureBookSellingDB->performQuery("SELECT", $query, [], "sssss");
+
+        $SecureBookSellingDB->closeConnection();
+        return $result;
+    }
+    catch(Exception $e){
+        $logger->writeLog(  "ERROR",
+            "Error performing the query to retrieve all customers' data",
+            $_SERVER['SCRIPT_NAME'],
+            "MySQL - Code: ".$e->getCode(),
+            $e->getMessage());
+        $SecureBookSellingDB->closeConnection();
+        return false;
+    }
+}
