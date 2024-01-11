@@ -11,6 +11,8 @@ services:
         volumes:
             # base directory of the website
             - ./src:/var/www/html/
+            # storage of the e-books
+            - ./apache_conf/e-books:/home/bookselling/e-books-mounted
             # https config files
             - ./apache_conf/ssl_conf/certificates/bookselling:/etc/ssl/ssl_certificates
             - ./apache_conf/ssl_conf/sites-available:/etc/apache2/sites-available

@@ -5,18 +5,9 @@ global $logger;
 global $errorHandler;
 global $sessionHandler;
 
-function checkFormData(): bool{
-    $requiredFields = ['email', 'otp', 'password', 'repeat_password'];
-    foreach ($requiredFields as $field) {
-        if (!isset($_POST[$field]) || empty($_POST[$field])) {
-            return false;
-        }
-    }
-    return true;
-}
-
 // this block is executed only after the submit of the POST form
-if(checkFormData()){
+if(checkFormData(['email', 'otp', 'password', 'repeat_password'])){
+
     $token = htmlspecialchars($_POST['token'], ENT_QUOTES, 'UTF-8');
     $email = htmlspecialchars($_POST['email'], ENT_QUOTES, 'UTF-8');
     $otp = htmlspecialchars($_POST['otp'], ENT_QUOTES, 'UTF-8');

@@ -80,7 +80,7 @@ if ($sessionHandler->isLogged()) {
 }
 
 // this block is executed only after submit of the POST form
-if (isset($_POST['email']) && isset($_POST['password'])) {
+if(checkFormData(['email', 'password'])){
 
     $token = htmlspecialchars($_POST['token'], ENT_QUOTES, 'UTF-8');
 

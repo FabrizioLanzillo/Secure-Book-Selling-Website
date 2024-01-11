@@ -1,4 +1,8 @@
 <?php
+global $sessionHandler;
+
+use JetBrains\PhpStorm\NoReturn;
+
 function generateRandomString($length) {
     $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
     $randomString = '';
@@ -10,4 +14,13 @@ function generateRandomString($length) {
 
 function showInfoMessage($textMessage){
     echo '<script>alert("'.$textMessage.'");</script>';
+}
+
+function checkFormData($requiredFields): bool{
+    foreach ($requiredFields as $field) {
+        if (!isset($_POST[$field]) || empty($_POST[$field])) {
+            return false;
+        }
+    }
+    return true;
 }

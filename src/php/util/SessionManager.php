@@ -49,6 +49,33 @@ class SessionManager {
         $_SESSION['token'] = md5(uniqid(mt_rand(), true));
     }
 
+    public function saveCreditCardInfo($cardHolderName, $cardNumber, $Expire, $cvv): void {
+        $_SESSION['paymentInfo'] = array(
+            'cardHolderName' => $cardHolderName,
+            'cardNumber' => $cardNumber,
+            'expire' => $Expire,
+            'cvv' => $cvv
+        );
+    }
+
+    public function clearCheckoutInfo($checkoutInfo): void {
+        if (isset($_SESSION[$checkoutInfo])) {
+            unset($_SESSION[$checkoutInfo]);
+        }
+    }
+
+    public function saveShippingInfo($fullName, $address, $city, $province, $cap, $country): void {
+        $_SESSION['shippingInfo'] = array(
+            'fullName' => $fullName,
+            'address' => $address,
+            'country' => $country,
+            'province' => $province,
+            'city' => $city,
+            'cap' => $cap
+        );
+    }
+
+
     public function unsetSession(): bool {
         try {
             // this function frees all session variables currently registered.
@@ -66,12 +93,13 @@ class SessionManager {
     }
 
     public function isLogged(): int {
-        if(isset($_SESSION['userId']) && isset($_SESSION['username']) && isset($_SESSION['email']) && isset($_SESSION['name']) && isset($_SESSION['isAdmin'])){
-            return 1;
+        $loggedFields = ['userId', 'username', 'email', 'name', 'isAdmin'];
+        foreach ($loggedFields as $field) {
+            if (!isset($_SESSION[$field])) {
+                return 0;
+            }
         }
-        else{
-            return 0;
-        }
+        return 1;
     }
 
     public function isAdmin(): bool {

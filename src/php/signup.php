@@ -4,18 +4,8 @@ require_once __DIR__ . "/../config.php";
 global $logger;
 global $errorHandler;
 
-function checkFormData(): bool{
-    $requiredFields = ['name', 'surname', 'email', 'username', 'password', 'repeat_password', 'birthdate'];
-    foreach ($requiredFields as $field) {
-        if (!isset($_POST[$field]) || empty($_POST[$field])) {
-            return false;
-        }
-    }
-    return true;
-}
-
 // this block is executed only after the submit of the POST form
-if(checkFormData()){
+if(checkFormData(['name', 'surname', 'email', 'username', 'password', 'repeat_password', 'birthdate'])){
     // Protect against XSS
     $token = htmlspecialchars($_POST['token'], ENT_QUOTES, 'UTF-8');
     $name = htmlspecialchars($_POST['name'], ENT_QUOTES, 'UTF-8');

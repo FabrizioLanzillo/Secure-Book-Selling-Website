@@ -37,6 +37,7 @@ CREATE TABLE IF NOT EXISTS `book` (
   `price` float NOT NULL,
   `category` varchar(64) DEFAULT NULL,
   `stocks_number` int NOT NULL,
+  `ebook_name` varchar(64) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
@@ -44,22 +45,22 @@ CREATE TABLE IF NOT EXISTS `book` (
 -- Dump dei dati per la tabella `book`
 --
 
-INSERT INTO `book` (`id`, `title`, `author`, `publisher`, `price`, `category`, `stocks_number`) VALUES
-(1, 'Harry Potter e la PIetra Filosofale', 'J.K. Rowling', 'Salani Editore', 21.99, 'Fantasy', 4),
-(2, 'Harry Potter ed il Principe Mezzosangue', 'J.K. Rowling', 'Salani Editore', 24.99, 'Fantasy', 8),
-(3, 'One Piece vol.102', 'Eiichiro Oda', 'Star Comics', 4.25, 'Manga', 10),
-(4, 'To Kill a Mockingbird', 'Harper Lee', 'Harper Perennial', 14.99, 'Fiction', 15),
-(5, '1984', 'George Orwell', 'Penguin Books', 12.5, 'Dystopian', 20),
-(6, 'The Great Gatsby', 'F. Scott Fitzgerald', 'Scribner', 17.99, 'Classic', 12),
-(7, 'The Catcher in the Rye', 'J.D. Salinger', 'Little, Brown and Company', 16.25, 'Fiction', 18),
-(8, 'The Hobbit', 'J.R.R. Tolkien', 'Houghton Mifflin', 19.99, 'Fantasy', 25),
-(9, 'To the Lighthouse', 'Virginia Woolf', 'Harvest Books', 13.75, 'Modernist', 8),
-(10, 'Brave New World', 'Aldous Huxley', 'Harper Perennial Modern Classics', 15.5, 'Dystopian', 22),
-(11, 'Pride and Prejudice', 'Jane Austen', 'Penguin Classics', 11.99, 'Romance', 30),
-(12, 'The Lord of the Rings', 'J.R.R. Tolkien', 'Houghton Mifflin', 29.99, 'Fantasy', 14),
-(13, 'The Odyssey', 'Homer', 'Penguin Classics', 10.75, 'Epic Poetry', 16),
-(14, 'The Road', 'Cormac McCarthy', 'Vintage Books', 18.25, 'Post-apocalyptic', 10),
-(15, 'The Alchemist', 'Paulo Coelho', 'HarperOne', 14.5, 'Fiction', 12);
+INSERT INTO `book` (`id`, `title`, `author`, `publisher`, `price`, `category`, `stocks_number`, `ebook_name`) VALUES
+(1, 'Harry Potter e la PIetra Filosofale', 'J.K. Rowling', 'Salani Editore', 21.99, 'Fantasy', 4, '1_unix.pdf'),
+(2, 'Harry Potter ed il Principe Mezzosangue', 'J.K. Rowling', 'Salani Editore', 24.99, 'Fantasy', 8, '2_shell.pdf'),
+(3, 'One Piece vol.102', 'Eiichiro Oda', 'Star Comics', 4.25, 'Manga', 10, '3_env-exploits.pdf'),
+(4, 'To Kill a Mockingbird', 'Harper Lee', 'Harper Perennial', 14.99, 'Fiction', 15, '4_symlinks.pdf'),
+(5, '1984', 'George Orwell', 'Penguin Books', 12.5, 'Dystopian', 20, '5_code-injection.pdf'),
+(6, 'The Great Gatsby', 'F. Scott Fitzgerald', 'Scribner', 17.99, 'Classic', 12, '6_brute-force.pdf'),
+(7, 'The Catcher in the Rye', 'J.D. Salinger', 'Little, Brown and Company', 16.25, 'Fiction', 18, '7_canaries.pdf'),
+(8, 'The Hobbit', 'J.R.R. Tolkien', 'Houghton Mifflin', 19.99, 'Fantasy', 25, '8_format-strings.pdf'),
+(9, 'To the Lighthouse', 'Virginia Woolf', 'Harvest Books', 13.75, 'Modernist', 8, '9_dynamic-libraries.pdf'),
+(10, 'Brave New World', 'Aldous Huxley', 'Harper Perennial Modern Classics', 15.5, 'Dystopian', 22, '10_non-exec-data.pdf'),
+(11, 'Pride and Prejudice', 'Jane Austen', 'Penguin Classics', 11.99, 'Romance', 30, '11_code-reuse.pdf'),
+(12, 'The Lord of the Rings', 'J.R.R. Tolkien', 'Houghton Mifflin', 29.99, 'Fantasy', 14, '12_aslr-pie.pdf'),
+(13, 'The Odyssey', 'Homer', 'Penguin Classics', 10.75, 'Epic Poetry', 16, '13_heap.pdf'),
+(14, 'The Road', 'Cormac McCarthy', 'Vintage Books', 18.25, 'Post-apocalyptic', 10, '14_pointers.pdf'),
+(15, 'The Alchemist', 'Paulo Coelho', 'HarperOne', 14.5, 'Fiction', 12, '15_kernel.pdf');
 
 -- --------------------------------------------------------
 

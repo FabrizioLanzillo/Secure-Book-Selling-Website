@@ -12,6 +12,10 @@ php -r "if (hash_file('SHA384', '/tmp/composer-setup.php') === '$HASH') { echo '
 php /tmp/composer-setup.php --install-dir=/usr/local/bin --filename=composer
 (cd /var/www/html && composer require phpmailer/phpmailer)
 (cd /var/www/html && composer install)
+
+(cd /home/bookselling && mkdir e-books)
+(cd /home/bookselling && cp e-books-mounted/* e-books)
+
 # install mysql tools
 apt-get install -y libmysqli-dev
 docker-php-ext-install mysqli

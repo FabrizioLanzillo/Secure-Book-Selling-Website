@@ -7,6 +7,10 @@
     require_once __DIR__ . "/php/util/ShoppingCartHandler.php";
     require_once __DIR__ . "/php/util/function.php";
     require_once __DIR__ . "/php/util/dbInteraction.php";
+    require_once __DIR__ . "/php/util/AccessControlManager.php";
+
+    define("PROJECT_ROOT", $_SERVER["DOCUMENT_ROOT"]);
+    define("SERVER_ROOT", $_SERVER["SERVER_NAME"]);
 
     $debug = true;
     $lifetime = 10800;
@@ -19,7 +23,7 @@
     $emailSender = EmailSender::getInstance();
     $sessionHandler = SessionManager::getInstance($lifetime, $path, $secure, $httponly);
     $shoppingCartHandler = ShoppingCartHandler::getInstance();
+    $accessControlManager = AccessControlManager::getInstance();
 
-    define("PROJECT_ROOT", $_SERVER["DOCUMENT_ROOT"]);
-    define("SERVER_ROOT", $_SERVER["SERVER_NAME"]);
+
 

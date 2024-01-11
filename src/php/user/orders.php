@@ -26,7 +26,6 @@ if ($sessionHandler->isLogged()) {
         <?php
         if ($performedOrders) {
         ?>
-
             <table>
                 <tr>
                     <th>Book</th>

@@ -49,7 +49,10 @@ catch (Exception $e) {
                 if ($bookDetails) {
                     ?>
                     <h1>Book Details</h1>
-                    <div class="book-image"><img src="../img/book.png" alt="Book_image"></div>
+          
+                    <div class="book-image">
+                        <img src="../img/books/<?php echo htmlspecialchars($bookId); ?>.jpg" alt="Book Image" style="width: 45%; height: auto;">
+                    </div>
                     <div class="detail-item"><strong>Title:</strong> <?php echo htmlspecialchars($bookDetails['title']); ?></div>
                     <div class="detail-item"><strong>Author:</strong> <?php echo htmlspecialchars($bookDetails['author']); ?></div>
                     <div class="detail-item"><strong>Publisher:</strong> <?php echo htmlspecialchars($bookDetails['publisher']); ?></div>
