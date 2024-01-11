@@ -30,7 +30,7 @@ if ($sessionHandler->isLogged() and $sessionHandler->isAdmin()) {
             $result = insertBook($book);
             if($result){
                 $logger->writeLog('INFO', "Book: ".$book[0]." added into database");
-                header('Location: //' . SERVER_ROOT . '/php/admin/bookList.php');
+                header('Location: //' . SERVER_ROOT . '/php/admin/homeAdmin.php');
                 exit;
             }
             else{

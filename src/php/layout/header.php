@@ -47,7 +47,7 @@
 <?php
                 if($sessionHandler->isLogged() and ($_SESSION['isAdmin'] == 1)){
 ?>
-                    <a href="//<?php echo SERVER_ROOT. '/php/admin/bookList.php'?>">
+                    <a href="//<?php echo SERVER_ROOT. '/php/admin/homeAdmin.php'?>">
 <?php
                 }
                 else{

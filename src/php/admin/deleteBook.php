@@ -15,7 +15,7 @@ if ($sessionHandler->isLogged() and $sessionHandler->isAdmin()) {
         if($success){
             $message = "Book: ".$bookId." removed from database";
             $logger->writeLog('INFO', $message);
-            header('Location: ./bookList.php');
+            header('Location: ./homeAdmin.php');
             exit;
         }
         else{

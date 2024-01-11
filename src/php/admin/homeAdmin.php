@@ -31,7 +31,7 @@ include "./../layout/header.php";
         <hr>
         <ul class="nav nav-pills flex-column mb-auto">
             <li class="nav-item">
-                <a href="//<?php echo SERVER_ROOT. '/php/admin/bookList.php'?>" class="nav-link active" aria-current="page">
+                <a href="//<?php echo SERVER_ROOT. '/php/admin/homeAdmin.php'?>" class="nav-link active" aria-current="page">
                     <i class="fas fa-book"></i>
                     Books
                 </a>

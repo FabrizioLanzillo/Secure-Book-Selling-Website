@@ -36,7 +36,7 @@ if ($sessionHandler->isLogged() and $sessionHandler->isAdmin()) {
             $result = updateBook($book);
             if($result){
                 $logger->writeLog('INFO', "Book: ".$book[0]."with id= ".$book[6]." updated");
-                header('Location: //' . SERVER_ROOT . '/php/admin/bookList.php');
+                header('Location: //' . SERVER_ROOT . '/php/admin/homeAdmin.php');
                 exit;
             }
             else{

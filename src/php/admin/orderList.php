@@ -32,7 +32,7 @@ include "./../layout/header.php";
     <hr>
     <ul class="nav nav-pills flex-column mb-auto">
         <li class="nav-item">
-            <a href="//<?php echo SERVER_ROOT. '/php/admin/bookList.php'?>" class="nav-link link-dark" >
+            <a href="//<?php echo SERVER_ROOT. '/php/admin/homeAdmin.php'?>" class="nav-link link-dark" >
                 <i class="fas fa-book"></i>
                 Books
             </a>
