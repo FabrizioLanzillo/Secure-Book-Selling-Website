@@ -4,13 +4,59 @@ require_once __DIR__ . "/../../config.php";
 global $sessionHandler;
 global $shoppingCartHandler;
 global $errorHandler;
+global $emailSender;
+global $logger;
 global $accessControlManager;
+
+// This function checks if the user is anonymous or not
+// if in case, the user will be redirected to the login
+$accessControlManager->redirectIfAnonymous();
 
 // This function checks if the user has already inserted payment info and shipping info
 // if is not the case, the user will be redirected to the shopping cart page.
 $accessControlManager->checkFinalStepCheckout();
-
 $items = $shoppingCartHandler->getBooks();
+
+try{
+    if(checkFormData(['totalPrice'])){
+        // Protect against XSS
+        $token = htmlspecialchars($_POST['token'], ENT_QUOTES, 'UTF-8');
+        $totalPriceOrder = htmlspecialchars($_POST['totalPrice'], ENT_QUOTES, 'UTF-8');
+
+        if (!$token || $token !== $_SESSION['token']) {
+            // return 405 http status code
+            $accessControlManager ->redirectIfXSRFAttack();
+        }
+        else {
+            $currentTime = date('Y-m-d H:i:s');
+            $userId = $_SESSION['userId'];
+            if(addItemToOrders($userId, $currentTime, $items, $totalPriceOrder)){
+                $shoppingCartHandler->clearShoppingCart();
+                if ($emailSender->sendEmail($_SESSION['email'],
+                                                "BookSelling - Successful Purchase",
+                                                "A New Books Purchase",
+                                                "Purchase was successfully completed.",
+                                                "You will be able to download the ebook through the link in the orders section, 
+                                                    accessible after logging in.") !== false){
+
+                    $logger->writeLog('INFO', "Purchase made by the user: " . $_SESSION['email'] . ", was Successful");
+                }
+                else {
+                    throw new Exception("Couldn't send an email to the specified email address");
+                }
+                header('Location: //' . SERVER_ROOT . '/php/user/paymentPerformed.php');
+                exit;
+            }
+            else{
+                throw new Exception("Problem During the Payment!");
+            }
+        }
+    }
+}
+catch (Exception $e) {
+    $errorHandler->handleException($e);
+}
+
 $totalPrice = 0;
 
 ?>
@@ -23,6 +69,7 @@ $totalPrice = 0;
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Order Summary Page</title>
         <link rel="stylesheet" href="../../css/bootstrap.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     </head>
     <body>
         <?php
@@ -60,7 +107,7 @@ $totalPrice = 0;
                                                     <div class="media align-items-center">
                                                         <img src="../../img/books/<?php echo htmlspecialchars($itemId);?>.jpg" class="d-block ui-w-40 ui-bordered mr-4" style="width: 20%; height: auto;" alt="Book Image">
                                                         <div class="media-body">
-                                                            <a href="#" class="d-block text-dark"><?= $itemDetails['title'] ?></a>
+                                                            <a href="//<?php echo htmlspecialchars(SERVER_ROOT. '/php/book_details.php?book_id='. $itemId);?>" class="d-block text-dark"><?= $itemDetails['title'] ?></a>
                                                             <small>
                                                                 <span class="text-muted">Author: </span> <?= $itemDetails['author'] ?>
                                                                 &nbsp;<br>
@@ -116,7 +163,7 @@ $totalPrice = 0;
                                             <input type="hidden" name="editInfo" value="shippingInfo">
                                             <!-- Hidden token to protect against CSRF -->
                                             <input type="hidden" name="token" value="<?php echo htmlspecialchars($_SESSION['token'] ?? ''); ?>">
-                                            <button type="submit" class="btn btn-secondary btn-sm mr-1">Edit</button>
+                                            <button type="submit" class="btn btn-secondary btn-sm ml-1"><i class="fas fa-edit"></i></button>
                                         </form>
                                     </div>
                                 </div>
@@ -146,7 +193,7 @@ $totalPrice = 0;
                                             <input type="hidden" name="editInfo" value="paymentInfo">
                                             <!-- Hidden token to protect against CSRF -->
                                             <input type="hidden" name="token" value="<?php echo htmlspecialchars($_SESSION['token'] ?? ''); ?>">
-                                            <button type="submit" class="btn btn-secondary btn-sm mr-1">Edit</button>
+                                            <button type="submit" class="btn btn-secondary btn-sm ml-1"><i class="fas fa-edit"></i></button>
                                         </form>
 
                                     </div>
@@ -155,21 +202,21 @@ $totalPrice = 0;
                             </div>
 
                             <!-- Checkout Button -->
-                                <!-- TODO-->
-<!--                            <form action="//--><?php //echo htmlspecialchars(SERVER_ROOT . '/php/user/orderSummary.php' ?><!--" method="POST">-->
-<!--                                <input type="hidden" name="editInfo" value="paymentInfo">-->
-<!--                                <button type="submit" class="btn btn-primary btn-block">Pay Now</button>-->
-<!--                            </form>-->
-
-                            <!-- Checkout Button -->
-                            <form action="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/user/paymentPerformed.php'); ?>" method="POST">
-                                <?php if (!empty($items)) { ?>
+                            <form action="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/user/orderSummary.php'); ?>" method="POST">
+                                <?php
+                                if (!empty($items)) {
+                                ?>
                                     <input type="hidden" name="totalPrice" value="<?php echo htmlspecialchars($totalPrice); ?>">
                                     <input type="hidden" name="token" value="<?php echo htmlspecialchars($_SESSION['token'] ?? ''); ?>">
                                     <button type="submit" class="btn btn-primary btn-block">Checkout</button>
-                                <?php } else { ?>
+                                <?php
+                                }
+                                else {
+                                ?>
                                     <p>No items in the shopping cart.</p>
-                                <?php } ?>
+                                <?php
+                                }
+                                ?>
                             </form>
                         </div>
                     </div>

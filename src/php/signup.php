@@ -3,6 +3,7 @@ require_once __DIR__ . "/../config.php";
 
 global $logger;
 global $errorHandler;
+global $accessControlManager;
 
 // this block is executed only after the submit of the POST form
 if(checkFormData(['name', 'surname', 'email', 'username', 'password', 'repeat_password', 'birthdate'])){
@@ -19,8 +20,7 @@ if(checkFormData(['name', 'surname', 'email', 'username', 'password', 'repeat_pa
 
     if (!$token || $token !== $_SESSION['token']) {
         // return 405 http status code
-        header($_SERVER['SERVER_PROTOCOL'] . ' 405 Method Not Allowed');
-        exit;
+        $accessControlManager ->redirectIfXSRFAttack();
     } else {
         try{
             if ($password !== $repeatPassword){

@@ -505,10 +505,10 @@ function getAllCustomersData(){
         global $logger;
 
         try{
-            $query = "INSERT INTO book (title, author, publisher, price, category, stocks_number) 
-                            VALUES (?, ?, ?, ?, ?, ?);";
+            $query = "INSERT INTO book (title, author, publisher, price, category, stocks_number, ebook_name) 
+                            VALUES (?, ?, ?, ?, ?, ?, ?);";
 
-            $SecureBookSellingDB->performQuery("INSERT", $query, $bookInfo, "sssdsi");
+            $SecureBookSellingDB->performQuery("INSERT", $query, $bookInfo, "sssdsis");
             $SecureBookSellingDB->closeConnection();
             return true;
 
@@ -725,9 +725,10 @@ function getAllCustomersData(){
         global $debug;
 
         try{
-            $query = "SELECT b.title, o.time, o.amount, o.quantity, o.payment_method
-            FROM orders o INNER JOIN book b ON o.id_book = b.id
-            WHERE id_user = ?;";
+            $query = "SELECT b.title, o.time, o.amount, o.quantity, o.payment_method, b.id AS id_book
+                        FROM orders o INNER JOIN book b ON o.id_book = b.id
+                        WHERE id_user = ?
+                        ORDER BY o.time DESC";
 
             $result = $SecureBookSellingDB->performQuery("SELECT", $query, [$userId], "s");
 			
@@ -801,7 +802,7 @@ function getAllCustomersData(){
         global $logger;
 
         try{
-            $query = "SELECT u.username as username, b.title as title, o.amount as amount, o.status as status, o.payment_method as payment_method
+            $query = "SELECT u.username as username, b.title as title, o.amount as amount, o.payment_method as payment_method
                         FROM orders o 
                             INNER JOIN user u ON o.id_user = u.id
                             INNER JOIN book b ON o.id_book = b.id
@@ -815,6 +816,34 @@ function getAllCustomersData(){
         catch(Exception $e){
             $logger->writeLog(  "ERROR",
                 "Error performing the query to retrieve all customers' data",
+                $_SERVER['SCRIPT_NAME'],
+                "MySQL - Code: ".$e->getCode(),
+                $e->getMessage());
+            $SecureBookSellingDB->closeConnection();
+            return false;
+        }
+    }
+
+    function checkBookPurchaseByBook($userId, $bookId){
+        global $SecureBookSellingDB;
+        global $logger;
+
+        try{
+            $query = "SELECT b.ebook_name
+                        FROM orders o INNER JOIN book b ON o.id_book = b.id
+                        WHERE o.id_user = ? AND o.id_book = ?
+                        LIMIT ?";
+
+            $limit = 1;
+
+            $result = $SecureBookSellingDB->performQuery("SELECT", $query, [$userId, $bookId, $limit], "iii");
+
+            $SecureBookSellingDB->closeConnection();
+            return $result;
+        }
+        catch(Exception $e){
+            $logger->writeLog(  "ERROR",
+                "Error performing the query to check the book purchase",
                 $_SERVER['SCRIPT_NAME'],
                 "MySQL - Code: ".$e->getCode(),
                 $e->getMessage());

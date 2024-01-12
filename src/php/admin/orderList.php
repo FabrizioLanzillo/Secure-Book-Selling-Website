@@ -69,7 +69,6 @@ include "./../layout/header.php";
             <th>Username</th>
             <th>Book</th>
             <th>Amount</th>
-            <th>Status</th>
             <th>Payment</th>
         </tr>
         </thead>
@@ -81,7 +80,6 @@ include "./../layout/header.php";
                 <td><?php echo htmlspecialchars($order['username']); ?></td>
                 <td><?php echo htmlspecialchars($order['title']); ?></td>
                 <td><?php echo htmlspecialchars($order['amount']); ?></td>
-                <td><?php echo htmlspecialchars($order['status']); ?></td>
                 <td><?php echo htmlspecialchars($order['payment_method']); ?></td>
                 <!--<td >
                     <button class="btn btn-secondary btn-sm mr-1"><i class="fas fa-pencil"></i></button>

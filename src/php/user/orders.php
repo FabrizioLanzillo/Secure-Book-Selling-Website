@@ -14,82 +14,94 @@ if ($sessionHandler->isLogged()) {
     <head>
 <!--        <link rel="stylesheet" type="text/css" href="./../../css/orders.css">-->
         <link rel="stylesheet" type="text/css" href="./../../css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
         <title>Book Selling - Orders</title>
     </head>
     <body>
 
-    <?php
-    include "./../layout/header.php";
-
-    if ($sessionHandler->isLogged()) {
-    ?>
-
-    <div class="container bg-secondary mt-4 p-4">
-
-        <h1 class="text-white">Your Orders</h1>
-
         <?php
-        if ($performedOrders) {
+        include "./../layout/header.php";
+
+        if ($sessionHandler->isLogged()) {
         ?>
-        <table class="table table-light table-striped mt-4">
-            <thead>
-                <tr>
-                    <th>Book</th>
-                    <th>Time</th>
-                    <th>Amount</th>
-                    <th>Quantity</th>
-                    <th>Payment Method</th>
-                </tr>
-            </thead>
-            <tbody>
+
+        <div class="container bg-secondary mt-4 p-4">
+            <h1 class="text-white">Your Orders</h1>
+
             <?php
-                //FARE GRAFICA X QUESTO
-                $ordersByTime = array();
-
-                while ($order = $performedOrders->fetch_assoc()) {
-                    $time = $order['time'];
-                    $title = htmlspecialchars($order['title']);
-
-                    // Check if the time is already in the array
-                    if (array_key_exists($time, $ordersByTime)) {
-                        // If yes, add the title to the existing array
-                        $ordersByTime[$time][] = $title;
-                    } else {
-                        // If no, create a new array with the title
-                        $ordersByTime[$time] = array($title);
-                    }
-                }
-                // Display the titles in an array for each time
-                foreach ($ordersByTime as $time => $titles) {
-                    echo '<p>Orders at ' . htmlspecialchars($time) . ': ' . implode(', ', $titles) . '</p>';
-                }
-                while ($order = $performedOrders->fetch_assoc()) {
+            if ($performedOrders) {
             ?>
-                <tr>
-                    <td><?php echo htmlspecialchars($order['title']); ?></td>
-                    <td><?php echo htmlspecialchars($order['time']); ?></td>
-                    <td><?php echo htmlspecialchars($order['amount']); ?></td>
-                    <td><?php echo htmlspecialchars($order['quantity']); ?></td>
-                    <td><?php echo htmlspecialchars($order['payment_method']); ?></td>
-                </tr>
+            <table class="table table-light table-striped mt-4">
+                <thead>
+                    <tr>
+                        <th class="text-center align-middle px-0">Time</th>
+                        <th class="text-center align-middle px-0">Amount</th>
+                        <th class="text-center align-middle px-0">Payment Method</th>
+                        <th class="text-center align-middle px-0">Book</th>
+                        <th class="text-center align-middle px-0">Quantity</th>
+                        <th class="text-center align-middle px-0">E-book</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    $previousTime = null;
+                    if($performedOrders->num_rows > 0){
+                        while ($order = $performedOrders->fetch_assoc()) {
+                        ?>
+                            <tr>
+                                <?php
+                                if ($order['time'] !== $previousTime) {
+                                ?>
+                                    <td class="text-center align-middle px-0"><?php echo htmlspecialchars($order['time']); ?></td>
+                                    <td class="text-center align-middle px-0"><?php echo htmlspecialchars($order['amount']); ?></td>
+                                    <td class="text-center align-middle px-0"><?php echo htmlspecialchars($order['payment_method']); ?></td>
 
-            </tbody>
-            <?php } ?>
-        </table>
-    <?php
+                                <?php
+                                    $previousTime = $order['time'];
+                                } else {
+                                ?>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                <?php
+                                }
+                                ?>
+                                <td class="align-middle px-0"><?php echo htmlspecialchars($order['title']); ?></td>
+                                <td class="text-center align-middle px-0"><?php echo htmlspecialchars($order['quantity']); ?></td>
+                                <td class="text-center align-middle px-0">
+                                    <form action="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/util/downloadEbook.php'); ?>" method="POST">
+                                        <input type="hidden" name="id_book" value="<?php echo htmlspecialchars($order['id_book']); ?>">
+                                        <!-- Hidden token to protect against CSRF -->
+                                        <input type="hidden" name="token" value="<?php echo htmlspecialchars($_SESSION['token'] ?? ''); ?>">
+                                        <button type="submit" class="btn btn-secondary btn-sm ml-1"><i class="fas fa-download"></i></button>
+                                    </form>
+                                </td>
+                            </tr>
+                        <?php
+                        }
+                    }
+                    else{
+                    ?>
+                        <p>No orders found.</p>
+                    <?php
+                    }
+                    ?>
+                </tbody>
+            </table>
+        <?php
+            }
+            else {
+        ?>
+            <p>No orders found.</p>
+        <?php
+            }
         }
         else {
-    ?>
-        <p>No orders found.</p>
-    <?php
-        }}
-        else {
-    ?>
-        <div class='error-message'>No user logged</div>
-    <?php
+        ?>
+            <div class='error-message'>No user logged</div>
+        <?php
         }
-    ?>
-
-    </div>
+        ?>
+        </div>
     </body>
 </html>

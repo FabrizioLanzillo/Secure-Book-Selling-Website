@@ -1,11 +1,11 @@
 <?php
-
 require_once __DIR__ . "/../config.php";
 
 global $logger;
 global $errorHandler;
 global $sessionHandler;
 global $shoppingCartHandler;
+global $accessControlManager;
 
 function login($email, $password, $failedAccesses): ?bool{
 
@@ -89,8 +89,7 @@ if(checkFormData(['email', 'password'])){
 
     if (!$token || $token !== $_SESSION['token']) {
         // return 405 http status code
-        header($_SERVER['SERVER_PROTOCOL'] . ' 405 Method Not Allowed');
-        exit;
+        $accessControlManager ->redirectIfXSRFAttack();
     } else {
         try {
             // retrieve from the db the salt of the user

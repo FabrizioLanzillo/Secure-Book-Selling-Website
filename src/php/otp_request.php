@@ -1,10 +1,10 @@
 <?php
-    require_once __DIR__ . "/../config.php";
+require_once __DIR__ . "/../config.php";
 
     global $logger;
     global $errorHandler;
     global $emailSender;
-    $sentOtpEmail = false;
+    global $accessControlManager;
 
     // this block is executed only after submit of the POST form
     if (isset($_POST['email'])) {
@@ -12,8 +12,7 @@
 
         if (!$token || $token !== $_SESSION['token']) {
             // return 405 http status code
-            header($_SERVER['SERVER_PROTOCOL'] . ' 405 Method Not Allowed');
-            exit;
+            $accessControlManager ->redirectIfXSRFAttack();
         } else {
             try {
                 $email = htmlspecialchars($_POST['email'], ENT_QUOTES, 'UTF-8');
@@ -33,9 +32,10 @@
                                                         "This is the otp: $newOtp requested.", "It will last only for 5 minutes.") !== false){
 
                                 $logger->writeLog('INFO', "2FA check for the user: " . $email . " OTP has been created successfully");
-                                $sentOtpEmail = true;
+                                header('Location: //' . SERVER_ROOT . '/php/password_recovery.php');
+                                exit;
                             } else {
-                                throw new Exception("Couldn't send an email to the specified email");
+                                throw new Exception("Couldn't send an email to the specified email address");
                             }
                         }
                     } else {
@@ -69,7 +69,7 @@
             <div class="col-md-6">
                 <div class="p-4 border rounded">
                     <h2 class="text-center mb-5">Insert your email to receive an OTP</h2>
-                    <form name="otp_request" action="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/password_recovery.php'); ?>" method="POST">
+                    <form name="otp_request" action="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/otp_request.php'); ?>" method="POST">
                         <div class="form-group m-auto w-75 ">
                             <label for="email" class="sr-only">Email</label>
                             <input class="form-control mb-4" type="email" placeholder="Email" name="email" required>
@@ -78,34 +78,11 @@
 
                             <button class="btn btn-primary btn-block" type="submit">Generate OTP</button>
                         </div>
-
-                        <a href="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/password_recovery.php'); ?>" class="btn btn-link btn-block mt-3">I already have an OTP</a>
                     </form>
+                    <a href="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/password_recovery.php'); ?>" class="btn btn-link btn-block mt-3">I already have an OTP</a>
                 </div>
             </div>
         </div>
     </div>
-
-
-    <script>
-        $(document).ready(function(){
-            $(".gen_otp_button").click(function(){
-                const email = $(".email_input").val();
-                const token = $("[name='token']").val(); // Get the CSRF token from the hidden input
-
-                $(".gen_otp_button").prop("disabled", true).css("background-color", "grey").css("pointer-events", "none");
-                
-                $.post(
-                    "//<?php echo htmlspecialchars(SERVER_ROOT. '/php/otp_request.php') ?>",
-                    { email: email, token: token }, // Include the CSRF token in the data object
-                    function(){
-                        alert("Your OTP has been sent successfully!");
-                        $(".email_input").val("");
-                        $(".gen_otp_button").prop("disabled", true).css("background-color", "#1982cf").css("pointer-events", "none");
-                    }
-                );
-            });
-        });
-    </script>
 </body>
 </html>

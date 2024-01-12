@@ -22,8 +22,7 @@ try {
 
         if (!$token || $token !== $_SESSION['token']) {
             // return 405 http status code
-            header($_SERVER['SERVER_PROTOCOL'] . ' 405 Method Not Allowed');
-            exit;
+            $accessControlManager ->redirectIfXSRFAttack();
         } else {
             $sessionHandler->saveCreditCardInfo($cardHolderName, $cardNumber, $expire, $CVV);
             $accessControlManager->routeMultiStepCheckout();

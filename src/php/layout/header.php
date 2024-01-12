@@ -7,7 +7,7 @@
     <div class="container">
 
         <?php if($sessionHandler->isLogged() and ($_SESSION['isAdmin'] == 1)){ ?>
-        <a class="navbar-brand" href="//<?php echo htmlspecialchars(SERVER_ROOT. '/php/admin/bookList.php')?>">
+        <a class="navbar-brand" href="//<?php echo htmlspecialchars(SERVER_ROOT. '/php/admin/homeAdmin.php')?>">
             <?php }else{ ?>
             <a class="navbar-brand" href="//<?php echo htmlspecialchars(SERVER_ROOT. '/')?>">
                 <?php } ?>
