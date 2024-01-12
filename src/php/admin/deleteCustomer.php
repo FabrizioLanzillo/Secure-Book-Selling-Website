@@ -7,7 +7,8 @@ global $sessionHandler;
 
 if ($sessionHandler->isLogged() and $sessionHandler->isAdmin()) {
 
-    $customerId = $_GET['user_id'] ?? null;
+    // Sanitize user input
+    $customerId = isset($_GET['user_id']) ? htmlspecialchars($_GET['user_id'], ENT_QUOTES, 'UTF-8') : null;
 
     try {
         $success = deleteCustomer($customerId);
@@ -23,7 +24,6 @@ if ($sessionHandler->isLogged() and $sessionHandler->isAdmin()) {
     } catch (Exception $e) {
         $errorHandler->handleException($e);
     }
-
 }else{
     header('Location: //' . SERVER_ROOT . '/');
     exit;

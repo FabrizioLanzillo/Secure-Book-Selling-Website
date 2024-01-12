@@ -12,7 +12,8 @@ php -r "if (hash_file('SHA384', '/tmp/composer-setup.php') === '$HASH') { echo '
 php /tmp/composer-setup.php --install-dir=/usr/local/bin --filename=composer
 (cd /var/www/html && composer require phpmailer/phpmailer)
 (cd /var/www/html && composer install)
-
+# this copy all the e-book file from the e-books-mounted volume mounted with the docker-compose file
+# this is a trick in order to change the file owner of the directory and of the files inside it
 (cd /home/bookselling && mkdir e-books)
 (cd /home/bookselling && cp e-books-mounted/* e-books)
 

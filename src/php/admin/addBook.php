@@ -4,6 +4,7 @@ require_once __DIR__ . "/../../config.php";
 global $sessionHandler;
 global $logger;
 global $errorHandler;
+global $accessControlManager;
 
 function checkBookData(): bool{
     $requiredFields = ['title', 'author', 'publisher', 'price', 'category', 'stock'];
@@ -16,36 +17,51 @@ function checkBookData(): bool{
 }
 
 if ($sessionHandler->isLogged() and $sessionHandler->isAdmin()) {
+
     if(checkBookData()){
-        try{
-            $book = array(
-                $_POST['title'],
-                $_POST['author'],
-                $_POST['publisher'],
-                $_POST['price'],
-                $_POST['category'],
-                $_POST['stock'],
-            );
+        $token = htmlspecialchars($_POST['token'], ENT_QUOTES, 'UTF-8');
+        $title = htmlspecialchars($_POST['title'], ENT_QUOTES, 'UTF-8');
+        $author = htmlspecialchars($_POST['author'], ENT_QUOTES, 'UTF-8');
+        $publisher = htmlspecialchars($_POST['publisher'], ENT_QUOTES, 'UTF-8');
+        $price = htmlspecialchars($_POST['price'], ENT_QUOTES, 'UTF-8');
+        $category = htmlspecialchars($_POST['category'], ENT_QUOTES, 'UTF-8');
+        $stock = htmlspecialchars($_POST['stock'], ENT_QUOTES, 'UTF-8');
 
-            $result = insertBook($book);
-            if($result){
-                $logger->writeLog('INFO', "Book: ".$book[0]." added into database");
-                header('Location: //' . SERVER_ROOT . '/php/admin/homeAdmin.php');
-                exit;
-            }
-            else{
-                throw new Exception('Could not add the book');
-            }
+        if (!$token || $token !== $_SESSION['token']) {
+            // return 405 http status code
+            $accessControlManager ->redirectIfXSRFAttack();
+        } else {
+            try{
+                $book = array(
+                    $title,
+                    $author,
+                    $publisher,
+                    $price,
+                    $category,
+                    $stock,
+                    '1_unix.pdf'
+                );
 
-        } catch (Exception $e) {
-            $errorHandler->handleException($e);
+                $result = insertBook($book);
+                if($result){
+                    $logger->writeLog('INFO', "Book: ".$book[0]." added into database");
+                    header('Location: //' . SERVER_ROOT . '/php/admin/homeAdmin.php');
+                    exit;
+                }
+                else{
+                    throw new Exception('Could not add the book');
+                }
+
+            } catch (Exception $e) {
+                $errorHandler->handleException($e);
+            }
         }
     }
-}else{
+}
+else{
     header('Location: //' . SERVER_ROOT . '/');
     exit;
 }
-
 ?>
 
 <!DOCTYPE html>
@@ -63,7 +79,7 @@ include "./../layout/header.php";
 <div class="container bg-light mt-5 w-50">
     <h2>Add New Book</h2>
 
-    <form action="//<?php echo SERVER_ROOT . '/php/admin/addBook.php'?>" method="post">
+    <form action="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/admin/addBook.php'); ?>" method="post">
         <div class="form-group">
             <label for="title">Title:</label>
             <input type="text" class="form-control" id="title" name="title" placeholder="Book" value="Book" required>
@@ -88,6 +104,10 @@ include "./../layout/header.php";
             <label for="stock">Stock:</label>
             <input type="number" class="form-control" id="stock" name="stock" placeholder="50" value="50" required>
         </div>
+
+        <!-- Hidden token to protect against CSRF -->
+        <input type="hidden" name="token" value="<?php echo htmlspecialchars($_SESSION['token'] ?? ''); ?>">
+
         <button type="submit" class="btn btn-primary">Add</button>
     </form>
 

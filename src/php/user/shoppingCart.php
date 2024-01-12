@@ -16,8 +16,7 @@ if (isset($_POST['itemId'])){
 
     if (!$token || $token !== $_SESSION['token']) {
         // return 405 http status code
-        header($_SERVER['SERVER_PROTOCOL'] . ' 405 Method Not Allowed');
-        exit;
+        $accessControlManager ->redirectIfXSRFAttack();
     } else {
         try{
             if($shoppingCartHandler->removeItem($bookId)){
@@ -40,6 +39,7 @@ if (isset($_POST['itemId'])){
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <!-- CSS di Bootstrap -->
         <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     </head>
     <body>
         <?php
@@ -76,9 +76,9 @@ if (isset($_POST['itemId'])){
                                     <tr>
                                         <td class="p-4">
                                             <div class="media align-items-center">
-                                                <img src="../../img/books/<?php echo $itemId?>.jpg" class="d-block ui-w-40 ui-bordered mr-4" alt="Book Image">
+                                                <img src="../../img/books/<?php echo htmlspecialchars( $itemId);?>.jpg" class="d-block ui-w-40 ui-bordered mr-4" alt="Book Image">
                                                 <div class="media-body">
-                                                    <a href="#" class="d-block text-dark"><?= htmlspecialchars($itemDetails['title']) ?></a>
+                                                    <a href="//<?php echo htmlspecialchars(SERVER_ROOT. '/php/book_details.php?book_id='. $itemId);?>" class="d-block text-dark"><?= htmlspecialchars($itemDetails['title']) ?></a>
                                                     <small>
                                                         <span class="text-muted">Author: </span> <?= htmlspecialchars($itemDetails['author']) ?> &nbsp;
                                                         <span class="text-muted">Publisher: </span> <?= htmlspecialchars($itemDetails['publisher']) ?> &nbsp;
@@ -90,11 +90,11 @@ if (isset($_POST['itemId'])){
                                         <td class="text-center font-weight-semibold align-middle p-4"><?= htmlspecialchars($itemDetails['quantity']) ?></td>
                                         <td class="text-center font-weight-semibold align-middle p-4">$<?= htmlspecialchars($itemDetails['price'] * $itemDetails['quantity']) ?></td>
                                         <td class="text-center align-middle px-0">
-                                            <form action="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/user/shoppingCart.php') ?>" method="POST">
+                                            <form action="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/user/shoppingCart.php'); ?>" method="POST">
                                                 <input type="hidden" name="itemId" value="<?php echo htmlspecialchars($itemId); ?>">
                                                 <!-- Hidden token to protect against CSRF -->
                                                 <input type="hidden" name="token" value="<?php echo htmlspecialchars($_SESSION['token'] ?? ''); ?>">
-                                                <button class="btn btn-danger btn-sm ml-1"><i class="fas fa-trash">×</i></button>
+                                                <button type="submit" class="btn btn-danger btn-sm ml-1"><i class="fas fa-trash"></i></button>
                                             </form>
                                         </td>
                                     </tr>
@@ -127,13 +127,13 @@ if (isset($_POST['itemId'])){
                             if ($sessionHandler->isLogged()) {
                                 $pathNextStepToCheckout = $accessControlManager->getNextStepToCheckout();
                                 ?>
-                                <a href="//<?php echo $pathNextStepToCheckout ?>"
+                                <a href="//<?php echo htmlspecialchars($pathNextStepToCheckout); ?>"
                                    class="btn btn-lg btn-primary mt-2">Checkout</a>
                                 <?php
                             }
                             else {
                                 ?>
-                                <a href="//<?php echo SERVER_ROOT . '/php/login.php' ?>" class="btn btn-lg btn-primary mt-2">Checkout</a>
+                                <a href="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/user/paymentPerformed.php');?>" class="btn btn-lg btn-primary mt-2">Checkout</a>
                                 <?php
                             }
                         }

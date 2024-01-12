@@ -7,7 +7,8 @@ global $sessionHandler;
 
 if ($sessionHandler->isLogged() and $sessionHandler->isAdmin()) {
 
-    $bookId = $_GET['book_id'] ?? null;
+    // Sanitize user input
+    $bookId = isset($_GET['book_id']) ? htmlspecialchars($_GET['book_id'], ENT_QUOTES, 'UTF-8') : null;
 
     try {
         $success = deleteBook($bookId);
@@ -24,7 +25,6 @@ if ($sessionHandler->isLogged() and $sessionHandler->isAdmin()) {
     }catch (Exception $e){
         $errorHandler->handleException($e);
     }
-
 }else{
     header('Location: //' . SERVER_ROOT . '/');
     exit;

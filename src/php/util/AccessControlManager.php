@@ -1,5 +1,6 @@
 <?php
 global $shoppingCartHandler;
+
 class AccessControlManager{
     private static ?AccessControlManager $instance = null;
     private $orderSummaryPath;
@@ -94,5 +95,10 @@ class AccessControlManager{
                 return $this->paymentInfoPath;
             }
         }
+    }
+
+    function redirectIfXSRFAttack(): void{
+        header($_SERVER['SERVER_PROTOCOL'] . ' 405 Method Not Allowed');
+        exit;
     }
 }

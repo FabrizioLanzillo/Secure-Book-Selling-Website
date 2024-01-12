@@ -3,9 +3,11 @@ require_once __DIR__ . "/../config.php";
 
 global $logger;
 global $errorHandler;
+global $accessControlManager;
 
 // this block is executed only after the submit of the POST form
 if(checkFormData(['name', 'surname', 'email', 'username', 'password', 'repeat_password', 'birthdate'])){
+    
     // Protect against XSS
     $token = htmlspecialchars($_POST['token'], ENT_QUOTES, 'UTF-8');
     $name = htmlspecialchars($_POST['name'], ENT_QUOTES, 'UTF-8');
@@ -18,8 +20,7 @@ if(checkFormData(['name', 'surname', 'email', 'username', 'password', 'repeat_pa
 
     if (!$token || $token !== $_SESSION['token']) {
         // return 405 http status code
-        header($_SERVER['SERVER_PROTOCOL'] . ' 405 Method Not Allowed');
-        exit;
+        $accessControlManager ->redirectIfXSRFAttack();
     } else {
         try{
             if ($password !== $repeatPassword){
@@ -61,7 +62,8 @@ if(checkFormData(['name', 'surname', 'email', 'username', 'password', 'repeat_pa
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="stylesheet" type="text/css" href="../css/signup.css">
+<!--    <link rel="stylesheet" type="text/css" href="../css/signup.css">-->
+    <link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css">
     <script src="../js/utilityFunction.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/zxcvbn/4.4.2/zxcvbn.js"></script>
     <title>Book Selling - Sign Up</title>
@@ -71,46 +73,59 @@ if(checkFormData(['name', 'surname', 'email', 'username', 'password', 'repeat_pa
         include "./layout/header.php";
     ?>
 
-    <div class="signup_container">
-        <h2>Sign up</h2>
-        <form name="sign_up" action="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/signup.php') ?>" method="POST">
-            <label><b>Name</b>
-                <input class="signup_form_input" type="text" placeholder="Name" name="name" required>
-            </label>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="signup-container">
+                    <h2 class="text-center">Sign up</h2>
+                    <form name="sign_up" action="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/signup.php'); ?>" method="POST">
+                        <div class="form-group">
+                            <label for="name"><b>Name</b></label>
+                            <input class="form-control" type="text" placeholder="Name" name="name" required>
+                        </div>
 
-            <label><b>Surname</b>
-                <input class="signup_form_input" type="text" placeholder="Surname" name="surname" required>
-            </label>
+                        <div class="form-group">
+                            <label for="surname"><b>Surname</b></label>
+                            <input class="form-control" type="text" placeholder="Surname" name="surname" required>
+                        </div>
 
-            <label><b>Email</b>
-                <input class="signup_form_input" type="email" placeholder="Email" name="email" required>
-            </label>
+                        <div class="form-group">
+                            <label for="email"><b>Email</b></label>
+                            <input class="form-control" type="email" placeholder="Email" name="email" required>
+                        </div>
 
-            <label><b>Username</b>
-                <input class="signup_form_input" type="text" placeholder="Username" name="username" required>
-            </label>
+                        <div class="form-group">
+                            <label for="username"><b>Username</b></label>
+                            <input class="form-control" type="text" placeholder="Username" name="username" required>
+                        </div>
 
-            <label><b>Password</b>
-                <input class="signup_form_input" type="password" placeholder="Password" name="password" id="password"
-                    pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{9,}" title="Deve contenere almeno un numero, una lettera maiuscola, una lettera minuscola e almeno 8 o più caratteri"
-                    required oninput="checkPasswordStrength('signup_button')">
-                <meter max="4" id="password-strength-meter"></meter>
-                <p id="password-strength-text"></p>
-            </label>
+                        <div class="form-group">
+                            <label for="password"><b>Password</b></label>
+                            <input class="form-control" type="password" placeholder="Password" name="password" id="password"
+                                   pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{9,}" title="Must contain at least one number, one uppercase letter, one lowercase letter, and at least 8 or more characters"
+                                   required oninput="checkPasswordStrength('signup_button')">
+                            <meter max="4" id="password-strength-meter"></meter>
+                            <p id="password-strength-text"></p>
+                        </div>
 
-            <label><b>Repeat password</b>
-                <input class="signup_form_input" type="password" placeholder="Repeat Password" name="repeat_password" required>
-            </label>
+                        <div class="form-group">
+                            <label for="repeat_password"><b>Repeat password</b></label>
+                            <input class="form-control" type="password" placeholder="Repeat Password" name="repeat_password" required>
+                        </div>
 
-            <label><b>Date of birth</b>
-                <input class="signup_form_input" type="date" name="birthdate" required>
-            </label>
+                        <div class="form-group mb-5">
+                            <label for="birthdate"><b>Date of birth</b></label>
+                            <input class="form-control" type="date" name="birthdate" required>
+                        </div>
 
-            <!-- Hidden token to protect against CSRF -->
-            <input type="hidden" name="token" value="<?php echo htmlspecialchars($_SESSION['token'] ?? ''); ?>">
+                        <!-- Hidden token to protect against CSRF -->
+                        <input type="hidden" name="token" value="<?php echo htmlspecialchars($_SESSION['token'] ?? ''); ?>">
 
-            <button class="signup_form_button" id="signup_button" type="submit">Sign up</button>
-        </form>
+                        <button class="btn btn-primary btn-block mb-5" id="signup_button" type="submit">Sign up</button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 </body>
 </html>

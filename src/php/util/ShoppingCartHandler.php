@@ -136,4 +136,27 @@ class ShoppingCartHandler{
         }
         return true;
     }
+
+    /**
+     * @throws Exception
+     */
+    public function clearShoppingCart(): bool{
+
+        global $sessionHandler;
+        if (!empty($_SESSION['cart'])) {
+            foreach ($_SESSION['cart'] as $itemId => $quantity) {
+
+                if (isset($_SESSION['cart'][$itemId])) {
+                    unset($_SESSION['cart'][$itemId]);
+                    if ($sessionHandler->isLogged()) {
+                        removeItems($itemId, 0, $_SESSION['email']);
+                    }
+                }
+            }
+            return true;
+        }
+        else {
+            throw new Exception("Error during the clear of the ShoppingCart");
+        }
+    }
 }

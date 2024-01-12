@@ -12,10 +12,21 @@ global $accessControlManager;
 $accessControlManager->redirectIfAnonymous();
 
 try {
-
     if (checkFormData(['CardHolderName', 'CardNumber', 'Expire', 'CVV'])) {
-        $sessionHandler->saveCreditCardInfo($_POST['CardHolderName'], $_POST['CardNumber'], $_POST['Expire'], $_POST['CVV']);
-        $accessControlManager->routeMultiStepCheckout();
+
+        $token = htmlspecialchars($_POST['token'], ENT_QUOTES, 'UTF-8');
+        $cardHolderName = htmlspecialchars($_POST['CardHolderName'], ENT_QUOTES, 'UTF-8');
+        $cardNumber = htmlspecialchars($_POST['CardNumber'], ENT_QUOTES, 'UTF-8');
+        $expire = htmlspecialchars($_POST['Expire'], ENT_QUOTES, 'UTF-8');
+        $CVV = htmlspecialchars($_POST['CVV'], ENT_QUOTES, 'UTF-8');
+
+        if (!$token || $token !== $_SESSION['token']) {
+            // return 405 http status code
+            $accessControlManager ->redirectIfXSRFAttack();
+        } else {
+            $sessionHandler->saveCreditCardInfo($cardHolderName, $cardNumber, $expire, $CVV);
+            $accessControlManager->routeMultiStepCheckout();
+        }
     }
 }
 catch (Exception $e) {
@@ -47,7 +58,7 @@ catch (Exception $e) {
                                 <img class="img-fluid cc-img" src="../../img/creditcardicons.png" alt="creditcardicons">
                             </div>
 
-                            <form name="paymentInfoForm" action="//<?php echo SERVER_ROOT . '/php/user/paymentMethod.php' ?>" method="POST">
+                            <form name="paymentInfoForm" action="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/user/paymentMethod.php');?>" method="POST">
                                 <div id="cardOptions">
                                     <div class="form-outline mb-4">
                                         <label class="form-label" for="formControlLgXsd">Cardholder's Name</label>
@@ -96,6 +107,8 @@ catch (Exception $e) {
                                             </div>
                                         </div>
                                     </div>
+                                    <!-- Hidden token to protect against CSRF -->
+                                    <input type="hidden" name="token" value="<?php echo htmlspecialchars($_SESSION['token'] ?? ''); ?>">
                                     <button type="submit" class="btn btn-success btn-lg btn-block">Continue to Shipping Info</button>
                                 </div>
                             </form>
