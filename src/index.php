@@ -3,6 +3,12 @@ require_once __DIR__ . "/config.php";
 
 global $errorHandler;
 global $accessControlManager;
+global $sessionHandler;
+
+if ($sessionHandler->isLogged() and $sessionHandler->isAdmin()) {
+    header('Location: //' . SERVER_ROOT . '/php/admin/homeAdmin.php');
+    exit;
+}
 
 // Check if the search form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["search_query"])) {

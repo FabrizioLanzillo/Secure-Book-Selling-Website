@@ -1,9 +1,8 @@
 <?php
 global $sessionHandler;
 
-use JetBrains\PhpStorm\NoReturn;
-
-function generateRandomString($length) {
+function generateRandomString($length): string
+{
     $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
     $randomString = '';
     for ($i = 0; $i < $length; $i++) {
@@ -12,7 +11,8 @@ function generateRandomString($length) {
     return $randomString;
 }
 
-function showInfoMessage($textMessage){
+function showInfoMessage($textMessage): void
+{
     echo '<script>alert("'.$textMessage.'");</script>';
 }
 
@@ -24,3 +24,4 @@ function checkFormData($requiredFields): bool{
     }
     return true;
 }
+

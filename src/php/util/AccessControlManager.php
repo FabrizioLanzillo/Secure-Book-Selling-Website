@@ -21,6 +21,7 @@ class AccessControlManager{
         $this->shoppingCart = '//' . SERVER_ROOT . '/php/user/shoppingCart.php';
     }
 
+
     public static function getInstance(): ?AccessControlManager{
         if (self::$instance == null) {
             self::$instance = new AccessControlManager();

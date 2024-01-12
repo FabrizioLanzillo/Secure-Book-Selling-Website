@@ -71,3 +71,11 @@ WEB-SERVER LOGS:
 +[INFO] 2024-01-12 17:07:31 = Logout of the user succeeded
 +[INFO] 2024-01-12 17:07:55 = SessionID changed in order to avoid Session Fixation attacks
 +[INFO] 2024-01-12 17:07:55 = Login of the user: f.lanzillo@studenti.unipi.it, Succeeded
++[INFO] 2024-01-12 17:38:39 = SessionID changed in order to avoid Session Fixation attacks
++[INFO] 2024-01-12 17:38:39 = Login of the user: f.montini1@studenti.unipi.it, Succeeded
++[INFO] 2024-01-12 17:39:59 = SessionID changed in order to avoid Session Fixation attacks 
++[INFO] 2024-01-12 17:39:59 = Logout of the user succeeded
++[INFO] 2024-01-12 17:40:19 = SessionID changed in order to avoid Session Fixation attacks
++[INFO] 2024-01-12 17:40:19 = Login of the user: f.montini1@studenti.unipi.it, Succeeded
++[INFO] 2024-01-12 17:45:48 = SessionID changed in order to avoid Session Fixation attacks 
++[INFO] 2024-01-12 17:45:48 = Logout of the user succeeded
