@@ -54,7 +54,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="stylesheet" type="text/css" href="../css/otp_request.css">
+<!--    <link rel="stylesheet" type="text/css" href="../css/otp_request.css">-->
+    <link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <title>Book Selling - Otp Request</title>
 </head>
@@ -63,19 +64,29 @@
         include "./layout/header.php";
     ?>
 
-    <div class="otp_request_container">
-        <h2>Insert your email to receive an Otp</h2>
-        <label><b>Email</b>
-            <input class="email_input" type="email" placeholder="Email" name="email" required>
-        </label>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="p-4 border rounded">
+                    <h2 class="text-center mb-5">Insert your email to receive an OTP</h2>
+                    <form name="otp_request" action="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/password_recovery.php'); ?>" method="POST">
+                        <div class="form-group m-auto w-75 ">
+                            <label for="email" class="sr-only">Email</label>
+                            <input class="form-control mb-4" type="email" placeholder="Email" name="email" required>
+                            <!-- Hidden token to protect against CSRF -->
+                            <input type="hidden" name="token" value="<?php echo htmlspecialchars($_SESSION['token'] ?? ''); ?>">
 
-        <!-- Hidden token to protect against CSRF -->
-        <input type="hidden" name="token" value="<?php echo htmlspecialchars($_SESSION['token'] ?? ''); ?>">
+                            <button class="btn btn-primary btn-block" type="submit">Generate OTP</button>
+                        </div>
 
-        <button class="gen_otp_button" type="button">Generate OTP</button>
-        <!-- <div class="message"></div> -->
-        <a href="//<?php echo htmlspecialchars(SERVER_ROOT. '/php/password_recovery.php') ?>" class="already-otp" >I already have an Otp</a>
+                        <a href="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/password_recovery.php'); ?>" class="btn btn-link btn-block mt-3">I already have an OTP</a>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
+
+
     <script>
         $(document).ready(function(){
             $(".gen_otp_button").click(function(){

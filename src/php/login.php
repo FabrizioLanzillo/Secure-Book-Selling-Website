@@ -132,31 +132,40 @@ if(checkFormData(['email', 'password'])){
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <link rel="stylesheet" type="text/css" href="../css/login.css">
-        <title>Book Selling</title>
+<!--        <link rel="stylesheet" type="text/css" href="../css/login.css">-->
+        <link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css">
+        <title>Book Selling - Login</title>
     </head>
     <body>
         <?php
         include "./layout/header.php";
         ?>
 
-        <div class="login_container">
-            <h2>Login</h2>
-            <form name="login" action="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/login.php'); ?>" method="POST">
-                <label><b>Email</b>
-                    <input class="login_form_input" type="text" placeholder="Enter Email" name="email" required>
-                </label>
+        <div class="container mt-5">
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <div class="login-container">
+                        <h2 class="text-center">Login</h2>
+                        <form name="login" action="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/login.php'); ?>" method="POST">
+                            <div class="form-group">
+                                <label for="email"><b>Email</b></label>
+                                <input class="form-control" type="text" placeholder="Enter Email" name="email" required>
+                            </div>
 
-                <label><b>Password</b>
-                    <input class="login_form_input" type="password" placeholder="Enter Password" name="password" required>
-                </label>
+                            <div class="form-group mb-5">
+                                <label for="password"><b>Password</b></label>
+                                <input class="form-control" type="password" placeholder="Enter Password" name="password" required>
+                            </div>
 
-                <!-- Hidden token to protect against CSRF -->
-                <input type="hidden" name="token" value="<?php echo htmlspecialchars($_SESSION['token'] ?? ''); ?>">
+                            <!-- Hidden token to protect against CSRF -->
+                            <input type="hidden" name="token" value="<?php echo htmlspecialchars($_SESSION['token'] ?? ''); ?>">
 
-                <button class="login_form_button" type="submit">Login</button>
-            </form>
-            <a href="//<?php echo htmlspecialchars(SERVER_ROOT. '/php/otp_request.php'); ?>" class="forgot-pwd">Forgot Password?</a>
+                            <button class="btn btn-primary btn-block" type="submit">Login</button>
+                        </form>
+                        <a href="//<?php echo htmlspecialchars(SERVER_ROOT. '/php/otp_request.php')?>" class="forgot-pwd d-block text-center mt-3">Forgot Password?</a>
+                    </div>
+                </div>
+            </div>
         </div>
     </body>
 </html>
