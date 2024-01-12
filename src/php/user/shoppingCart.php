@@ -76,7 +76,7 @@ if (isset($_POST['itemId'])){
                                     <tr>
                                         <td class="p-4">
                                             <div class="media align-items-center">
-                                                <img src="../../img/books/<?php echo $itemId?>.jpg" class="d-block ui-w-40 ui-bordered mr-4" alt="Book Image">
+                                                <img src="../../img/books/<?php echo htmlspecialchars( $itemId);?>.jpg" class="d-block ui-w-40 ui-bordered mr-4" alt="Book Image">
                                                 <div class="media-body">
                                                     <a href="#" class="d-block text-dark"><?= htmlspecialchars($itemDetails['title']) ?></a>
                                                     <small>
@@ -90,7 +90,7 @@ if (isset($_POST['itemId'])){
                                         <td class="text-center font-weight-semibold align-middle p-4"><?= htmlspecialchars($itemDetails['quantity']) ?></td>
                                         <td class="text-center font-weight-semibold align-middle p-4">$<?= htmlspecialchars($itemDetails['price'] * $itemDetails['quantity']) ?></td>
                                         <td class="text-center align-middle px-0">
-                                            <form action="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/user/shoppingCart.php') ?>" method="POST">
+                                            <form action="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/user/shoppingCart.php'); ?>" method="POST">
                                                 <input type="hidden" name="itemId" value="<?php echo htmlspecialchars($itemId); ?>">
                                                 <!-- Hidden token to protect against CSRF -->
                                                 <input type="hidden" name="token" value="<?php echo htmlspecialchars($_SESSION['token'] ?? ''); ?>">
@@ -127,13 +127,13 @@ if (isset($_POST['itemId'])){
                             if ($sessionHandler->isLogged()) {
                                 $pathNextStepToCheckout = $accessControlManager->getNextStepToCheckout();
                                 ?>
-                                <a href="//<?php echo $pathNextStepToCheckout ?>"
+                                <a href="//<?php echo htmlspecialchars($pathNextStepToCheckout); ?>"
                                    class="btn btn-lg btn-primary mt-2">Checkout</a>
                                 <?php
                             }
                             else {
                                 ?>
-                                <a href="//<?php echo SERVER_ROOT . '/php/login.php' ?>" class="btn btn-lg btn-primary mt-2">Checkout</a>
+                                <a href="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/user/paymentPerformed.php');?>" class="btn btn-lg btn-primary mt-2">Checkout</a>
                                 <?php
                             }
                         }

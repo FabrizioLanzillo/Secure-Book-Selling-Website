@@ -32,25 +32,25 @@ include "./layout/header.php";
             <hr>
             <ul class="nav nav-pills flex-column mb-auto">
                 <li class="nav-item">
-                    <a href="//<?php echo SERVER_ROOT. '/php/admin/homeAdmin.php'?>" class="nav-link link-dark" >
+                    <a href="//<?php echo htmlspecialchars(SERVER_ROOT. '/php/admin/homeAdmin.php');?>" class="nav-link link-dark" >
                         <i class="fas fa-book"></i>
                         Books
                     </a>
                 </li>
                 <li>
-                    <a href="//<?php echo SERVER_ROOT. '/php/admin/orderList.php'?>" class="nav-link link-dark">
+                    <a href="//<?php echo htmlspecialchars(SERVER_ROOT. '/php/admin/orderList.php');?>" class="nav-link link-dark">
                         <i class="fas fa-list"></i>
                         Orders
                     </a>
                 </li>
                 <li>
-                    <a href="//<?php echo SERVER_ROOT. '/php/admin/customerList.php'?>" class="nav-link link-dark">
+                    <a href="//<?php echo htmlspecialchars(SERVER_ROOT. '/php/admin/customerList.php');?>" class="nav-link link-dark">
                         <i class="fas fa-users"></i>
                         Customers
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="//<?php echo SERVER_ROOT. '/php/profile.php'?>" class="nav-link active" aria-current="page">
+                    <a href="//<?php echo htmlspecialchars(SERVER_ROOT. '/php/profile.php');?>" class="nav-link active" aria-current="page">
                         <i class="fas fa-user"></i>
                         Admin
                     </a>
@@ -68,39 +68,39 @@ include "./layout/header.php";
 
                 $imagePath = ($isAdmin == 0) ? "../img/avatar.png" : "../img/federiho.png";
                 ?>
-                <img src="<?php echo $imagePath; ?>" alt="Profile Picture" class="img-fluid rounded-circle img-thumbnail">
+                <img src="<?php echo htmlspecialchars($imagePath); ?>" alt="Profile Picture" class="img-fluid rounded-circle img-thumbnail">
             </div>
             <div class="col-md-4">
                 <form>
                     <div class="form-group">
                         <label for="name">Name:</label>
-                        <input type="text" class="form-control" id="name" readonly="readonly" placeholder="<?php echo isset($user['name']) ? $user['name'] : ''; ?>">
+                        <input type="text" class="form-control" id="name" readonly="readonly" placeholder="<?php echo htmlspecialchars(isset($user['name']) ? $user['name'] : ''); ?>">
                     </div>
                     <div class="form-group">
                         <label for="surname">Surname:</label>
-                        <input type="text" class="form-control" id="surname" readonly="readonly" placeholder="<?php echo isset($user['surname']) ? $user['surname'] : ''; ?>">
+                        <input type="text" class="form-control" id="surname" readonly="readonly" placeholder="<?php echo htmlspecialchars(isset($user['surname']) ? $user['surname'] : ''); ?>">
                     </div>
                     <div class="form-group">
                         <label for="username">Username:</label>
-                        <input type="text" class="form-control" id="username" readonly="readonly" placeholder="<?php echo isset($user['username']) ? $user['username'] : ''; ?>">
+                        <input type="text" class="form-control" id="username" readonly="readonly" placeholder="<?php echo htmlspecialchars(isset($user['username']) ? $user['username'] : ''); ?>">
                     </div>
                     <div class="form-group">
                         <label for="date_birth">Date of birth:</label>
-                        <input type="text" class="form-control" id="date_birth" readonly="readonly" placeholder="<?php echo isset($user['date_of_birth']) ? $user['date_of_birth'] : ''; ?>">
+                        <input type="text" class="form-control" id="date_birth" readonly="readonly" placeholder="<?php echo htmlspecialchars(isset($user['date_of_birth']) ? $user['date_of_birth'] : ''); ?>">
                     </div>
                     <div class="form-group">
                         <label for="email">Email:</label>
-                        <input type="email" class="form-control" id="email" readonly="readonly" placeholder="<?php echo isset($user['email']) ? $user['email'] : ''; ?>">
+                        <input type="email" class="form-control" id="email" readonly="readonly" placeholder="<?php echo htmlspecialchars(isset($user['email']) ? $user['email'] : ''); ?>">
                     </div>
                     <div class="form-group">
                         <label for="password">Password:</label>
                         <input type="password" class="form-control" id="password" readonly="readonly" placeholder="*******************">
                     </div>
+                    <!-- Hidden token to protect against CSRF -->
+                    <input type="hidden" name="token" value="<?php echo htmlspecialchars($_SESSION['token'] ?? ''); ?>">
                     <a href="otp_request.php">
                         <button id="change-pwd" type="button" class="btn btn-primary">Change Password</button>
                     </a>
-
-
                 </form>
             </div>
         </div>

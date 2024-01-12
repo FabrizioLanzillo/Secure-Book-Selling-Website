@@ -32,25 +32,25 @@ include "./../layout/header.php";
     <hr>
     <ul class="nav nav-pills flex-column mb-auto">
         <li class="nav-item">
-            <a href="//<?php echo SERVER_ROOT. '/php/admin/homeAdmin.php'?>" class="nav-link link-dark">
+            <a href="//<?php echo htmlspecialchars(SERVER_ROOT. '/php/admin/homeAdmin.php');?>" class="nav-link link-dark">
                 <i class="fas fa-book"></i>
                 Books
             </a>
         </li>
         <li>
-            <a href="//<?php echo SERVER_ROOT. '/php/admin/orderList.php'?>" class="nav-link link-dark">
+            <a href="//<?php echo htmlspecialchars(SERVER_ROOT. '/php/admin/orderList.php');?>" class="nav-link link-dark">
                 <i class="fas fa-list"></i>
                 Orders
             </a>
         </li>
         <li>
-            <a href="//<?php echo SERVER_ROOT. '/php/admin/customerList.php'?>" class="nav-link active" aria-current="page">
+            <a href="//<?php echo htmlspecialchars(SERVER_ROOT. '/php/admin/customerList.php');?>" class="nav-link active" aria-current="page">
                 <i class="fas fa-users"></i>
                 Customers
             </a>
         </li>
         <li class="nav-item">
-            <a href="//<?php echo SERVER_ROOT. '/php/profile.php'?>" class="nav-link link-dark">
+            <a href="//<?php echo htmlspecialchars(SERVER_ROOT. '/php/profile.php');?>" class="nav-link link-dark">
                 <i class="fas fa-user"></i>
                 Admin
             </a>
@@ -79,13 +79,13 @@ include "./../layout/header.php";
         while ($customer = $customers->fetch_assoc()) {
             ?>
             <tr>
-                <td><?php echo $customer['name']; ?></td>
-                <td><?php echo $customer['surname']; ?></td>
-                <td><?php echo $customer['username']; ?></td>
-                <td><?php echo $customer['email']; ?></td>
-                <td><?php echo $customer['date_of_birth']; ?></td>
+                <td><?php echo htmlspecialchars($customer['name']); ?></td>
+                <td><?php echo htmlspecialchars($customer['surname']); ?></td>
+                <td><?php echo htmlspecialchars($customer['username']); ?></td>
+                <td><?php echo htmlspecialchars($customer['email']); ?></td>
+                <td><?php echo htmlspecialchars($customer['date_of_birth']); ?></td>
                 <td >
-                    <a href="<?php echo './deleteCustomer.php?user_id='.$customer['id']?>">
+                    <a href="<?php echo htmlspecialchars('./deleteCustomer.php?user_id='.$customer['id']);?>">
                         <button class="btn btn-danger btn-sm ml-1"><i class="fas fa-trash"></i></button>
                     </a>
                 </td>

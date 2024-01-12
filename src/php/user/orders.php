@@ -29,18 +29,40 @@ if ($sessionHandler->isLogged()) {
             <table>
                 <tr>
                     <th>Book</th>
+                    <th>Time</th>
                     <th>Amount</th>
-                    <th>Status</th>
+                    <th>Quantity</th>
                     <th>Payment Method</th>
                 </tr>
 
             <?php
+            //FARE GRAFICA X QUESTO
+            $ordersByTime = array();
+
+            while ($order = $performedOrders->fetch_assoc()) {
+                $time = $order['time'];
+                $title = htmlspecialchars($order['title']);
+
+                // Check if the time is already in the array
+                if (array_key_exists($time, $ordersByTime)) {
+                    // If yes, add the title to the existing array
+                    $ordersByTime[$time][] = $title;
+                } else {
+                    // If no, create a new array with the title
+                    $ordersByTime[$time] = array($title);
+                }
+            }
+            // Display the titles in an array for each time
+            foreach ($ordersByTime as $time => $titles) {
+                echo '<p>Orders at ' . htmlspecialchars($time) . ': ' . implode(', ', $titles) . '</p>';
+            }
             while ($order = $performedOrders->fetch_assoc()) {
             ?>
                 <tr>
                     <td><?php echo htmlspecialchars($order['title']); ?></td>
+                    <td><?php echo htmlspecialchars($order['time']); ?></td>
                     <td><?php echo htmlspecialchars($order['amount']); ?></td>
-                    <td><?php echo htmlspecialchars($order['status']); ?></td>
+                    <td><?php echo htmlspecialchars($order['quantity']); ?></td>
                     <td><?php echo htmlspecialchars($order['payment_method']); ?></td>
                 </tr>
             <?php

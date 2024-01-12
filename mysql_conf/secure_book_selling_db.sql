@@ -69,26 +69,26 @@ INSERT INTO `book` (`id`, `title`, `author`, `publisher`, `price`, `category`, `
 --
 
 CREATE TABLE IF NOT EXISTS `orders` (
-  `id` smallint NOT NULL AUTO_INCREMENT,
   `id_user` smallint NOT NULL,
   `id_book` smallint NOT NULL,
+  `time` timestamp NOT NULL,
   `amount` float NOT NULL,
-  `status` varchar(50) NOT NULL,
+  `quantity` int NOT NULL,
   `payment_method` varchar(50) NOT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`id_user`, `id_book`, `time`),
   KEY `orders_book_id_fk` (`id_book`),
   KEY `orders_user_id_fk` (`id_user`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dump dei dati per la tabella `orders`
 --
 
-INSERT INTO `orders` (`id`, `id_user`, `id_book`, `amount`, `status`, `payment_method`) VALUES
-(1, 1, 2, 24.99, 'Delivered', 'Card'),
-(2, 1, 3, 3.95, 'In transit', 'Card'),
-(3, 2, 3, 4.25, 'Delivered', 'Card'),
-(4, 3, 1, 19.99, 'Info received', 'Card');
+INSERT INTO `orders` ( `id_user`, `id_book`, `time`, `amount`, `quantity`, `payment_method`) VALUES
+(1, 2, now(), 24.99, 1, 'Card'),
+(1, 3, now(), 3.95, 1, 'Card'),
+(2, 3, now(), 4.25, 1, 'Card'),
+(3, 1, now(), 19.99, 1, 'Card');
 
 -- --------------------------------------------------------
 

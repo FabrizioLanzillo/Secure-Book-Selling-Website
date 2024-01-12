@@ -1,1 +1,19 @@
 WEB-SERVER LOGS:
++[ERROR] 2024-01-11 23:35:00 = [File: /index.php] - Error performing the query to retrieve all the books - [Error: MySQL - Code: 1146] [Details: Table 'secure_book_selling_db.book' doesn't exist]
++[INFO] 2024-01-11 23:40:48 = SessionID changed in order to avoid Session Fixation attacks
++[INFO] 2024-01-11 23:40:48 = Login of the user: g.marrucci4@studenti.unipi.it, Succeeded
++[INFO] 2024-01-11 23:47:38 = SessionID changed in order to avoid Session Fixation attacks 
++[INFO] 2024-01-11 23:47:38 = Logout of the user succeeded
++[INFO] 2024-01-11 23:47:53 = 2FA check for the user: g.marrucci4@studenti.unipi.it OTP has been created successfully
++[INFO] 2024-01-11 23:49:23 = The password update of the user: g.marrucci4@studenti.unipi.it, Succeeded
++[INFO] 2024-01-11 23:49:32 = SessionID changed in order to avoid Session Fixation attacks
++[INFO] 2024-01-11 23:49:32 = Login of the user: g.marrucci4@studenti.unipi.it, Succeeded
++[INFO] 2024-01-11 23:49:52 = SessionID changed in order to avoid Session Fixation attacks 
++[INFO] 2024-01-11 23:49:52 = Logout of the user succeeded
++[INFO] 2024-01-11 23:51:14 = SessionID changed in order to avoid Session Fixation attacks
++[INFO] 2024-01-11 23:51:14 = Login of the user: f.montini1@studenti.unipi.it, Succeeded
++[INFO] 2024-01-11 23:55:47 = SessionID changed in order to avoid Session Fixation attacks 
++[INFO] 2024-01-11 23:55:47 = Logout of the user succeeded
++[INFO] 2024-01-12 00:00:54 = SessionID changed in order to avoid Session Fixation attacks
++[INFO] 2024-01-12 00:00:54 = Login of the user: g.marrucci4@studenti.unipi.it, Succeeded
++[ERROR] 2024-01-12 01:11:43 = [File: /php/user/paymentPerformed.php] - Error performing the query to insert into the orders - [Error: MySQL - Code: 0] [Details: foreach() argument must be of type array|object, string given]

@@ -5,8 +5,18 @@ global $errorHandler;
 
 // Check if the search form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["search_query"])) {
-    $searchQuery = $_POST["search_query"];
-    $resultQuery = searchBooks($searchQuery);
+
+    // Protect against XSS
+    $token = htmlspecialchars($_POST['token'], ENT_QUOTES, 'UTF-8');
+    $searchQuery = htmlspecialchars($_POST["search_query"], ENT_QUOTES, 'UTF-8');
+
+    if (!$token || $token !== $_SESSION['token']) {
+        // return 405 http status code
+        header($_SERVER['SERVER_PROTOCOL'] . ' 405 Method Not Allowed');
+        exit;
+    } else {
+        $resultQuery = searchBooks($searchQuery);
+    }
 } else {
     $resultQuery = getBooks();
 }
@@ -25,10 +35,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["search_query"])) {
     ?>
 
     <div class="search_container">
-        <form name="search" action="//<?php echo SERVER_ROOT . '/'?>" method="POST">
+        <form name="search" action="//<?php echo htmlspecialchars(SERVER_ROOT . '/');?>" method="POST">
             <label>
                 <input class="search_form_input" type="text" name="search_query" placeholder="Enter book name" required>
             </label>
+            <!-- Hidden token to protect against CSRF -->
+            <input type="hidden" name="token" value="<?php echo htmlspecialchars($_SESSION['token'] ?? ''); ?>">
             <button class="search_button" type="submit">Search</button>
         </form>
     </div>
@@ -41,14 +53,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["search_query"])) {
                     // Output each book as a card in the grid
             ?>
                     <div class="book_card">
-                        <img src="/img/books/<?php echo $book['id']?>.jpg" alt="Book Image" style="width: 100%; height: auto;"> <br>
+                        <img src="/img/books/<?php echo htmlspecialchars($book['id']);?>.jpg" alt="Book Image" style="width: 100%; height: auto;"> <br>
                         <?php
                         foreach ($book as $key => $value) {
                             if ($key != 'id')
-                                echo $key . ": " . $value . "<br>";
+                                echo htmlspecialchars($key . ": " . $value) . "<br>";
                         }
                         ?>
-                        <a href="//<?php echo SERVER_ROOT. '/php/book_details.php?book_id='. $book['id']?>">
+                        <a href="//<?php echo htmlspecialchars(SERVER_ROOT. '/php/book_details.php?book_id='. $book['id']);?>">
                             <button class="view_details_button">
                                 Details
                             </button>

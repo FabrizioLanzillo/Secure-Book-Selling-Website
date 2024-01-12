@@ -6,6 +6,7 @@ global $errorHandler;
 
 // this block is executed only after the submit of the POST form
 if(checkFormData(['name', 'surname', 'email', 'username', 'password', 'repeat_password', 'birthdate'])){
+    
     // Protect against XSS
     $token = htmlspecialchars($_POST['token'], ENT_QUOTES, 'UTF-8');
     $name = htmlspecialchars($_POST['name'], ENT_QUOTES, 'UTF-8');

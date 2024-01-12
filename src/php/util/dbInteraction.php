@@ -725,7 +725,7 @@ function getAllCustomersData(){
         global $debug;
 
         try{
-            $query = "SELECT o.id, b.title, o.amount, o.status, o.payment_method
+            $query = "SELECT b.title, o.time, o.amount, o.quantity, o.payment_method
             FROM orders o INNER JOIN book b ON o.id_book = b.id
             WHERE id_user = ?;";
 
@@ -745,33 +745,80 @@ function getAllCustomersData(){
         }
     }
 
-/** Retrieve all orders' data
- * @return orders_info|false
- */
-function getAllOrdersData(){
+    function addItemToOrders($userId, $currentTime, $cartItems, $totalPrice){
+        global $SecureBookSellingDB;
+        global $logger;
 
-    global $SecureBookSellingDB;
-    global $logger;
+        try {
+            
+            $query = "INSERT INTO orders (id_user, id_book, time, amount, quantity, payment_method) 
+                    VALUES (?, ?, ?, ?, ?, ?)";
+            
+            foreach ($cartItems as $itemId => $itemDetails){
+                $parameters = array(
+                    $userId,
+                    $itemId,
+                    $currentTime,
+                    $totalPrice,
+                    $itemDetails['quantity'],
+                    "Card",
+                );
+                $SecureBookSellingDB->performQuery("INSERT", $query, $parameters, "iisdis");
+            }
 
-    try{
-        $query = "SELECT u.username as username, b.title as title, o.amount as amount, o.status as status, o.payment_method as payment_method
-                      FROM orders o 
-                        INNER JOIN user u ON o.id_user = u.id
-                        INNER JOIN book b ON o.id_book = b.id
-                      ORDER BY u.username;";
+            $query = "UPDATE book 
+                      SET stocks_number = stocks_number - ? 
+                      WHERE id = ?";
 
-        $result = $SecureBookSellingDB->performQuery("SELECT", $query, [], "sssss");
+            foreach ($cartItems as $itemId => $itemDetails){
+                $parameters = array(
+                    $itemDetails['quantity'],
+                    $itemId,
+                );
+                $SecureBookSellingDB->performQuery("UPDATE", $query, $parameters, "ii");
+            }
 
-        $SecureBookSellingDB->closeConnection();
-        return $result;
+            $SecureBookSellingDB->closeConnection();
+            return true;
+        }
+        catch (Exception $e) {
+            $logger->writeLog('ERROR',
+                "Error performing the query to insert into the orders",
+                $_SERVER['SCRIPT_NAME'],
+                "MySQL - Code: " . $e->getCode(),
+                $e->getMessage());
+            $SecureBookSellingDB->closeConnection();
+            return false;
+        }
     }
-    catch(Exception $e){
-        $logger->writeLog(  "ERROR",
-            "Error performing the query to retrieve all customers' data",
-            $_SERVER['SCRIPT_NAME'],
-            "MySQL - Code: ".$e->getCode(),
-            $e->getMessage());
-        $SecureBookSellingDB->closeConnection();
-        return false;
+
+    /** Retrieve all orders' data
+     * @return orders_info|false
+     */
+    function getAllOrdersData(){
+
+        global $SecureBookSellingDB;
+        global $logger;
+
+        try{
+            $query = "SELECT u.username as username, b.title as title, o.amount as amount, o.status as status, o.payment_method as payment_method
+                        FROM orders o 
+                            INNER JOIN user u ON o.id_user = u.id
+                            INNER JOIN book b ON o.id_book = b.id
+                        ORDER BY u.username;";
+
+            $result = $SecureBookSellingDB->performQuery("SELECT", $query, [], "sssss");
+
+            $SecureBookSellingDB->closeConnection();
+            return $result;
+        }
+        catch(Exception $e){
+            $logger->writeLog(  "ERROR",
+                "Error performing the query to retrieve all customers' data",
+                $_SERVER['SCRIPT_NAME'],
+                "MySQL - Code: ".$e->getCode(),
+                $e->getMessage());
+            $SecureBookSellingDB->closeConnection();
+            return false;
+        }
     }
-}

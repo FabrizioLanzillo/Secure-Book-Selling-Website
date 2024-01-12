@@ -58,7 +58,7 @@ $totalPrice = 0;
                                             <tr>
                                                 <td class="p-3">
                                                     <div class="media align-items-center">
-                                                        <img src="../../img/books/<?php echo $itemId?>.jpg" class="d-block ui-w-40 ui-bordered mr-4" style="width: 20%; height: auto;" alt="Book Image">
+                                                        <img src="../../img/books/<?php echo htmlspecialchars($itemId);?>.jpg" class="d-block ui-w-40 ui-bordered mr-4" style="width: 20%; height: auto;" alt="Book Image">
                                                         <div class="media-body">
                                                             <a href="#" class="d-block text-dark"><?= $itemDetails['title'] ?></a>
                                                             <small>
@@ -101,7 +101,7 @@ $totalPrice = 0;
                             <!-- Total Price -->
                             <div class="mb-3">
                                 <h5 class="mb-1">Total Amount</h5>
-                                <p class="mb-0"><?php echo '$'. $totalPrice?></p>
+                                <p class="mb-0"><?php echo htmlspecialchars('$'. $totalPrice);?></p>
                             </div>
 
                             <hr>
@@ -112,8 +112,10 @@ $totalPrice = 0;
                                         <h5>Shipping Info</h5>
                                     </div>
                                     <div class="col-md-4">
-                                        <form action="//<?php echo SERVER_ROOT . '/php/util/changeInfoCheckout.php' ?>" method="POST">
+                                        <form action="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/util/changeInfoCheckout.php');?>" method="POST">
                                             <input type="hidden" name="editInfo" value="shippingInfo">
+                                            <!-- Hidden token to protect against CSRF -->
+                                            <input type="hidden" name="token" value="<?php echo htmlspecialchars($_SESSION['token'] ?? ''); ?>">
                                             <button type="submit" class="btn btn-secondary btn-sm mr-1">Edit</button>
                                         </form>
                                     </div>
@@ -125,7 +127,7 @@ $totalPrice = 0;
 
                                         foreach ($_SESSION['shippingInfo'] as $key => $value) {
                                         ?>
-                                            <span><?php echo $_SESSION['shippingInfo'][$key];?></span><br>
+                                            <span><?php echo htmlspecialchars($_SESSION['shippingInfo'][$key]);?></span><br>
                                         <?php
                                         }
                                         ?>
@@ -140,25 +142,35 @@ $totalPrice = 0;
                                         <h5>Payment Method</h5>
                                     </div>
                                     <div class="col-md-4">
-                                        <form action="//<?php echo SERVER_ROOT . '/php/util/changeInfoCheckout.php' ?>" method="POST">
+                                        <form action="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/util/changeInfoCheckout.php');?>" method="POST">
                                             <input type="hidden" name="editInfo" value="paymentInfo">
+                                            <!-- Hidden token to protect against CSRF -->
+                                            <input type="hidden" name="token" value="<?php echo htmlspecialchars($_SESSION['token'] ?? ''); ?>">
                                             <button type="submit" class="btn btn-secondary btn-sm mr-1">Edit</button>
                                         </form>
 
                                     </div>
                                 </div>
-                                <p class="mb-0">Credit Card Number: <?php echo '****' . substr($_SESSION['paymentInfo']['cardNumber'], -4);?></p>
+                                <p class="mb-0">Credit Card Number: <?php echo htmlspecialchars('****' . substr($_SESSION['paymentInfo']['cardNumber'], -4));?></p>
                             </div>
 
                             <!-- Checkout Button -->
                                 <!-- TODO-->
-<!--                            <form action="//--><?php //echo SERVER_ROOT . '/php/user/orderSummary.php' ?><!--" method="POST">-->
+<!--                            <form action="//--><?php //echo htmlspecialchars(SERVER_ROOT . '/php/user/orderSummary.php' ?><!--" method="POST">-->
 <!--                                <input type="hidden" name="editInfo" value="paymentInfo">-->
 <!--                                <button type="submit" class="btn btn-primary btn-block">Pay Now</button>-->
 <!--                            </form>-->
-                            <a href="//<?php echo SERVER_ROOT . '/' ?>" target="_blank">
-                                <button type="button" class="btn btn-primary btn-block">Pay Now</button>
-                            </a>
+
+                            <!-- Checkout Button -->
+                            <form action="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/user/paymentPerformed.php'); ?>" method="POST">
+                                <?php if (!empty($items)) { ?>
+                                    <input type="hidden" name="totalPrice" value="<?php echo htmlspecialchars($totalPrice); ?>">
+                                    <input type="hidden" name="token" value="<?php echo htmlspecialchars($_SESSION['token'] ?? ''); ?>">
+                                    <button type="submit" class="btn btn-primary btn-block">Checkout</button>
+                                <?php } else { ?>
+                                    <p>No items in the shopping cart.</p>
+                                <?php } ?>
+                            </form>
                         </div>
                     </div>
                 </div>
