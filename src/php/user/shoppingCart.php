@@ -139,7 +139,7 @@ if (isset($_POST['itemId'])){
                             }
                             else {
                                 ?>
-                                <a href="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/user/paymentPerformed.php');?>" class="btn btn-lg btn-primary mt-2">Checkout</a>
+                                <a href="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/login.php');?>" class="btn btn-lg btn-primary mt-2">Checkout</a>
                                 <?php
                             }
                         }

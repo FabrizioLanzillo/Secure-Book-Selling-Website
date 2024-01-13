@@ -26,7 +26,7 @@ class ErrorHandler {
     public function handleException($exception): void
     {
         echo '<script>
-                 alert("'.$exception->getMessage().'");
+                 alert("'.htmlspecialchars($exception->getMessage()).'");
               </script>';
     }
 }

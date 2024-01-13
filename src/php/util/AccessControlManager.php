@@ -33,7 +33,7 @@ class AccessControlManager{
     function redirectToHome(): void{
         global $sessionHandler;
 
-        if ($sessionHandler->isLogged() and $_SESSION['isAdmin'] == 1) {
+        if ($sessionHandler->isLogged() and $sessionHandler->isAdmin()) {
             header('Location: ' . $this->homeAdminPath);
             exit;
         }
