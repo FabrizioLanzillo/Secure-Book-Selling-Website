@@ -12,8 +12,15 @@ require_once __DIR__ . "/../../config.php";
 <?php
         include "./../layout/header.php";
 ?>
-        <h1><b>Payment done</b></h1>
-        <a href="//<?php echo htmlspecialchars(SERVER_ROOT. '/')?>?>"
-           class="btn btn-lg btn-primary mt-2">Continue Shopping</a>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8 text-center">
+                <h1 class="display-4 text-success"><b>Payment Successful!</b></h1>
+                <p class="lead">Thank you for your purchase.</p>
+                <a href="//<?php echo htmlspecialchars(SERVER_ROOT. '/')?>" class="btn btn-primary btn-lg mt-3">Continue Shopping</a>
+            </div>
+        </div>
+    </div>
+
 	</body>
 </html>

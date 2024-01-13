@@ -802,13 +802,12 @@ function getAllCustomersData(){
         global $logger;
 
         try{
-            $query = "SELECT u.username as username, b.title as title, o.amount as amount, o.payment_method as payment_method
-                        FROM orders o 
-                            INNER JOIN user u ON o.id_user = u.id
-                            INNER JOIN book b ON o.id_book = b.id
-                        ORDER BY u.username;";
+            $query = "SELECT u.username as username, b.title, o.time, o.amount, o.quantity, o.payment_method, b.id AS id_book
+                        FROM orders o INNER JOIN book b ON o.id_book = b.id
+                                        INNER JOIN user u ON o.id_user = u.id
+                        ORDER BY o.time DESC";
 
-            $result = $SecureBookSellingDB->performQuery("SELECT", $query, [], "sssss");
+            $result = $SecureBookSellingDB->performQuery("SELECT", $query);
 
             $SecureBookSellingDB->closeConnection();
             return $result;

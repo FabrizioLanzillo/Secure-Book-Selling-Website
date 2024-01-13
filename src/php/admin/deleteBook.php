@@ -11,6 +11,7 @@ if ($sessionHandler->isLogged() and $sessionHandler->isAdmin()) {
     $bookId = isset($_GET['book_id']) ? htmlspecialchars($_GET['book_id'], ENT_QUOTES, 'UTF-8') : null;
 
     try {
+        // try to remove book from database
         $success = deleteBook($bookId);
 
         if($success){

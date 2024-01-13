@@ -11,6 +11,7 @@ if ($sessionHandler->isLogged() and $sessionHandler->isAdmin()) {
     $customerId = isset($_GET['user_id']) ? htmlspecialchars($_GET['user_id'], ENT_QUOTES, 'UTF-8') : null;
 
     try {
+        // try to remove user from database
         $success = deleteCustomer($customerId);
 
         if ($success) {
