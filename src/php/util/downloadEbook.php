@@ -41,17 +41,16 @@ try{
                         exit;
                     }
                     else {
-                        throw new Exception();
+                        throw new Exception("File not found");
                     }
                 }
-                throw new Exception();
+                throw new Exception("this book is not available for download");
             }
-            throw new Exception();
+            throw new Exception("Error retrieving book information");
         }
     }
-    throw new Exception();
+    throw new Exception("The given data are incorrect");
 }
 catch (Exception $e) {
-    header('Location: //' . SERVER_ROOT . '/php/user/orders.php');
-    exit;
+    $accessControlManager->redirectToHome("downloadBookError", $e->getMessage());
 }

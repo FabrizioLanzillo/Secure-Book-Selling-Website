@@ -41,10 +41,11 @@ try{
                 $shoppingCartHandler->clearShoppingCart();
                 if ($emailSender->sendEmail($_SESSION['email'],
                                                 "BookSelling - Successful Purchase",
-                                                "A New Books Purchase",
-                                                "Purchase was successfully completed.",
-                                                "You will be able to download the ebook through the link in the orders section, 
-                                                    accessible after logging in.") !== false){
+                                                "New Books Purchase",
+                                                "Your Purchase was successfully completed.",
+                                                "You will be able to download your e-books through the download buttons in the orders section, 
+                                                    accessible after the login.",
+                                                "Thank you again for your purchase.") !== false){
 
                     $logger->writeLog('INFO', "Purchase made by the user: " . $_SESSION['email'] . ", was Successful");
                 }
@@ -54,9 +55,8 @@ try{
                     // Error sending the email
                     throw new Exception("Couldn't send an email to the specified email address");
                 }
-                // Redirect to new .php page
-                header('Location: //' . SERVER_ROOT . '/php/user/paymentPerformed.php');
-                exit;
+                // Redirect to the home page
+                $accessControlManager->redirectToHome("paymentResponse", "OK");
             }
             else{
                 $logger->writeLog('ERROR',
@@ -68,7 +68,7 @@ try{
     }
 }
 catch (Exception $e) {
-    $errorHandler->handleException($e);
+    $accessControlManager->redirectToHome("paymentResponse", $e->getMessage());
 }
 
 // Var to display total price in the page

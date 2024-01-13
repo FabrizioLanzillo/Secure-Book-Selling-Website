@@ -2,14 +2,14 @@
 require_once __DIR__ . "/../../config.php";
 
 global $sessionHandler;
+global $accessControlManager;
 
 // check path manipulation
 // broken access control
 if ($sessionHandler->isLogged() and $sessionHandler->isAdmin()) {
-    $customers = getAllCustomersData();
+    $result = getAllCustomersData();
 } else {
-    header('Location: //' . SERVER_ROOT . '/');
-    exit;
+    $accessControlManager->redirectToHome();
 }
 ?>
 
@@ -82,20 +82,32 @@ include "./../layout/header.php";
             </thead>
             <tbody>
             <?php
-            while ($customer = $customers->fetch_assoc()) {
+            if ($result) {
+                if ($result->num_rows >= 1) {
+                    while ($customer = $result->fetch_assoc()) {
+                        ?>
+                        <tr>
+                            <td><?php echo htmlspecialchars($customer['name']); ?></td>
+                            <td><?php echo htmlspecialchars($customer['surname']); ?></td>
+                            <td><?php echo htmlspecialchars($customer['username']); ?></td>
+                            <td><?php echo htmlspecialchars($customer['email']); ?></td>
+                            <td><?php echo htmlspecialchars($customer['date_of_birth']); ?></td>
+                            <td>
+                                <a href="<?php echo htmlspecialchars('./deleteCustomer.php?user_id=' . $customer['id']); ?>">
+                                    <button class="btn btn-danger btn-sm ml-1"><i class="fas fa-trash"></i></button>
+                                </a>
+                            </td>
+                        </tr>
+                        <?php
+                    }
+                } else {
+                    ?>
+                    <div class='alert alert-danger mt-4'>Users not found in the database</div>
+                    <?php
+                }
+            } else {
                 ?>
-                <tr>
-                    <td><?php echo htmlspecialchars($customer['name']); ?></td>
-                    <td><?php echo htmlspecialchars($customer['surname']); ?></td>
-                    <td><?php echo htmlspecialchars($customer['username']); ?></td>
-                    <td><?php echo htmlspecialchars($customer['email']); ?></td>
-                    <td><?php echo htmlspecialchars($customer['date_of_birth']); ?></td>
-                    <td>
-                        <a href="<?php echo htmlspecialchars('./deleteCustomer.php?user_id=' . $customer['id']); ?>">
-                            <button class="btn btn-danger btn-sm ml-1"><i class="fas fa-trash"></i></button>
-                        </a>
-                    </td>
-                </tr>
+                <div class='alert alert-danger mt-4'>Error retrieving book details</div>
                 <?php
             }
             ?>

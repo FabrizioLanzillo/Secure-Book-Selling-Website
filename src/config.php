@@ -16,8 +16,8 @@
         "Content-Security-Policy: " .
         "default-src 'self'; " .
         "script-src 'self' https://cdnjs.cloudflare.com https://www.bookselling.snh 'unsafe-inline'; " .
-        "style-src 'self' 'unsafe-inline' https://stackpath.bootstrapcdn.com; " .
-        "font-src 'self' https://stackpath.bootstrapcdn.com; " .
+        "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://stackpath.bootstrapcdn.com; " .
+        "font-src 'self' https://cdnjs.cloudflare.com https://stackpath.bootstrapcdn.com; " .
         "img-src 'self' data:; " .
         "base-uri 'self'; " .
         "form-action 'self'; " .

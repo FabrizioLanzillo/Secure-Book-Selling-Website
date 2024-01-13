@@ -30,7 +30,7 @@ class AccessControlManager{
         return self::$instance;
     }
 
-    function redirectToHome(): void{
+    function redirectToHome($getParameterName = null, $getParameterValue = null): void{
         global $sessionHandler;
 
         if ($sessionHandler->isLogged() and $sessionHandler->isAdmin()) {
@@ -38,7 +38,12 @@ class AccessControlManager{
             exit;
         }
         else{
-            header('Location: ' . $this->homePath);
+            if(isset($getParameterName) && isset($getParameterValue)){
+                header('Location: ' . $this->homePath .'?'. $getParameterName .'='. $getParameterValue);
+            }
+            else{
+                header('Location: ' . $this->homePath);
+            }
             exit;
         }
     }
@@ -100,6 +105,7 @@ class AccessControlManager{
     }
 
     function redirectIfXSRFAttack(): void{
+        global $logger;
         $logger->writeLog('ERROR', "XSRF attack detected");
         header($_SERVER['SERVER_PROTOCOL'] . ' 405 Method Not Allowed');
         exit;

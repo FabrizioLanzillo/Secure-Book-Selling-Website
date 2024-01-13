@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS `book` (
 --
 
 INSERT INTO `book` (`id`, `title`, `author`, `publisher`, `price`, `category`, `stocks_number`, `ebook_name`) VALUES
-(1, 'Harry Potter e la PIetra Filosofale', 'J.K. Rowling', 'Salani Editore', 21.99, 'Fantasy', 4, '1_unix.pdf'),
+(1, 'Harry Potter e la Pietra Filosofale', 'J.K. Rowling', 'Salani Editore', 21.99, 'Fantasy', 4, '1_unix.pdf'),
 (2, 'Harry Potter ed il Principe Mezzosangue', 'J.K. Rowling', 'Salani Editore', 24.99, 'Fantasy', 8, '2_shell.pdf'),
 (3, 'One Piece vol.102', 'Eiichiro Oda', 'Star Comics', 4.25, 'Manga', 10, '3_env-exploits.pdf'),
 (4, 'To Kill a Mockingbird', 'Harper Lee', 'Harper Perennial', 14.99, 'Fiction', 15, '4_symlinks.pdf'),

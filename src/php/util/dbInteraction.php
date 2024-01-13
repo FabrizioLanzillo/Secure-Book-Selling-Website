@@ -232,18 +232,14 @@ function getOtpTimeInformation($email)
     global $logger;
 
     try {
-
         $query = "SELECT lastOtp
                         FROM user
                         WHERE email = ?;";
 
         $result = $SecureBookSellingDB->performQuery("SELECT", $query, [$email], "s");
-        if ($result->num_rows != 1) {
-            return null;
-        }
         $SecureBookSellingDB->closeConnection();
-        $result = $result->fetch_assoc();
-        return $result['lastOtp'];
+        return $result;
+
     } catch (Exception $e) {
         $logger->writeLog('ERROR',
             "Error getting the lastOtp for the user",
@@ -295,7 +291,6 @@ function getSecurityInfo($email)
 
     global $SecureBookSellingDB;
     global $logger;
-    global $debug;
 
     try {
         $query = "SELECT otp, lastOtp
@@ -381,7 +376,6 @@ function getBooks()
 
     global $SecureBookSellingDB;
     global $logger;
-    global $debug;
 
     try {
         $query = "SELECT id, title, author, price FROM book;";
@@ -410,7 +404,6 @@ function searchBooks($title)
 
     global $SecureBookSellingDB;
     global $logger;
-    global $debug;
 
     try {
         $query = "SELECT id, title, author, price FROM book WHERE title LIKE ?;";
@@ -438,7 +431,6 @@ function searchBooks($title)
  */
 function getBookDetails($bookId)
 {
-
     global $SecureBookSellingDB;
     global $logger;
 
@@ -446,9 +438,9 @@ function getBookDetails($bookId)
         $query = "SELECT id, title, author, publisher, price, category, stocks_number FROM book WHERE id = ?;";
 
         $result = $SecureBookSellingDB->performQuery("SELECT", $query, [$bookId], "s");
-
         $SecureBookSellingDB->closeConnection();
         return $result;
+
     } catch (Exception $e) {
         $logger->writeLog("ERROR",
             "Error performing the query to retrieve all the details of the book",

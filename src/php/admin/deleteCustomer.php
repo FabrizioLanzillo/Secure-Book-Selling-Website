@@ -4,6 +4,7 @@ require_once __DIR__ . "/../../config.php";
 global $logger;
 global $errorHandler;
 global $sessionHandler;
+global $accessControlManager;
 
 if ($sessionHandler->isLogged() and $sessionHandler->isAdmin()) {
 
@@ -12,11 +13,8 @@ if ($sessionHandler->isLogged() and $sessionHandler->isAdmin()) {
 
     try {
         // try to remove user from database
-        $success = deleteCustomer($customerId);
-
-        if ($success) {
-            $message = "Book: " . $customerId . " removed from database";
-            $logger->writeLog('INFO', $message);
+        if (deleteCustomer($customerId)) {
+            $logger->writeLog('INFO', "Book: " . $customerId . " removed from database");
             header('Location: ./customerList.php');
             exit;
         } else {
@@ -25,7 +23,6 @@ if ($sessionHandler->isLogged() and $sessionHandler->isAdmin()) {
     } catch (Exception $e) {
         $errorHandler->handleException($e);
     }
-}else{
-    header('Location: //' . SERVER_ROOT . '/');
-    exit;
+} else {
+    $accessControlManager->redirectToHome();
 }

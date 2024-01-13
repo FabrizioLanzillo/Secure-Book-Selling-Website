@@ -10,85 +10,109 @@ if ($sessionHandler->isLogged() and $sessionHandler->isAdmin()) {
     exit;
 }
 
-// Check if the search form is submitted
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["search_query"])) {
+try {
+    // Sanitize user input
+    $paymentResponse = isset($_GET['paymentResponse']) ? htmlspecialchars($_GET['paymentResponse'], ENT_QUOTES, 'UTF-8') : null;
+    if ($paymentResponse !== null) {
+        if ($paymentResponse === "OK") {
+            showInfoMessage("Payment Successful! Thank you for your purchase.");
+        } else {
+            throw new Exception($paymentResponse);
+        }
+    }
 
+    $downloadBookError = isset($_GET['downloadBookError']) ? htmlspecialchars($_GET['downloadBookError'], ENT_QUOTES, 'UTF-8') : null;
+    if ($downloadBookError !== null) {
+        throw new Exception($downloadBookError);
+    }
+
+} catch (Exception $e) {
+    $errorHandler->handleException($e);
+}
+
+// Check if the search form is submitted
+if ($_SERVER["REQUEST_METHOD"] == "POST" && checkFormData(['search_query'])) {
     // Protect against XSS
     $token = htmlspecialchars($_POST['token'], ENT_QUOTES, 'UTF-8');
     $searchQuery = htmlspecialchars($_POST["search_query"], ENT_QUOTES, 'UTF-8');
 
+    // Protect against XSRF
     if (!$token || $token !== $_SESSION['token']) {
         // return 405 http status code
-        $accessControlManager ->redirectIfXSRFAttack();
+        $accessControlManager->redirectIfXSRFAttack();
     } else {
-        $resultQuery = searchBooks($searchQuery);
+        $result = searchBooks($searchQuery);
     }
 } else {
-    $resultQuery = getBooks();
+    $result = getBooks();
 }
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-<!--        <link rel="stylesheet" type="text/css" href="./css/home.css">-->
-        <link rel="stylesheet" type="text/css" href="./css/bootstrap.min.css">
-        <title>Book Selling - Home</title>
-    </head>
-    <body>
+<head>
+    <!--        <link rel="stylesheet" type="text/css" href="./css/home.css">-->
+    <link rel="stylesheet" type="text/css" href="./css/bootstrap.min.css">
+    <title>Book Selling - Home</title>
+</head>
+<body>
 
-    <?php
-        include "./php/layout/header.php";
-    ?>
+<?php
+include "./php/layout/header.php";
+?>
 
-    <div class="container mt-5">
-        <form class="d-flex" name="search" action="//<?php echo htmlspecialchars(SERVER_ROOT . '/');?>" method="POST">
-            <input class="form-control me-2" type="text" name="search_query" placeholder="Search for books" required>
-            <!-- Hidden token to protect against CSRF -->
-            <input type="hidden" name="token" value="<?php echo htmlspecialchars($_SESSION['token'] ?? ''); ?>">
-            <button class="btn btn-primary" type="submit">Search</button>
-        </form>
-    </div>
+<div class="container mt-5">
+    <form class="d-flex" name="search" action="//<?php echo htmlspecialchars(SERVER_ROOT . '/'); ?>" method="POST">
+        <input class="form-control me-2" type="text" name="search_query" placeholder="Search for books" required>
+        <!-- Hidden token to protect against CSRF -->
+        <input type="hidden" name="token" value="<?php echo htmlspecialchars($_SESSION['token'] ?? ''); ?>">
+        <button class="btn btn-primary" type="submit">Search</button>
+    </form>
+</div>
 
-    <div class="container mt-5" style="max-width: 1440px;">
-        <div class="row d-flex align-items-center">
-            <?php
-            try{
-                if ($resultQuery) {
-                    while ($book = $resultQuery->fetch_assoc()) {
-                        // Output each book as a card in the grid
-                        ?>
-                        <div class="col-lg-3 mb-4 ">
-                            <a href="//<?php echo htmlspecialchars(SERVER_ROOT. '/php/book_details.php?book_id='. $book['id']);?>">
-                                <div class="card d-flex align-items-center">
-                                    <!--                                    <img src="img/front_book.jpg" class="card-img-top w-50 mt-4" alt="Book Image">-->
-                                    <img src="/img/books/<?php echo htmlspecialchars($book['id']);?>.jpg" alt="Book Image" style="width: 100%; height: auto;"> <br>
-                                    <div class="card-body d-flex flex-column align-items-center">
-                                        <h5 class="card-title text-dark">
-                                            <?php
-                                                $title = $book['title'];
-                                                if (strlen($title) > 30) { $title = substr($title, 0, 30) . '...'; }
-                                                echo htmlspecialchars($title);
-                                            ?>
-                                        </h5>
-                                        <p class="card-text text-dark"><?php echo htmlspecialchars($book['author']) ?></p>
-                                    </div>
+<div class="container mt-5" style="max-width: 1440px;">
+    <div class="row d-flex align-items-center">
+        <?php
+        if ($result) {
+            if ($result->num_rows >= 1) {
+                while ($book = $result->fetch_assoc()) {
+                    // Output each book as a card in the grid
+                    ?>
+                    <div class="col-lg-3 mb-4 ">
+                        <a href="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/book_details.php?book_id=' . $book['id']); ?>">
+                            <div class="card d-flex align-items-center">
+                                <!--                                    <img src="img/front_book.jpg" class="card-img-top w-50 mt-4" alt="Book Image">-->
+                                <img src="/img/books/<?php echo htmlspecialchars($book['id']); ?>.jpg" alt="Book Image"
+                                     style="width: 100%; height: auto;"> <br>
+                                <div class="card-body d-flex flex-column align-items-center">
+                                    <h5 class="card-title text-dark">
+                                        <?php
+                                        $title = $book['title'];
+                                        if (strlen($title) > 30) {
+                                            $title = substr($title, 0, 30) . '...';
+                                        }
+                                        echo htmlspecialchars($title);
+                                        ?>
+                                    </h5>
+                                    <p class="card-text text-dark"><?php echo htmlspecialchars($book['author']) ?></p>
                                 </div>
-                            </a>
-                        </div>
-                        <?php
-                    }
+                            </div>
+                        </a>
+                    </div>
+                    <?php
                 }
-                else {
-                    throw new Exception('Error retrieving books data');
-                }
-            } catch (Exception $e){
-                $errorHandler->handleException($e);
+            } else {
+                ?>
+                <div class='alert alert-danger mt-4'>Book not found in the database</div>
+                <?php
             }
+        } else {
             ?>
-        </div>
+            <div class='alert alert-danger mt-4'>Error retrieving book details</div>
+            <?php
+        }
+        ?>
     </div>
-
-
-    </body>
+</div>
+</body>
 </html>
