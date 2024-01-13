@@ -5,8 +5,10 @@
 
 global $user;
 
+// Checks if user is logged
 if($sessionHandler->isLogged()){
     $username = $_SESSION['username'];
+    // Retrieves user's data from the db
     $resultQuery = getUserData($username);
     if($resultQuery)
         $user = $resultQuery->fetch_assoc();
@@ -16,7 +18,6 @@ if($sessionHandler->isLogged()){
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- <link rel="stylesheet" type="text/css" href="../css/profile.css"> -->
     <link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <title>Book Selling - Profile</title></head>

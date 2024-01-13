@@ -5,9 +5,8 @@ require_once __DIR__ . "/../../config.php";
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <!--        <link rel="stylesheet" type="text/css" href="./css/home.css">-->
         <link rel="stylesheet" type="text/css" href="../../css/bootstrap.min.css">
-        <title>Book Selling - Home</title>
+        <title>Book Selling - Payment performed</title>
 	<body>
 <?php
         include "./../layout/header.php";

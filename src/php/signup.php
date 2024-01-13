@@ -5,11 +5,11 @@ global $logger;
 global $errorHandler;
 global $accessControlManager;
 
-// this block is executed only after the submit of the POST form
+// If POST vars are set it means that a POST form has been submitted 
 if(checkFormData(['name', 'surname', 'email', 'username', 'password', 'repeat_password', 'birthdate'])){
-    
-    // Protect against XSS
+    // Protect against XSRF
     $token = htmlspecialchars($_POST['token'], ENT_QUOTES, 'UTF-8');
+    // Protect against XSS
     $name = htmlspecialchars($_POST['name'], ENT_QUOTES, 'UTF-8');
     $surname = htmlspecialchars($_POST['surname'], ENT_QUOTES, 'UTF-8');
     $email = htmlspecialchars($_POST['email'], ENT_QUOTES, 'UTF-8');
@@ -17,16 +17,20 @@ if(checkFormData(['name', 'surname', 'email', 'username', 'password', 'repeat_pa
     $password = htmlspecialchars($_POST['password'], ENT_QUOTES, 'UTF-8');
     $repeatPassword = htmlspecialchars($_POST['repeat_password'], ENT_QUOTES, 'UTF-8');
     $birthdate = htmlspecialchars($_POST['birthdate'], ENT_QUOTES, 'UTF-8');
+    $logger->writeLog('INFO', "Protection against XSS applied");
 
     if (!$token || $token !== $_SESSION['token']) {
         // return 405 http status code
         $accessControlManager ->redirectIfXSRFAttack();
     } else {
+        $logger->writeLog('INFO', "XSRF control passed");
         try{
+            // Checks if passwords are the same
             if ($password !== $repeatPassword){
                 throw new Exception('The inserted passwords don\'t match');
             }
             else{
+                // Generates new vars to insert in the db
                 $salt = bin2hex(random_bytes(32));
                 $hashedPassword = hash('sha256', $password . $salt);
     
@@ -41,7 +45,8 @@ if(checkFormData(['name', 'surname', 'email', 'username', 'password', 'repeat_pa
                     0,
                     0,
                 );
-    
+                
+                // Inserts user's info in the db
                 $result = insertUser($userData);
                 if($result){
                     $logger->writeLog('INFO', "Signup of the user: ".$userData[4].", Succeeded");
@@ -49,6 +54,7 @@ if(checkFormData(['name', 'surname', 'email', 'username', 'password', 'repeat_pa
                     exit;
                 }
                 else{
+                    // No need to send a logger because it enetrs here only if db fails
                     throw new Exception('Couldn\'t register the user');
                 }
             }
@@ -62,7 +68,6 @@ if(checkFormData(['name', 'surname', 'email', 'username', 'password', 'repeat_pa
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!--    <link rel="stylesheet" type="text/css" href="../css/signup.css">-->
     <link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css">
     <script src="../js/utilityFunction.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/zxcvbn/4.4.2/zxcvbn.js"></script>
@@ -118,7 +123,7 @@ if(checkFormData(['name', 'surname', 'email', 'username', 'password', 'repeat_pa
                             <input class="form-control" type="date" name="birthdate" required>
                         </div>
 
-                        <!-- Hidden token to protect against CSRF -->
+                        <!-- Hidden token to protect against XSRF -->
                         <input type="hidden" name="token" value="<?php echo htmlspecialchars($_SESSION['token'] ?? ''); ?>">
 
                         <button class="btn btn-primary btn-block mb-5" id="signup_button" type="submit">Sign up</button>

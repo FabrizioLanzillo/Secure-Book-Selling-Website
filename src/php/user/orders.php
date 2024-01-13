@@ -3,8 +3,10 @@ require_once __DIR__ . "/../../config.php";
 
 global $sessionHandler;
 
+// Checks if the user is logged
 if ($sessionHandler->isLogged()) {
     $performedOrders = getUserOrders($_SESSION['userId']);
+    $logger->writeLog('INFO', "user " . $_SESSION['userId'] . " requested his orders");
 }
 
 ?>
@@ -23,6 +25,7 @@ if ($sessionHandler->isLogged()) {
 <?php
 include "./../layout/header.php";
 
+// Checks if the user is logged
 if ($sessionHandler->isLogged()) {
 ?>
 
@@ -46,11 +49,13 @@ if ($sessionHandler->isLogged()) {
             <tbody>
             <?php
             $previousTime = null;
+            // Checks if the user has performed more than 0 orders
             if ($performedOrders->num_rows > 0) {
                 while ($order = $performedOrders->fetch_assoc()) {
                     ?>
                     <tr>
                         <?php
+                        // Display orders by time, amount and payment method
                         if ($order['time'] !== $previousTime) {
                             ?>
                             <td class="text-center align-middle px-0"><?php echo htmlspecialchars($order['time']); ?></td>
@@ -74,7 +79,7 @@ if ($sessionHandler->isLogged()) {
                                   method="POST">
                                 <input type="hidden" name="id_book"
                                        value="<?php echo htmlspecialchars($order['id_book']); ?>">
-                                <!-- Hidden token to protect against CSRF -->
+                                <!-- Hidden token to protect against XSRF -->
                                 <input type="hidden" name="token"
                                        value="<?php echo htmlspecialchars($_SESSION['token'] ?? ''); ?>">
                                 <button type="submit" class="btn btn-secondary btn-sm ml-1"><i

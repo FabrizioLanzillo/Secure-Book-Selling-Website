@@ -6,25 +6,36 @@ require_once __DIR__ . "/../config.php";
     global $emailSender;
     global $accessControlManager;
 
-    // this block is executed only after submit of the POST form
+    // If one of POST vars is set it means that a POST form has been submitted 
     if (isset($_POST['email'])) {
+        // Protect against XSRF
         $token = htmlspecialchars($_POST['token'], ENT_QUOTES, 'UTF-8');
+        // Protect against XSS
+        $email = htmlspecialchars($_POST['email'], ENT_QUOTES, 'UTF-8');
+        $logger->writeLog('INFO', "Protection against XSS applied");
 
         if (!$token || $token !== $_SESSION['token']) {
             // return 405 http status code
             $accessControlManager ->redirectIfXSRFAttack();
         } else {
+            $logger->writeLog('INFO', "XSRF control passed");
             try {
-                $email = htmlspecialchars($_POST['email'], ENT_QUOTES, 'UTF-8');
+                // Check when the last otp has been requested
                 $retrievedTime = getOtpTimeInformation($email);
-                if ($retrievedTime === null)
+                if ($retrievedTime === null){
+                    $logger->writeLog('ERROR',
+                    "Failed to retrived the last Otp generated for the user: " . $email);
                     throw new Exception('Error retrieving the last Otp generated');
+                }
                 $lastOtpTime = strtotime($retrievedTime);
                 $currentTime = time();
 
+                // Checks if 90 seconds have passed 
                 if ($lastOtpTime !== false) {
                     if(($currentTime-$lastOtpTime) > 90) {     // 1 minute and 30 sec
+                        // Generates a random string of 8 chars
                         $newOtp = generateRandomString(8);
+                        // Set the OTP of the user
                         if (setOtp($email, $newOtp)) {
                             if ($emailSender->sendEmail($email,
                                                         "BookSelling - Your OTP code",
@@ -35,13 +46,19 @@ require_once __DIR__ . "/../config.php";
                                 header('Location: //' . SERVER_ROOT . '/php/password_recovery.php');
                                 exit;
                             } else {
+                                $logger->writeLog('ERROR',
+                                "Couldn't send email to user: " . $email);
                                 throw new Exception("Couldn't send an email to the specified email address");
                             }
                         }
                     } else {
+                        $logger->writeLog('ERROR',
+                        "User: " . $email . " requested an Otp before the 5 minutes deadline");
                         throw new Exception('You already received an Otp recently');
                     }
                 } else {
+                    $logger->writeLog('ERROR',
+                    "Failed to retrived the last Otp generated for the user: " . $email);
                     throw new Exception('Error retrieving the last Otp generated');
                 }
             } catch (Exception $e) {
@@ -54,7 +71,6 @@ require_once __DIR__ . "/../config.php";
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!--    <link rel="stylesheet" type="text/css" href="../css/otp_request.css">-->
     <link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <title>Book Selling - Otp Request</title>
