@@ -9,19 +9,27 @@ global $accessControlManager;
 $bookId = isset($_GET['book_id']) ? htmlspecialchars($_GET['book_id'], ENT_QUOTES, 'UTF-8') : null;
 $resultQuery = getBookDetails($bookId);
 
+// If one of POST vars is set it means that a POST form has been submitted 
 try{
     if (isset($_POST['bookId'])) {
-        // Protect against XSS
+        // Protect against XSRF
         $token = htmlspecialchars($_POST['token'], ENT_QUOTES, 'UTF-8');
+        // Protect against XSS
         $book = htmlspecialchars($_POST['bookId'], ENT_QUOTES, 'UTF-8');
         $quantity = htmlspecialchars($_POST['quantity'], ENT_QUOTES, 'UTF-8');
+        $logger->writeLog('INFO', "Protection against XSS applied");
 
         if (!$token || $token !== $_SESSION['token']) {
             // return 405 http status code
             $accessControlManager ->redirectIfXSRFAttack();
         } else {
-            if($shoppingCartHandler->addItem($book, $quantity)){       /*aggiunta la nuova post qui*/
+            $logger->writeLog('INFO', "XSRF control passed");
+            // Adds n of the specified books to the cart of the user
+            if($shoppingCartHandler->addItem($book, $quantity)){
                 showInfoMessage("Book Successfully added to the shopping cart!");
+            } else {
+                $logger->writeLog('ERROR',
+                "User: " . $_SESSION['email'] . " failed to add a book to its shopping cart");
             }
         }
     }
@@ -34,7 +42,6 @@ catch (Exception $e) {
 <!DOCTYPE html>
 <html lang="en">
     <head>
-<!--        <link rel="stylesheet" type="text/css" href="../css/book_details.css">-->
         <link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css">
         <title>Book Selling - Book Details</title>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -47,6 +54,7 @@ catch (Exception $e) {
 
         <div class="container mt-5">
             <?php
+            // Display book details based on what was retrieved in the db
                 if ($resultQuery) {
                 $bookDetails = $resultQuery->fetch_assoc();
                 if ($bookDetails) {
@@ -55,8 +63,6 @@ catch (Exception $e) {
             <div class="card">
                 <div class="row g-0 d-flex justify-content-center p-4">
                     <div class="col-md-4">
-                        <!--                        <img src="../img/front_book.jpg" alt="Book Image" class="img-fluid">-->
-<!--                        <img src="../img/bookImages/img---><?php //echo rand(1, 20); ?><!--.jpg" class="img-thumbnail w-75" alt="Book Image">-->
                         <img src="../img/books/<?php echo htmlspecialchars($bookId); ?>.jpg" alt="Book Image" class="img-thumbnail w-75" >
                     </div>
                     <div class="col-md-8">
@@ -100,15 +106,5 @@ catch (Exception $e) {
         }
         ?>
         </div>
-
-
-        <script>
-            //We need to handle this later
-            function addToCart() {
-                alert('Item has been added to the cart!');
-            }
-        </script>
-
-
     </body>
 </html>

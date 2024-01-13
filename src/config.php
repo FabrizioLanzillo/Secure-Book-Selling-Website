@@ -12,6 +12,18 @@
     define("PROJECT_ROOT", $_SERVER["DOCUMENT_ROOT"]);
     define("SERVER_ROOT", $_SERVER["SERVER_NAME"]);
 
+    header(
+        "Content-Security-Policy: " .
+        "default-src 'self'; " .
+        "script-src 'self' https://cdnjs.cloudflare.com https://www.bookselling.snh 'unsafe-inline'; " .
+        "style-src 'self' 'unsafe-inline' https://stackpath.bootstrapcdn.com; " .
+        "font-src 'self' https://stackpath.bootstrapcdn.com; " .
+        "img-src 'self' data:; " .
+        "base-uri 'self'; " .
+        "form-action 'self'; " .
+        "frame-ancestors 'self';"
+    );
+
     $debug = true;
     $lifetime = 10800;
     $path = '/';
