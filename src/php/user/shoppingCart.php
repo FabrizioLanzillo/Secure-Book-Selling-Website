@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . "/../../config.php";
 
+global $logger;
 global $sessionHandler;
 global $shoppingCartHandler;
 global $errorHandler;
@@ -9,17 +10,23 @@ global $accessControlManager;
 $items = $shoppingCartHandler->getBooks();
 $totalPrice = 0;
 
+// If a form has been submitted and the itemId is set
 if (isset($_POST['itemId'])){
-    // Protect against XSS
+    // Protect against XSRF
     $token = htmlspecialchars($_POST['token'], ENT_QUOTES, 'UTF-8');
+    // Protect against XSS
     $bookId = htmlspecialchars($_POST['itemId'], ENT_QUOTES, 'UTF-8');
+    $logger->writeLog('INFO', "Protection against XSS applied");
 
     if (!$token || $token !== $_SESSION['token']) {
         // return 405 http status code
         $accessControlManager ->redirectIfXSRFAttack();
     } else {
+        $logger->writeLog('INFO', "XSRF control passed");
         try{
+            // Remove item from the cart using its book_id
             if($shoppingCartHandler->removeItem($bookId)){
+                // Redirect to itself to update visual graphic
                 header('Location: //' . SERVER_ROOT . '/php/user/shoppingCart.php');
                 exit;
             }
@@ -37,7 +44,6 @@ if (isset($_POST['itemId'])){
         <link rel="stylesheet" type="text/css" href="../../css/shoppingCart.css">
         <title>Book Selling - Shopping Cart</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <!-- CSS di Bootstrap -->
         <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     </head>
@@ -133,7 +139,7 @@ if (isset($_POST['itemId'])){
                             }
                             else {
                                 ?>
-                                <a href="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/user/paymentPerformed.php');?>" class="btn btn-lg btn-primary mt-2">Checkout</a>
+                                <a href="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/login.php');?>" class="btn btn-lg btn-primary mt-2">Checkout</a>
                                 <?php
                             }
                         }

@@ -12,27 +12,34 @@ global $accessControlManager;
 $accessControlManager->redirectIfAnonymous();
 
 try{
-
+    // If POST vars are set it means that a POST form has been submitted 
     if(checkFormData(['fullName', 'address', 'city', 'province', 'cap', 'country'])){
-
+        // Protect against XSRF
         $token = htmlspecialchars($_POST['token'], ENT_QUOTES, 'UTF-8');
+        // Protect against XSS
         $fullName = htmlspecialchars($_POST['fullName'], ENT_QUOTES, 'UTF-8');
         $address = htmlspecialchars($_POST['address'], ENT_QUOTES, 'UTF-8');
         $city = htmlspecialchars($_POST['city'], ENT_QUOTES, 'UTF-8');
         $province = htmlspecialchars($_POST['province'], ENT_QUOTES, 'UTF-8');
         $cap = htmlspecialchars($_POST['cap'], ENT_QUOTES, 'UTF-8');
         $country = htmlspecialchars($_POST['country'], ENT_QUOTES, 'UTF-8');
+        $logger->writeLog('INFO', "Protection against XSS applied");
 
         if (!$token || $token !== $_SESSION['token']) {
             // return 405 http status code
             $accessControlManager ->redirectIfXSRFAttack();
         } else {
+            $logger->writeLog('INFO', "XSRF control passed");
+            // Save cart information in $_SESSION and redirect depending on $_SESSION vars set
             $sessionHandler->saveShippingInfo($fullName, $address, $city, $province, $cap, $country);
+            $logger->writeLog('INFO', "User: " . $_SESSION['email'] . " succesfully set his shipment info");
             $accessControlManager->routeMultiStepCheckout();
         }
     }
 }
 catch (Exception $e) {
+    $logger->writeLog('ERROR',
+    "Failed to set the shipment info for the user: " . $_SESSION['email']);
     $errorHandler->handleException($e);
 }
 ?>
@@ -132,7 +139,6 @@ catch (Exception $e) {
 
                                 <!-- Hidden token to protect against CSRF -->
                                 <input type="hidden" name="token" value="<?php echo htmlspecialchars($_SESSION['token'] ?? ''); ?>">
-
                                 <button type="submit" class="btn btn-success btn-lg btn-block">Continue to Payment</button>
                             </form>
 

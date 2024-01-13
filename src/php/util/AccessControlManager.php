@@ -1,5 +1,6 @@
 <?php
 global $shoppingCartHandler;
+global $logger;
 
 class AccessControlManager{
     private static ?AccessControlManager $instance = null;
@@ -32,7 +33,7 @@ class AccessControlManager{
     function redirectToHome(): void{
         global $sessionHandler;
 
-        if ($sessionHandler->isLogged() and $_SESSION['isAdmin'] == 1) {
+        if ($sessionHandler->isLogged() and $sessionHandler->isAdmin()) {
             header('Location: ' . $this->homeAdminPath);
             exit;
         }
@@ -99,6 +100,7 @@ class AccessControlManager{
     }
 
     function redirectIfXSRFAttack(): void{
+        $logger->writeLog('ERROR', "XSRF attack detected");
         header($_SERVER['SERVER_PROTOCOL'] . ' 405 Method Not Allowed');
         exit;
     }

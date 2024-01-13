@@ -6,36 +6,51 @@ global $errorHandler;
 global $sessionHandler;
 global $accessControlManager;
 
-// this block is executed only after the submit of the POST form
+// If POST vars are set it means that a POST form has been submitted 
 if(checkFormData(['email', 'otp', 'password', 'repeat_password'])){
-
+    // Protect against XSRF
     $token = htmlspecialchars($_POST['token'], ENT_QUOTES, 'UTF-8');
+    // Protect against XSS
     $email = htmlspecialchars($_POST['email'], ENT_QUOTES, 'UTF-8');
     $otp = htmlspecialchars($_POST['otp'], ENT_QUOTES, 'UTF-8');
     $password = htmlspecialchars($_POST['password'], ENT_QUOTES, 'UTF-8');
     $repeatPassword = htmlspecialchars($_POST['repeat_password'], ENT_QUOTES, 'UTF-8');
+    $logger->writeLog('INFO', "Protection against XSS applied");
 
     if (!$token || $token !== $_SESSION['token']) {
         // return 405 http status code
         $accessControlManager ->redirectIfXSRFAttack();
     } else {
+        $logger->writeLog('INFO', "XSRF control passed");
         try{
+            // Checks if passwords are the same
             if ($password !== $repeatPassword) {
                 throw new Exception('The inserted passwords don\'t match');
             }
             else {
+                // Get all security info from db to verify user
                 $resultQuery = getSecurityInfo($email);
                 $otpData = $resultQuery->fetch_assoc();
-    
-                if($otpData['otp'] === null OR $otpData['lastOtp'] === null)
+                
+                // Checks OTP retrieved from db
+                if($otpData['otp'] === null OR $otpData['lastOtp'] === null){
+                    $logger->writeLog('ERROR',
+                    "The Otp for the user: " . $email . " is null");
                     throw new Exception('An error occured in your request');
-    
+                }
+                    
+                // Convert time for comparison
                 $lastOtpTime = strtotime($otpData['lastOtp']);
                 $currentTime = time();
-    
-                if(($currentTime-$lastOtpTime) > 300 OR $otpData['otp'] !== $otp)
+                
+                // Checks OTP inserted with the one in the db
+                if(($currentTime-$lastOtpTime) > 300 OR $otpData['otp'] !== $otp){
+                    $logger->writeLog('ERROR',
+                    "The user: " . $email . " tried to use his Otp but failed");
                     throw new Exception('The Otp is incorrect and/or expired');
-    
+                }
+                    
+                // Generates new vars to insert in the db
                 $salt = bin2hex(random_bytes(32));
                 $hashedPassword = hash('sha256', $password . $salt);
     
@@ -44,7 +59,8 @@ if(checkFormData(['email', 'otp', 'password', 'repeat_password'])){
                     $salt,
                     $email,
                 );
-    
+                
+                // Update user's password
                 $result = updateUserPassword($userData);
                 if($result){
                     $logger->writeLog('INFO', "The password update of the user: ".$userData[2].", Succeeded");
@@ -52,6 +68,7 @@ if(checkFormData(['email', 'otp', 'password', 'repeat_password'])){
                     exit;
                 }
                 else{
+                    // No need to send a logger because it enetrs here only if db fails
                     throw new Exception('Couldn\'t update the user\'s password');
                 }
             }
@@ -65,7 +82,6 @@ if(checkFormData(['email', 'otp', 'password', 'repeat_password'])){
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!--    <link rel="stylesheet" type="text/css" href="../css/password_recovery.css">-->
     <link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css">
     <script src="../js/utilityFunction.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/zxcvbn/4.4.2/zxcvbn.js"></script>
