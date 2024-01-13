@@ -56,7 +56,7 @@ catch (Exception $e) {
         <?php
         include "../layout/header.php";
         ?>
-        <section class="p-4 p-md-5 m-5 bg-info">
+        <section class="p-4 p-md-5 m-5">
             <div class="row d-flex justify-content-center">
                 <div class="col-md-10 col-lg-8 col-xl-5 w-100">
                     <div class="card rounded-4">

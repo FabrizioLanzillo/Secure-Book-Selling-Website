@@ -59,15 +59,20 @@ catch (Exception $e) {
                 $bookDetails = $resultQuery->fetch_assoc();
                 if ($bookDetails) {
             ?>
-            <h1 class="mb-4">Book Details</h1>
+            <h1 class="mb-4 text-center"><?php echo htmlspecialchars($bookDetails['title']); ?></h1>
             <div class="card">
                 <div class="row g-0 d-flex justify-content-center p-4">
-                    <div class="col-md-4">
-                        <img src="../img/books/<?php echo htmlspecialchars($bookId); ?>.jpg" alt="Book Image" class="img-thumbnail w-75" >
+                    <div class="col-md-4 d-flex justify-content-center">
+                        <img src="../img/books/<?php echo htmlspecialchars($bookId); ?>.jpg" alt="Book Image" class="img-thumbnail m-auto" >
                     </div>
                     <div class="col-md-8">
                         <div class="card-body">
-                            <h5 class="card-title"><?php echo htmlspecialchars($bookDetails['title']); ?></h5>
+                            <p class="card-text text-justify"><strong>Synopsis:</strong>
+                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed condimentum dapibus velit, ac vulputate tellus. Duis vestibulum vel elit vitae consectetur.
+                                Curabitur auctor, libero eu tempus ullamcorper, dui ante dictum augue, nec interdum velit justo in nulla. Vivamus id nisi vel justo euismod volutpat.
+                                Nullam malesuada lacus at neque malesuada, vel sollicitudin risus bibendum. Integer eu nulla id nisl interdum suscipit. Phasellus vel odio at quam bibendum ultrices id eu elit.
+                                Fusce tincidunt, felis vel pharetra laoreet, felis elit dapibus tortor, eu vulputate purus sem eu lacus. Etiam tristique sem nec leo cursus, in varius ex laoreet.
+                            </p>
                             <p class="card-text"><strong>Author:</strong> <?php echo htmlspecialchars($bookDetails['author']); ?></p>
                             <p class="card-text"><strong>Publisher:</strong> <?php echo htmlspecialchars($bookDetails['publisher']); ?></p>
                             <p class="card-text"><strong>Price:</strong> $<?php echo htmlspecialchars($bookDetails['price']); ?></p>

@@ -90,14 +90,15 @@ $totalPrice = 0;
         <?php
         include "./../layout/header.php";
         ?>
-        <section class="container mt-5 p-5 bg-info rounded ">
-            <h2 class="mb-4">Checkout</h2>
+        <section class="container mt-5 p-5 rounded ">
+<!--            <h2 class="mb-4">Checkout</h2>-->
 
             <div class="row">
                 <div class="col-md-8">
                     <div class="card">
                         <div class="card-header">
-                            <h2>Order</h2>
+<!--                            <h2>Order</h2>-->
+                            <h2>Checkout</h2>
                         </div>
                         <div class="card-body">
                             <?php

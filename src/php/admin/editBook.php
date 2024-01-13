@@ -6,6 +6,7 @@ global $logger;
 global $errorHandler;
 global $accessControlManager;
 
+// If POST vars are set it means that a POST form has been submitted
 function checkBookData(): bool{
     $requiredFields = ['id','title', 'author', 'publisher', 'price', 'category', 'stock'];
     foreach ($requiredFields as $field) {
@@ -21,8 +22,9 @@ if ($sessionHandler->isLogged() and $sessionHandler->isAdmin()) {
     // Sanitize user input
     $bookId = isset($_GET['book_id']) ? htmlspecialchars($_GET['book_id'], ENT_QUOTES, 'UTF-8') : null;
 
-// retrieve the book that admin want to edit
-    $editBook = (getBookDetails($bookId))->fetch_assoc();
+    // retrieve the book that admin want to edit
+    if($bookId !== null)
+        $editBook = (getBookDetails($bookId))->fetch_assoc();
 
     
     if(checkBookData()){
@@ -51,6 +53,7 @@ if ($sessionHandler->isLogged() and $sessionHandler->isAdmin()) {
                     $id,
                 );
 
+                // update book information
                 $result = updateBook($book);
                 if($result){
                     $logger->writeLog('INFO', "Book: ".$book[0]."with id= ".$book[6]." updated");

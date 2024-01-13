@@ -48,7 +48,7 @@ catch (Exception $e) {
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Payment Method</title>
-
+        <script type="text/javascript" src="../../js/payment.js"></script>
         <link rel="stylesheet" href="../../css/bootstrap.css">
 
     </head>
@@ -56,7 +56,7 @@ catch (Exception $e) {
         <?php
         include "../layout/header.php";
         ?>
-        <section class="p-4 p-md-5 m-5 bg-info">
+        <section class="p-4 p-md-5 m-5 ">
             <div class="row d-flex justify-content-center">
                 <div class="col-md-10 col-lg-8 col-xl-6 w-100">
                     <div class="card rounded-4">
@@ -88,7 +88,8 @@ catch (Exception $e) {
                                                        placeholder="1234 5678 1234 5678"
                                                        maxlength="19"
                                                        pattern="[0-9]{4} [0-9]{4} [0-9]{4} [0-9]{4}"
-                                                       title="Please enter a valid 16-digit card number divided by a space" required>
+                                                       title="Please enter a valid 16-digit card number divided by a space"
+                                                       oninput="formatCardNumber(event)" required>
                                             </div>
                                         </div>
                                         <div class="col-3">
@@ -100,7 +101,8 @@ catch (Exception $e) {
                                                        placeholder="MM/YY"
                                                        pattern="\d{2}/\d{2}"
                                                        title="Please Insert this format MM/YY"
-                                                       maxlength="5" required>
+                                                       maxlength="5"
+                                                       oninput="formatExpirationDate(event)" required>
                                             </div>
                                         </div>
                                         <div class="col-2">
