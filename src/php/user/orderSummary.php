@@ -18,19 +18,26 @@ $accessControlManager->checkFinalStepCheckout();
 $items = $shoppingCartHandler->getBooks();
 
 try{
+    // If one of POST vars is set it means that a POST form has been submitted 
     if(checkFormData(['totalPrice'])){
-        // Protect against XSS
+        // Protect against XSRF
         $token = htmlspecialchars($_POST['token'], ENT_QUOTES, 'UTF-8');
+        // Protect against XSS
         $totalPriceOrder = htmlspecialchars($_POST['totalPrice'], ENT_QUOTES, 'UTF-8');
+        $logger->writeLog('INFO', "Protection against XSS applied");
 
         if (!$token || $token !== $_SESSION['token']) {
             // return 405 http status code
             $accessControlManager ->redirectIfXSRFAttack();
         }
         else {
+            $logger->writeLog('INFO', "XSRF control passed");
+            //Set the time and userId for the order's rows
             $currentTime = date('Y-m-d H:i:s');
             $userId = $_SESSION['userId'];
+            // Perform query to add item in the db
             if(addItemToOrders($userId, $currentTime, $items, $totalPriceOrder)){
+                // Now the shopping cart needs to be emptied, since user performed the order
                 $shoppingCartHandler->clearShoppingCart();
                 if ($emailSender->sendEmail($_SESSION['email'],
                                                 "BookSelling - Successful Purchase",
@@ -42,13 +49,20 @@ try{
                     $logger->writeLog('INFO', "Purchase made by the user: " . $_SESSION['email'] . ", was Successful");
                 }
                 else {
+                    $logger->writeLog('ERROR',
+                    "Failed to send an email to the user: " . $_SESSION['email']);
+                    // Error sending the email
                     throw new Exception("Couldn't send an email to the specified email address");
                 }
+                // Redirect to new .php page
                 header('Location: //' . SERVER_ROOT . '/php/user/paymentPerformed.php');
                 exit;
             }
             else{
-                throw new Exception("Problem During the Payment!");
+                $logger->writeLog('ERROR',
+                "User: " . $_SESSION['email'] . " failed to perform the payment");
+                // Error performing payment
+                throw new Exception("Problem during the Payment!");
             }
         }
     }
@@ -57,6 +71,7 @@ catch (Exception $e) {
     $errorHandler->handleException($e);
 }
 
+// Var to display total price in the page
 $totalPrice = 0;
 
 ?>
@@ -161,7 +176,7 @@ $totalPrice = 0;
                                     <div class="col-md-4">
                                         <form action="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/util/changeInfoCheckout.php');?>" method="POST">
                                             <input type="hidden" name="editInfo" value="shippingInfo">
-                                            <!-- Hidden token to protect against CSRF -->
+                                            <!-- Hidden token to protect against XSRF -->
                                             <input type="hidden" name="token" value="<?php echo htmlspecialchars($_SESSION['token'] ?? ''); ?>">
                                             <button type="submit" class="btn btn-secondary btn-sm ml-1"><i class="fas fa-edit"></i></button>
                                         </form>
@@ -170,6 +185,7 @@ $totalPrice = 0;
 
                                 <small>
                                         <?php
+                                        // Displays the shipping info
                                         $shippingInfo = $_SESSION['shippingInfo'];
 
                                         foreach ($_SESSION['shippingInfo'] as $key => $value) {
@@ -207,6 +223,7 @@ $totalPrice = 0;
                                 if (!empty($items)) {
                                 ?>
                                     <input type="hidden" name="totalPrice" value="<?php echo htmlspecialchars($totalPrice); ?>">
+                                    <!-- Hidden token to protect against CSRF -->
                                     <input type="hidden" name="token" value="<?php echo htmlspecialchars($_SESSION['token'] ?? ''); ?>">
                                     <button type="submit" class="btn btn-primary btn-block">Checkout</button>
                                 <?php

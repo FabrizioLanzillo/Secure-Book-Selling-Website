@@ -84,6 +84,8 @@ if (checkFormData(['email', 'password'])) {
     $token = htmlspecialchars($_POST['token'], ENT_QUOTES, 'UTF-8');
     $email = htmlspecialchars($_POST['email'], ENT_QUOTES, 'UTF-8');
     $submittedPassword = htmlspecialchars($_POST['password'], ENT_QUOTES, 'UTF-8');
+  
+    $logger->writeLog('INFO', "Protection against XSS applied");
 
     // Protect against XSRF
     if (!$token || $token !== $_SESSION['token']) {
@@ -91,6 +93,7 @@ if (checkFormData(['email', 'password'])) {
         $accessControlManager->redirectIfXSRFAttack();
     } else {
         try {
+            $logger->writeLog('INFO', "XSRF control passed");
             // retrieve from the db the salt of the user, and the blockAccess information
             $result = getAccessInformation($email);
             // check if an error occurred while performing the query
