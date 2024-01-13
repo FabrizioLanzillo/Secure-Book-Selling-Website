@@ -100,15 +100,5 @@ catch (Exception $e) {
         }
         ?>
         </div>
-
-
-        <script>
-            //We need to handle this later
-            function addToCart() {
-                alert('Item has been added to the cart!');
-            }
-        </script>
-
-
     </body>
 </html>

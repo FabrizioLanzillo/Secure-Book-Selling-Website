@@ -13,7 +13,7 @@ function generateRandomString($length): string
 
 function showInfoMessage($textMessage): void
 {
-    echo '<script>alert("'.$textMessage.'");</script>';
+    echo '<script>alert("'.htmlspecialchars($textMessage).'");</script>';
 }
 
 function checkFormData($requiredFields): bool{
