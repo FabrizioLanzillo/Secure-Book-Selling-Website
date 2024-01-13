@@ -11,7 +11,7 @@
             <?php }else{ ?>
             <a class="navbar-brand" href="//<?php echo htmlspecialchars(SERVER_ROOT. '/')?>">
                 <?php } ?>
-                <img src="./../../img/book_selling_logo.png" alt="logo" class="img-fluid">
+                <img src="./../../img/bookselling.png" alt="logo" class="img-fluid" style="width: 200px; height: auto;">
             </a>
 
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
