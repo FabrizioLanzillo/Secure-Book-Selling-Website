@@ -6,21 +6,9 @@ global $logger;
 global $errorHandler;
 global $accessControlManager;
 
-// If POST vars are set it means that a POST form has been submitted
-function checkBookData(): bool
-{
-    $requiredFields = ['title', 'author', 'publisher', 'price', 'category', 'stock'];
-    foreach ($requiredFields as $field) {
-        if (!isset($_POST[$field]) || empty($_POST[$field])) {
-            return false;
-        }
-    }
-    return true;
-}
-
 if ($sessionHandler->isLogged() and $sessionHandler->isAdmin()) {
-
-    if (checkBookData()) {
+    if(checkFormData(['title', 'author', 'publisher', 'price', 'category', 'stock'])){
+        // Protect against XSS
         $token = htmlspecialchars($_POST['token'], ENT_QUOTES, 'UTF-8');
         $title = htmlspecialchars($_POST['title'], ENT_QUOTES, 'UTF-8');
         $author = htmlspecialchars($_POST['author'], ENT_QUOTES, 'UTF-8');
@@ -28,7 +16,7 @@ if ($sessionHandler->isLogged() and $sessionHandler->isAdmin()) {
         $price = htmlspecialchars($_POST['price'], ENT_QUOTES, 'UTF-8');
         $category = htmlspecialchars($_POST['category'], ENT_QUOTES, 'UTF-8');
         $stock = htmlspecialchars($_POST['stock'], ENT_QUOTES, 'UTF-8');
-
+        // Protect against XSRF
         if (!$token || $token !== $_SESSION['token']) {
             // return 405 http status code
             $accessControlManager->redirectIfXSRFAttack();
@@ -45,12 +33,9 @@ if ($sessionHandler->isLogged() and $sessionHandler->isAdmin()) {
                 );
 
                 //add book into database
-                $result = insertBook($book);
-
-                if ($result) {
+                if (insertBook($book)) {
                     $logger->writeLog('INFO', "Book: " . $book[0] . " added into database");
-                    header('Location: //' . SERVER_ROOT . '/php/admin/homeAdmin.php');
-                    exit;
+                    $accessControlManager->redirectToHome();
                 } else {
                     throw new Exception('Could not add the book');
                 }
@@ -61,8 +46,7 @@ if ($sessionHandler->isLogged() and $sessionHandler->isAdmin()) {
         }
     }
 } else {
-    header('Location: //' . SERVER_ROOT . '/');
-    exit;
+    $accessControlManager->redirectToHome();
 }
 ?>
 

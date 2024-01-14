@@ -60,7 +60,7 @@ try{
             }
             else{
                 $logger->writeLog('ERROR',
-                "User: " . $_SESSION['email'] . " failed to perform the payment");
+                                    "User: " . $_SESSION['email'] . " failed to perform the payment");
                 // Error performing payment
                 throw new Exception("Problem during the Payment!");
             }

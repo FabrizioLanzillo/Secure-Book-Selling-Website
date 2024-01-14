@@ -27,11 +27,12 @@ try{
         }
         else {
             // check if the user has bought the book selected
-            $resultQuery = checkBookPurchaseByBook($_SESSION['userId'], $idBook);
-            if($resultQuery){
-                if($resultQuery->num_rows === 1){
-                    $result = $resultQuery->fetch_assoc();
-                    $ebookName = $result['ebook_name'];
+            $result = checkBookPurchaseByBook($_SESSION['userId'], $idBook);
+            if($result){
+                // check if the query returned a result and exactly 1 row
+                $dataQuery = $result->fetch_assoc();
+                if ($dataQuery !== null && $result->num_rows === 1) {
+                    $ebookName = $dataQuery['ebook_name'];
 
                     $filePath = $eBookPath . $ebookName;
                     if (file_exists($filePath)) {
@@ -44,12 +45,18 @@ try{
                         throw new Exception("File not found");
                     }
                 }
-                throw new Exception("this book is not available for download");
+                else{
+                    throw new Exception("this book is not available for download");
+                }
             }
-            throw new Exception("Error retrieving book information");
+            else{
+                throw new Exception("Error retrieving book information");
+            }
         }
     }
-    throw new Exception("The given data are incorrect");
+    else{
+        throw new Exception("The given data are incorrect");
+    }
 }
 catch (Exception $e) {
     $accessControlManager->redirectToHome("downloadBookError", $e->getMessage());

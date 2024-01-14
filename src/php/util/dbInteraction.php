@@ -6,32 +6,6 @@ $SecureBookSellingDB = DbManager::getInstance();
 
 /************************************************ User Function ***************************************************/
 
-/** TESTING
- * This function get all data from all the users
- */
-function getUsers()
-{
-
-    global $SecureBookSellingDB;
-    global $logger;
-
-    try {
-        $query = "SELECT username, name, surname, email, date_of_birth, isAdmin FROM user;";
-
-        $result = $SecureBookSellingDB->performQuery("SELECT", $query);
-        $SecureBookSellingDB->closeConnection();
-        return $result;
-    } catch (Exception $e) {
-        $logger->writeLog('ERROR',
-            "Error performing the query to retrieve all the users",
-            $_SERVER['SCRIPT_NAME'],
-            "MySQL - Code: " . $e->getCode(),
-            $e->getMessage());
-        $SecureBookSellingDB->closeConnection();
-        return false;
-    }
-}
-
 /** This function retrieves all the personal data of a user
  * @param $username
  * @return values|false
@@ -466,7 +440,6 @@ function getAllBooksData()
                           FROM book
                           ORDER BY title;";
 
-        //$result = $SecureBookSellingDB->performQuery("SELECT", $query, [], "isssfsi");
         $result = $SecureBookSellingDB->performQuery("SELECT", $query);
 
         $SecureBookSellingDB->closeConnection();
@@ -524,9 +497,10 @@ function deleteBook($bookId): bool
     try {
         $query = "DELETE FROM book WHERE id = ?;";
 
-        $SecureBookSellingDB->performQuery("DELETE", $query, [$bookId], "i");
+        $rowsAffected = $SecureBookSellingDB->performQuery("DELETE", $query, [$bookId], "i");
         $SecureBookSellingDB->closeConnection();
-        return true;
+
+        return $rowsAffected;
 
     } catch (Exception $e) {
         $logger->writeLog('ERROR',
@@ -585,9 +559,6 @@ function checkBookAvailability($bookId, $quantity)
                                 ? <= book.stocks_number;";
 
         $result = $SecureBookSellingDB->performQuery("SELECT", $query, [$bookId, $quantity], "ii");
-        if ($result->num_rows != 1) {
-            return null;
-        }
         $SecureBookSellingDB->closeConnection();
         return $result;
     } catch (Exception $e) {
@@ -651,11 +622,9 @@ function removeItems($bookID, $quantity, $email)
     try {
 
         if ($quantity <= 0) {
-            // Se la quantità è 0 o inferiore, elimina la riga corrispondente
             $deleteQuery = "DELETE FROM shopping_cart WHERE id_book = ? AND email = ?";
             $SecureBookSellingDB->performQuery("DELETE", $deleteQuery, [$bookID, $email], "is");
         } else {
-            // Altrimenti, decrementa la quantità
             $updateQuery = "UPDATE shopping_cart SET quantity = ? WHERE id_book = ? AND email = ?";
             $SecureBookSellingDB->performQuery("UPDATE", $updateQuery, [$quantity, $bookID, $email], "iis");
         }
@@ -710,7 +679,6 @@ function getUserOrders($userId)
 
     global $SecureBookSellingDB;
     global $logger;
-    global $debug;
 
     try {
         $query = "SELECT b.title, o.time, o.amount, o.quantity, o.payment_method, b.id AS id_book
