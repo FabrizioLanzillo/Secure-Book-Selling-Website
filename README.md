@@ -84,3 +84,43 @@ cd apache_conf/ssl_conf/certificates
 p.s. remember to give executable permission to the script with ```chmod +x config_certificates.sh```
 
 * After this import the SNH_CA.pem in ```apache_conf/ssl_conf/certificates``` in the browser
+
+## Structure of the repository
+
+```
+Secure-Book-Selling-Website
+│
+├── apache_conf
+│   ├── ssl_conf
+│   │   └── certificates
+│   │       ├── bookselling
+│   │       ├── ca
+│   │       └── config_certificates.sh
+│   ├── e-books
+│   └── config_system.sh
+│
+├── docs
+│
+├── mysql_conf
+│   └── my
+│
+├── src
+│   ├── css
+│   ├── img
+│   ├── js
+│   ├── logs
+│   └── php
+│       ├── admin
+│       ├── layout
+│       ├── user
+│       └── util
+│
+├── .env
+├── docker-compose.yml
+└── handle_services.sh
+```
+
+## Authors
+- [Fabrizio Lanzillo](https://github.com/FabrizioLanzillo)
+- [Giovanni Marrucci](https://github.com/Hfjqpowfjpq)
+- [Tommaso Bertini](https://github.com/tommasobertini)
