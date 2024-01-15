@@ -7,16 +7,18 @@ global $sessionHandler;
 global $shoppingCartHandler;
 global $accessControlManager;
 
-// This function checks if the user is anonymous or not
-// if in case, the user will be redirected to the login
+// Check path manipulation and broken access control
+// Check if the user is logged
 $accessControlManager->redirectIfAnonymous();
+// Check if an admin tries to access this page
+$accessControlManager->redirectIfAdmin();
 
 try{
     // If POST vars are set it means that a POST form has been submitted 
     if(checkFormData(['fullName', 'address', 'city', 'province', 'cap', 'country'])){
-        // Protect against XSRF
-        $token = htmlspecialchars($_POST['token'], ENT_QUOTES, 'UTF-8');
+
         // Protect against XSS
+        $token = htmlspecialchars($_POST['token'], ENT_QUOTES, 'UTF-8');
         $fullName = htmlspecialchars($_POST['fullName'], ENT_QUOTES, 'UTF-8');
         $address = htmlspecialchars($_POST['address'], ENT_QUOTES, 'UTF-8');
         $city = htmlspecialchars($_POST['city'], ENT_QUOTES, 'UTF-8');
@@ -25,6 +27,7 @@ try{
         $country = htmlspecialchars($_POST['country'], ENT_QUOTES, 'UTF-8');
         $logger->writeLog('INFO', "Protection against XSS applied");
 
+        // Protect against XSRF
         if (!$token || $token !== $_SESSION['token']) {
             // return 405 http status code
             $accessControlManager ->redirectIfXSRFAttack();
@@ -32,14 +35,13 @@ try{
             $logger->writeLog('INFO', "XSRF control passed");
             // Save cart information in $_SESSION and redirect depending on $_SESSION vars set
             $sessionHandler->saveShippingInfo($fullName, $address, $city, $province, $cap, $country);
-            $logger->writeLog('INFO', "User: " . $_SESSION['email'] . " succesfully set his shipment info");
+            $logger->writeLog('INFO', "User: " . $_SESSION['email'] . " successfully set his shipping info");
             $accessControlManager->routeMultiStepCheckout();
         }
     }
 }
 catch (Exception $e) {
-    $logger->writeLog('ERROR',
-    "Failed to set the shipment info for the user: " . $_SESSION['email']);
+    $logger->writeLog('ERROR', $e->getMessage());
     $errorHandler->handleException($e);
 }
 ?>

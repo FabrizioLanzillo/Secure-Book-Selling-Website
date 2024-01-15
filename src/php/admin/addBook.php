@@ -6,48 +6,53 @@ global $logger;
 global $errorHandler;
 global $accessControlManager;
 
-if ($sessionHandler->isLogged() and $sessionHandler->isAdmin()) {
-    if(checkFormData(['title', 'author', 'publisher', 'price', 'category', 'stock'])){
-        // Protect against XSS
-        $token = htmlspecialchars($_POST['token'], ENT_QUOTES, 'UTF-8');
-        $title = htmlspecialchars($_POST['title'], ENT_QUOTES, 'UTF-8');
-        $author = htmlspecialchars($_POST['author'], ENT_QUOTES, 'UTF-8');
-        $publisher = htmlspecialchars($_POST['publisher'], ENT_QUOTES, 'UTF-8');
-        $price = htmlspecialchars($_POST['price'], ENT_QUOTES, 'UTF-8');
-        $category = htmlspecialchars($_POST['category'], ENT_QUOTES, 'UTF-8');
-        $stock = htmlspecialchars($_POST['stock'], ENT_QUOTES, 'UTF-8');
-        // Protect against XSRF
-        if (!$token || $token !== $_SESSION['token']) {
-            // return 405 http status code
-            $accessControlManager->redirectIfXSRFAttack();
-        } else {
-            try {
-                $book = array(
-                    $title,
-                    $author,
-                    $publisher,
-                    $price,
-                    $category,
-                    $stock,
-                    '1_unix.pdf'
-                );
+// Check path manipulation and broken access control
+// Check if the user is logged
+$accessControlManager->redirectIfAnonymous();
+// Check if a normal user tries to access this page
+$accessControlManager->redirectIfNormalUser();
 
-                //add book into database
-                if (insertBook($book)) {
-                    $logger->writeLog('INFO', "Book: " . $book[0] . " added into database");
-                    $accessControlManager->redirectToHome();
-                } else {
-                    throw new Exception('Could not add the book');
-                }
+if (checkFormData(['title', 'author', 'publisher', 'price', 'category', 'stock'])) {
 
-            } catch (Exception $e) {
-                $errorHandler->handleException($e);
+    // Protect against XSS
+    $token = htmlspecialchars($_POST['token'], ENT_QUOTES, 'UTF-8');
+    $title = htmlspecialchars($_POST['title'], ENT_QUOTES, 'UTF-8');
+    $author = htmlspecialchars($_POST['author'], ENT_QUOTES, 'UTF-8');
+    $publisher = htmlspecialchars($_POST['publisher'], ENT_QUOTES, 'UTF-8');
+    $price = htmlspecialchars($_POST['price'], ENT_QUOTES, 'UTF-8');
+    $category = htmlspecialchars($_POST['category'], ENT_QUOTES, 'UTF-8');
+    $stock = htmlspecialchars($_POST['stock'], ENT_QUOTES, 'UTF-8');
+    // Protect against XSRF
+    if (!$token || $token !== $_SESSION['token']) {
+        // return 405 http status code
+        $accessControlManager->redirectIfXSRFAttack();
+    } else {
+        $logger->writeLog('INFO', "XSRF control passed");
+        try {
+            $book = array(
+                $title,
+                $author,
+                $publisher,
+                $price,
+                $category,
+                $stock,
+                '1_unix.pdf'
+            );
+
+            //add book into database
+            if (insertBook($book)) {
+                $logger->writeLog('INFO', "Book: " . $book[0] . " successfully added into database");
+                $accessControlManager->redirectToHome();
+            } else {
+                throw new Exception('Could not add the book');
             }
+
+        } catch (Exception $e) {
+            $errorHandler->handleException($e);
         }
     }
-} else {
-    $accessControlManager->redirectToHome();
 }
+
 ?>
 
 <!DOCTYPE html>

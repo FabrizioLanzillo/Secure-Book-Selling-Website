@@ -6,57 +6,61 @@ global $logger;
 global $errorHandler;
 global $accessControlManager;
 
-if ($sessionHandler->isLogged() and $sessionHandler->isAdmin()) {
-    $result = false;
-    // Sanitize user input
-    $bookId = isset($_GET['book_id']) ? htmlspecialchars($_GET['book_id'], ENT_QUOTES, 'UTF-8') : null;
-    // retrieve the book that admin want to edit
-    if ($bookId !== null) {
-        $result = getBookDetails($bookId);
-    }
+// Check path manipulation and broken access control
+// Check if the user is logged
+$accessControlManager->redirectIfAnonymous();
+// Check if a normal user tries to access this page
+$accessControlManager->redirectIfNormalUser();
 
-    if (checkFormData(['id', 'title', 'author', 'publisher', 'price', 'category', 'stock'])) {
+$result = false;
+// Sanitize user input
+$bookId = isset($_GET['book_id']) ? htmlspecialchars($_GET['book_id'], ENT_QUOTES, 'UTF-8') : null;
+// retrieve the book that admin want to edit
+if ($bookId !== null) {
+    $result = getBookDetails($bookId);
+}
 
-        // Protect against XSS
-        $token = htmlspecialchars($_POST['token'], ENT_QUOTES, 'UTF-8');
-        $title = htmlspecialchars($_POST['title'], ENT_QUOTES, 'UTF-8');
-        $author = htmlspecialchars($_POST['author'], ENT_QUOTES, 'UTF-8');
-        $publisher = htmlspecialchars($_POST['publisher'], ENT_QUOTES, 'UTF-8');
-        $price = htmlspecialchars($_POST['price'], ENT_QUOTES, 'UTF-8');
-        $category = htmlspecialchars($_POST['category'], ENT_QUOTES, 'UTF-8');
-        $stock = htmlspecialchars($_POST['stock'], ENT_QUOTES, 'UTF-8');
-        $id = htmlspecialchars($_POST['id'], ENT_QUOTES, 'UTF-8');
+if (checkFormData(['id', 'title', 'author', 'publisher', 'price', 'category', 'stock'])) {
 
-        // Protect against XSRF
-        if (!$token || $token !== $_SESSION['token']) {
-            // return 405 http status code
-            $accessControlManager->redirectIfXSRFAttack();
-        } else {
-            try {
-                $book = array(
-                    $title,
-                    $author,
-                    $publisher,
-                    $price,
-                    $category,
-                    $stock,
-                    $id,
-                );
+    // Protect against XSS
+    $token = htmlspecialchars($_POST['token'], ENT_QUOTES, 'UTF-8');
+    $title = htmlspecialchars($_POST['title'], ENT_QUOTES, 'UTF-8');
+    $author = htmlspecialchars($_POST['author'], ENT_QUOTES, 'UTF-8');
+    $publisher = htmlspecialchars($_POST['publisher'], ENT_QUOTES, 'UTF-8');
+    $price = htmlspecialchars($_POST['price'], ENT_QUOTES, 'UTF-8');
+    $category = htmlspecialchars($_POST['category'], ENT_QUOTES, 'UTF-8');
+    $stock = htmlspecialchars($_POST['stock'], ENT_QUOTES, 'UTF-8');
+    $id = htmlspecialchars($_POST['id'], ENT_QUOTES, 'UTF-8');
 
-                // update book information
-                if (updateBook($book)) {
-                    $logger->writeLog('INFO', "Book: " . $book[0] . "with id= " . $book[6] . " updated");
-                    $accessControlManager->redirectToHome();
-                } else {
-                    throw new Exception('Could not update the book');
-                }
-            } catch (Exception $e) {
-                $errorHandler->handleException($e);
+    // Protect against XSRF
+    if (!$token || $token !== $_SESSION['token']) {
+        // return 405 http status code
+        $accessControlManager->redirectIfXSRFAttack();
+    } else {
+        try {
+            $logger->writeLog('INFO', "XSRF control passed");
+            $book = array(
+                $title,
+                $author,
+                $publisher,
+                $price,
+                $category,
+                $stock,
+                $id,
+            );
+
+            // update book information
+            if (updateBook($book)) {
+                $logger->writeLog('INFO', "Book: " . $book[0] . "with id= " . $book[6] . " updated");
+                $accessControlManager->redirectToHome();
+            } else {
+                $logger->writeLog('ERROR', 'Admin: ' . $_SESSION['email'] . ' could not update the book');
+                throw new Exception('Could not update the book');
             }
+        } catch (Exception $e) {
+            $errorHandler->handleException($e);
         }
     }
-} else {
-    $accessControlManager->redirectToHome();
 }
 
 ?>
@@ -64,7 +68,7 @@ if ($sessionHandler->isLogged() and $sessionHandler->isAdmin()) {
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="stylesheet" type="text/css" href="../../../css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="../../css/bootstrap.min.css">
     <title>Edit Book</title>
 </head>
 <body>
@@ -95,7 +99,7 @@ include "./../layout/header.php";
                 </div>
                 <div class="form-group">
                     <label for="author">Author:</label>
-                    <input type="text" class="form-control" id="author" name="author" placeholder="Bookkin"
+                    <input type="text" class="form-control" id="author" name="author" placeholder="Book Author"
                            value="<?php echo htmlspecialchars($dataBook['author']); ?>"
                            required>
                 </div>

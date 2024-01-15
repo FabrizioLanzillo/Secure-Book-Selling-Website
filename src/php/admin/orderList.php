@@ -4,13 +4,13 @@ require_once __DIR__ . "/../../config.php";
 global $sessionHandler;
 global $accessControlManager;
 
-// check path manipulation
-// broken access control
-if ($sessionHandler->isLogged() and $sessionHandler->isAdmin()) {
-    $result = getAllOrdersData();
-} else {
-    $accessControlManager->redirectToHome();
-}
+// Check path manipulation and broken access control
+// Check if the user is logged
+$accessControlManager->redirectIfAnonymous();
+// Check if a normal user tries to access this page
+$accessControlManager->redirectIfNormalUser();
+
+$result = getAllOrdersData();
 ?>
 
 <!DOCTYPE html>

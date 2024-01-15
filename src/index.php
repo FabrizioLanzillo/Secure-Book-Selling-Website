@@ -12,7 +12,6 @@ if($sessionHandler->isLogged()){
     $accessControlManager->redirectIfAdmin();
 }
 
-
 try {
     // Sanitize get parameters, this parameter is set after the user makes a purchase, in order to show the outcome
     $paymentResponse = isset($_GET['paymentResponse']) ? htmlspecialchars($_GET['paymentResponse'], ENT_QUOTES, 'UTF-8') : null;

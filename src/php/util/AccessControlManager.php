@@ -129,7 +129,7 @@ class AccessControlManager
 
         // If the session variable containing the payment method information and
         // the session variable containing the shipping information are set
-        // then I can access the order summary and payment page
+        // then I can access the order summary page
         if (isset($_SESSION['paymentInfo']) && isset($_SESSION['shippingInfo'])) {
             if ($shoppingCartHandler->syncShoppingCart()) {
                 header('Location: ' . $this->orderSummaryPath);
