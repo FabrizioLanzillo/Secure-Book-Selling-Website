@@ -97,11 +97,6 @@ include "./layout/header.php";
                                placeholder="<?php echo htmlspecialchars($user['username']); ?>">
                     </div>
                     <div class="form-group">
-                        <label for="date_birth">Date of birth:</label>
-                        <input type="text" class="form-control" id="date_birth" readonly="readonly"
-                               placeholder="<?php echo htmlspecialchars($user['date_of_birth']); ?>">
-                    </div>
-                    <div class="form-group">
                         <label for="email">Email:</label>
                         <input type="email" class="form-control" id="email" readonly="readonly"
                                placeholder="<?php echo htmlspecialchars($user['email']); ?>">

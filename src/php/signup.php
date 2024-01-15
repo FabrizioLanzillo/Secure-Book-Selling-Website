@@ -14,7 +14,7 @@ if ($sessionHandler->isLogged()) {
 }
 
 // If POST vars are set it means that a POST form has been submitted 
-if (checkFormData(['name', 'surname', 'email', 'username', 'password', 'repeat_password', 'birthdate'])) {
+if (checkFormData(['name', 'surname', 'email', 'username', 'password', 'repeat_password'])) {
 
     // Protect against XSS
     $token = htmlspecialchars($_POST['token'], ENT_QUOTES, 'UTF-8');
@@ -24,7 +24,6 @@ if (checkFormData(['name', 'surname', 'email', 'username', 'password', 'repeat_p
     $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
     $password = htmlspecialchars($_POST['password'], ENT_QUOTES, 'UTF-8');
     $repeatPassword = htmlspecialchars($_POST['repeat_password'], ENT_QUOTES, 'UTF-8');
-    $birthdate = htmlspecialchars($_POST['birthdate'], ENT_QUOTES, 'UTF-8');
     $logger->writeLog('INFO', "Protection against XSS applied");
 
     // Protect against XSRF
@@ -49,7 +48,6 @@ if (checkFormData(['name', 'surname', 'email', 'username', 'password', 'repeat_p
                     $email,
                     $name,
                     $surname,
-                    $birthdate,
                     0,
                     0,
                 );
@@ -123,7 +121,7 @@ include "./layout/header.php";
                         <input class="form-control" type="password" placeholder="Password" name="password" id="password"
                                pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{9,}"
                                title="Must contain at least one number, one uppercase letter, one lowercase letter, and at least 8 or more characters"
-                               required oninput="checkPasswordStrength('signup_button')">
+                               required oninput="checkPasswordStrength()">
                         <meter max="4" id="password-strength-meter"></meter>
                         <p id="password-strength-text"></p>
                     </div>
@@ -132,11 +130,6 @@ include "./layout/header.php";
                         <label for="repeat_password"><b>Repeat password</b></label>
                         <input class="form-control" type="password" placeholder="Repeat Password" name="repeat_password"
                                required>
-                    </div>
-
-                    <div class="form-group mb-5">
-                        <label for="birthdate"><b>Date of birth</b></label>
-                        <input class="form-control" type="date" name="birthdate" required>
                     </div>
 
                     <!-- Hidden token to protect against XSRF -->

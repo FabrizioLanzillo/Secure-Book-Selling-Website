@@ -115,7 +115,7 @@ include "./layout/header.php";
                     <input class="form-control" type="password" placeholder="Password" name="password" id="password"
                            pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{9,}"
                            title="Must contain at least one number, one uppercase letter, one lowercase letter, and at least 8 or more characters"
-                           required oninput="checkPasswordStrength('change_psw_button')">
+                           required oninput="checkPasswordStrength()">
                     <meter max="4" id="password-strength-meter"></meter>
                     <p id="password-strength-text"></p>
                     <p id="suggestions"></p>

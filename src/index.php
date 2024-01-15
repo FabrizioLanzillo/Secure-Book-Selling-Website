@@ -6,7 +6,7 @@ global $accessControlManager;
 global $sessionHandler;
 global $logger;
 
-if($sessionHandler->isLogged()){
+if ($sessionHandler->isLogged()) {
     // Check path manipulation and broken access control
     // Check if an admin tries to access this page
     $accessControlManager->redirectIfAdmin();
@@ -85,7 +85,8 @@ include "./php/layout/header.php";
                     <div class="col-lg-3 mb-4 ">
                         <a href="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/book_details.php?book_id=' . $book['id']); ?>">
                             <div class="card d-flex align-items-center">
-                                <img src="/img/books/<?php echo ($book['id'] < 16) ? htmlspecialchars($book['id']) : 16;?>.jpg" alt="Book Image" style="width: 100%; height: auto;"> <br>
+                                <img src="/img/books/<?php echo ($book['id'] < 16) ? htmlspecialchars($book['id']) : 16; ?>.jpg"
+                                     alt="Book Image" style="width: 100%; height: auto;"> <br>
                                 <div class="card-body d-flex flex-column align-items-center">
                                     <h5 class="card-title text-dark">
                                         <?php

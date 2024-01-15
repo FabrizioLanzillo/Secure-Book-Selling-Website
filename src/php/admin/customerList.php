@@ -76,7 +76,6 @@ include "./../layout/header.php";
                 <th>Surname</th>
                 <th>Username</th>
                 <th>Email</th>
-                <th>Birth Date</th>
                 <th>Edit</th>
             </tr>
             </thead>
@@ -91,7 +90,6 @@ include "./../layout/header.php";
                             <td><?php echo htmlspecialchars($customer['surname']); ?></td>
                             <td><?php echo htmlspecialchars($customer['username']); ?></td>
                             <td><?php echo htmlspecialchars($customer['email']); ?></td>
-                            <td><?php echo htmlspecialchars($customer['date_of_birth']); ?></td>
                             <td>
                                 <a href="<?php echo htmlspecialchars('./deleteCustomer.php?user_id=' . $customer['id']); ?>">
                                     <button class="btn btn-danger btn-sm ml-1"><i class="fas fa-trash"></i></button>

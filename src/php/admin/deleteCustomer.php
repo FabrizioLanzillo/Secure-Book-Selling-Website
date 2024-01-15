@@ -16,7 +16,7 @@ $accessControlManager->redirectIfNormalUser();
 $customerId = isset($_GET['user_id']) ? htmlspecialchars($_GET['user_id'], ENT_QUOTES, 'UTF-8') : null;
 
 try {
-    if ($customerId !== null) {
+    if ($customerId !== null && $customerId !== "") {
         // try to remove user from database
         if (deleteCustomer($customerId)) {
             $logger->writeLog('INFO', "Book: " . $customerId . " removed from database");
@@ -26,8 +26,8 @@ try {
             throw new Exception('Could not remove the customer');
         }
     } else {
+        $logger->writeLog('WARNING', "Unauthorized Access to the delete customer page");
         throw new Exception('Customer to delete is not selected');
-
     }
 } catch (Exception $e) {
     $errorHandler->handleException($e);

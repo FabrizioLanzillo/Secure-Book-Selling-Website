@@ -16,7 +16,7 @@ $accessControlManager->redirectIfNormalUser();
 $bookId = isset($_GET['book_id']) ? htmlspecialchars($_GET['book_id'], ENT_QUOTES, 'UTF-8') : null;
 
 try {
-    if ($bookId !== null) {
+    if ($bookId !== null && $bookId !== "") {
         // try to remove book from database
         if (deleteBook($bookId)) {
             $message = "Book: " . $bookId . " removed from database";
@@ -27,8 +27,8 @@ try {
             throw new Exception('Could not remove the book');
         }
     } else {
+        $logger->writeLog('WARNING', "Unauthorized Access to the delete book page");
         throw new Exception('Book to delete is not selected');
-
     }
 } catch (Exception $e) {
     $errorHandler->handleException($e);

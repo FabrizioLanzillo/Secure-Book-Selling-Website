@@ -16,7 +16,7 @@ function getUserData($username)
     global $logger;
 
     try {
-        $query = "SELECT username, name, surname, email, password, date_of_birth 
+        $query = "SELECT username, name, surname, email, password 
                           FROM user 
                           WHERE username = ?;";
 
@@ -45,7 +45,7 @@ function getAllCustomersData()
     global $logger;
 
     try {
-        $query = "SELECT id, name, surname, username, email, date_of_birth 
+        $query = "SELECT id, name, surname, username, email 
                           FROM user
                           WHERE isAdmin = 0
                           ORDER BY username;";
@@ -75,10 +75,10 @@ function insertUser($userInformation): bool
     global $logger;
 
     try {
-        $query = "INSERT INTO user (username, password, salt, email, name, surname, date_of_birth, isAdmin, failedAccesses, lastOtp) 
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW());";
+        $query = "INSERT INTO user (username, password, salt, email, name, surname, isAdmin, failedAccesses, lastOtp) 
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW());";
 
-        $SecureBookSellingDB->performQuery("INSERT", $query, $userInformation, "sssssssii");
+        $SecureBookSellingDB->performQuery("INSERT", $query, $userInformation, "ssssssii");
         $SecureBookSellingDB->closeConnection();
         return true;
 
