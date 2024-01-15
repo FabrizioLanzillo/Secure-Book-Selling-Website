@@ -83,7 +83,7 @@ if(checkFormData(['name', 'surname', 'email', 'username', 'password', 'repeat_pa
             <div class="col-md-6">
                 <div class="signup-container">
                     <h2 class="text-center">Sign up</h2>
-                    <form name="sign_up" action="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/signup.php'); ?>" method="POST">
+                    <form name="sign_up" action="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/signup.php'); ?>" method="POST"">
                         <div class="form-group">
                             <label for="name"><b>Name</b></label>
                             <input class="form-control" type="text" placeholder="Name" name="name" required>
@@ -116,11 +116,6 @@ if(checkFormData(['name', 'surname', 'email', 'username', 'password', 'repeat_pa
                         <div class="form-group">
                             <label for="repeat_password"><b>Repeat password</b></label>
                             <input class="form-control" type="password" placeholder="Repeat Password" name="repeat_password" required>
-                        </div>
-
-                        <div class="form-group mb-5">
-                            <label for="birthdate"><b>Date of birth</b></label>
-                            <input class="form-control" type="date" name="birthdate" required>
                         </div>
 
                         <!-- Hidden token to protect against XSRF -->
