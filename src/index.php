@@ -31,7 +31,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["search_query"])) {
 <!DOCTYPE html>
 <html lang="en">
     <head>
-<!--        <link rel="stylesheet" type="text/css" href="./css/home.css">-->
+        <link rel="icon" href="" type="image/x-icon">
         <link rel="stylesheet" type="text/css" href="./css/bootstrap.min.css">
         <title>Book Selling - Home</title>
     </head>
@@ -61,8 +61,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["search_query"])) {
                         <div class="col-lg-3 mb-4 ">
                             <a href="//<?php echo htmlspecialchars(SERVER_ROOT. '/php/book_details.php?book_id='. $book['id']);?>">
                                 <div class="card d-flex align-items-center">
-                                    <!--                                    <img src="img/front_book.jpg" class="card-img-top w-50 mt-4" alt="Book Image">-->
-                                    <img src="/img/books/<?php echo htmlspecialchars($book['id']);?>.jpg" alt="Book Image" style="width: 100%; height: auto;"> <br>
+                                    <img src="/img/books/<?php echo ($book['id'] < 16) ? htmlspecialchars($book['id']) : 16;?>.jpg" alt="Book Image" style="width: 100%; height: auto;"> <br>
                                     <div class="card-body d-flex flex-column align-items-center">
                                         <h5 class="card-title text-dark">
                                             <?php

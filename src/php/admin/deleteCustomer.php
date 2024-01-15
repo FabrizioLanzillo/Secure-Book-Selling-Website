@@ -25,7 +25,7 @@ if ($sessionHandler->isLogged() and $sessionHandler->isAdmin()) {
     } catch (Exception $e) {
         $errorHandler->handleException($e);
     }
-}else{
+} else {
     header('Location: //' . SERVER_ROOT . '/');
     exit;
 }

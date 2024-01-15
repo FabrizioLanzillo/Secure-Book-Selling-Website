@@ -14,19 +14,18 @@ if ($sessionHandler->isLogged() and $sessionHandler->isAdmin()) {
         // try to remove book from database
         $success = deleteBook($bookId);
 
-        if($success){
-            $message = "Book: ".$bookId." removed from database";
+        if ($success) {
+            $message = "Book: " . $bookId . " removed from database";
             $logger->writeLog('INFO', $message);
             header('Location: ./homeAdmin.php');
             exit;
-        }
-        else{
+        } else {
             throw new Exception('Could not remove the book');
         }
-    }catch (Exception $e){
+    } catch (Exception $e) {
         $errorHandler->handleException($e);
     }
-}else{
+} else {
     header('Location: //' . SERVER_ROOT . '/');
     exit;
 }

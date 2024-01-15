@@ -7,8 +7,9 @@ global $errorHandler;
 global $accessControlManager;
 
 // If POST vars are set it means that a POST form has been submitted
-function checkBookData(): bool{
-    $requiredFields = ['id','title', 'author', 'publisher', 'price', 'category', 'stock'];
+function checkBookData(): bool
+{
+    $requiredFields = ['id', 'title', 'author', 'publisher', 'price', 'category', 'stock'];
     foreach ($requiredFields as $field) {
         if (!isset($_POST[$field]) || empty($_POST[$field])) {
             return false;
@@ -23,12 +24,12 @@ if ($sessionHandler->isLogged() and $sessionHandler->isAdmin()) {
     $bookId = isset($_GET['book_id']) ? htmlspecialchars($_GET['book_id'], ENT_QUOTES, 'UTF-8') : null;
 
     // retrieve the book that admin want to edit
-    if($bookId !== null)
+    if ($bookId !== null)
         $editBook = (getBookDetails($bookId))->fetch_assoc();
 
-    
-    if(checkBookData()){
-        
+
+    if (checkBookData()) {
+
         $token = htmlspecialchars($_POST['token'], ENT_QUOTES, 'UTF-8');
         $title = htmlspecialchars($_POST['title'], ENT_QUOTES, 'UTF-8');
         $author = htmlspecialchars($_POST['author'], ENT_QUOTES, 'UTF-8');
@@ -40,9 +41,9 @@ if ($sessionHandler->isLogged() and $sessionHandler->isAdmin()) {
 
         if (!$token || $token !== $_SESSION['token']) {
             // return 405 http status code
-            $accessControlManager ->redirectIfXSRFAttack();
+            $accessControlManager->redirectIfXSRFAttack();
         } else {
-            try{
+            try {
                 $book = array(
                     $title,
                     $author,
@@ -55,12 +56,11 @@ if ($sessionHandler->isLogged() and $sessionHandler->isAdmin()) {
 
                 // update book information
                 $result = updateBook($book);
-                if($result){
-                    $logger->writeLog('INFO', "Book: ".$book[0]."with id= ".$book[6]." updated");
+                if ($result) {
+                    $logger->writeLog('INFO', "Book: " . $book[0] . "with id= " . $book[6] . " updated");
                     header('Location: //' . SERVER_ROOT . '/php/admin/homeAdmin.php');
                     exit;
-                }
-                else{
+                } else {
                     throw new Exception('Could not update the book');
                 }
 
@@ -69,7 +69,7 @@ if ($sessionHandler->isLogged() and $sessionHandler->isAdmin()) {
             }
         }
     }
-}else{
+} else {
     header('Location: //' . SERVER_ROOT . '/');
     exit;
 }
@@ -91,34 +91,47 @@ include "./../layout/header.php";
 <div class="container bg-light mt-5 w-50">
     <h2>Edit Book</h2>
 
-    <form action="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/admin/editBook.php');?>" method="post">
+    <form action="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/admin/editBook.php'); ?>" method="post">
         <div class="form-group d-none">
             <label for="id">Id:</label>
-            <input type="text" class="form-control" id="id" name="id" value="<?php echo htmlspecialchars(!empty($editBook['id']) ? $editBook['id'] : 'id'); ?>" required>
+            <input type="text" class="form-control" id="id" name="id"
+                   value="<?php echo htmlspecialchars(!empty($editBook['id']) ? $editBook['id'] : '0'); ?>" required>
         </div>
         <div class="form-group">
             <label for="title">Title:</label>
-            <input type="text" class="form-control" id="title" name="title" placeholder="Book" value="<?php echo htmlspecialchars(!empty($editBook['title']) ? $editBook['title'] : 'Book'); ?>" required>
+            <input type="text" class="form-control" id="title" name="title" placeholder="Book Title"
+                   value="<?php echo htmlspecialchars(!empty($editBook['title']) ? $editBook['title'] : 'Title'); ?>"
+                   required>
         </div>
         <div class="form-group">
             <label for="author">Author:</label>
-            <input type="text" class="form-control" id="author" name="author" placeholder="Bookkin" value="<?php echo htmlspecialchars(!empty($editBook['author']) ? $editBook['author'] : 'Bookkin'); ?>" required>
+            <input type="text" class="form-control" id="author" name="author" placeholder="Book Author"
+                   value="<?php echo htmlspecialchars(!empty($editBook['author']) ? $editBook['author'] : 'Author'); ?>"
+                   required>
         </div>
         <div class="form-group">
             <label for="publisher">Publisher:</label>
-            <input type="text" class="form-control" id="publisher" name="publisher" placeholder="Book House" value="<?php echo htmlspecialchars(!empty($editBook['publisher']) ? $editBook['publisher'] : 'Book House'); ?>" required>
+            <input type="text" class="form-control" id="publisher" name="publisher" placeholder="Book Publisher"
+                   value="<?php echo htmlspecialchars(!empty($editBook['publisher']) ? $editBook['publisher'] : 'Publisher'); ?>"
+                   required>
         </div>
         <div class="form-group">
             <label for="price">Price:</label>
-            <input type="number" class="form-control" id="price" name="price" step="0.05" placeholder="13.90" value="<?php echo htmlspecialchars(!empty($editBook['price']) ? $editBook['price'] : '13.90'); ?>" required>
+            <input type="number" class="form-control" id="price" name="price" step="0.05" placeholder="13.90"
+                   value="<?php echo htmlspecialchars(!empty($editBook['price']) ? $editBook['price'] : '13.90'); ?>"
+                   required>
         </div>
         <div class="form-group">
             <label for="category">Category:</label>
-            <input type="text" class="form-control" id="category" name="category" placeholder="Romance" value="<?php echo htmlspecialchars(!empty($editBook['category']) ? $editBook['category'] : 'Romance'); ?>" required>
+            <input type="text" class="form-control" id="category" name="category" placeholder="Book Category"
+                   value="<?php echo htmlspecialchars(!empty($editBook['category']) ? $editBook['category'] : 'Category'); ?>"
+                   required>
         </div>
         <div class="form-group">
             <label for="stock">Stock:</label>
-            <input type="number" class="form-control" id="stock" name="stock" placeholder="50" value="<?php echo htmlspecialchars(!empty($editBook['stocks_number']) ? $editBook['stocks_number'] : '50'); ?>" required>
+            <input type="number" class="form-control" id="stock" name="stock" placeholder="50"
+                   value="<?php echo htmlspecialchars(!empty($editBook['stocks_number']) ? $editBook['stocks_number'] : '50'); ?>"
+                   required>
         </div>
 
         <!-- Hidden token to protect against CSRF -->
@@ -126,6 +139,7 @@ include "./../layout/header.php";
 
         <button type="submit" class="btn btn-primary">Update</button>
     </form>
+
 
 </div>
 
