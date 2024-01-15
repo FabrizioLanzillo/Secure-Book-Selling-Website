@@ -1,6 +1,6 @@
 <?php
-$currentFile = htmlspecialchars(SERVER_ROOT . $_SERVER['SCRIPT_NAME']);
 global $sessionHandler;
+$currentFile = htmlspecialchars(SERVER_ROOT . $_SERVER['SCRIPT_NAME']);
 ?>
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-5">

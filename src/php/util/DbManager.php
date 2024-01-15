@@ -3,8 +3,9 @@
 /**
  * Class that handle the connection with the mysql server and the queries
  */
-class DbManager{
-    private static $instance = null;
+class DbManager
+{
+    private static ?DbManager $instance = null;
     private $mysqli_connection = null;
     private $host;
     private $user;
@@ -12,10 +13,12 @@ class DbManager{
     private $dbName;
     private $port;
 
-    /** Constructor that imports the db configuration and open the connection
+    /**
+     * Constructor that imports the db configuration and open the connection
      * @throws Exception
      */
-    private function __construct(){
+    private function __construct()
+    {
         $this->host = "mysql-server";
         $this->user = getenv("MYSQL_USER");;
         $this->password = getenv("MYSQL_PASSWORD");
@@ -24,18 +27,25 @@ class DbManager{
         $this->openConnection();
     }
 
-    public static function getInstance(): ?DbManager{
-        if (self::$instance == null)
-        {
+    /**
+     * This method returns the singleton instance of DbManager.
+     * If the instance doesn't exist, it creates one; otherwise, it returns the existing instance.
+     * @return DbManager
+     */
+    public static function getInstance(): ?DbManager
+    {
+        if (self::$instance == null) {
             self::$instance = new DbManager();
         }
         return self::$instance;
     }
 
-    /** Method that create a connection with the db
+    /**
+     * Method that create a connection with the database
      * @throws Exception
      */
-    function openConnection(): void{
+    function openConnection(): void
+    {
         if (!$this->isOpened()) {
             $this->mysqli_connection = new mysqli($this->host,
                 $this->user,
@@ -50,21 +60,25 @@ class DbManager{
         }
     }
 
-    /** Method that checks if there is a connection to the db
+    /**
+     * Method that checks if there is a connection to the db
      * @return bool
      */
-    function isOpened(): bool{
+    function isOpened(): bool
+    {
         return ($this->mysqli_connection != null);
     }
 
-    /** Method that creates the prepared Statement and executes the query
+    /**
+     * Method that creates the prepared Statement and executes the query
+     * @param $crudOperation string, is the query type
      * @param $querytext string, is the query statement
      * @param $parameters array, is an array of the parameters of the statement
      * @param $types string, indicate the types of the parameters in the array
-     * @return mixed
      * @throws Exception
      */
-    function performQuery(string $crudOperation, string $querytext, array $parameters = [], string $types = ""){
+    function performQuery(string $crudOperation, string $querytext, array $parameters = [], string $types = "")
+    {
         if (!$this->isOpened()) {
             $this->openConnection();
         }
@@ -86,23 +100,24 @@ class DbManager{
                 $statement->connect_error);
         }
 
-        if($crudOperation == "SELECT"){
+        if ($crudOperation == "SELECT") {
             $result = $statement->get_result();
             if (!$result) {
                 throw new Exception('Get Result failed (' . $statement->connect_errno . ') ' .
                     $statement->connect_error);
             }
             return $result;
-        }
-        else{
+        } else {
             return $executionReturn;
         }
     }
 
-    /** Method that close the connection with the db
+    /**
+     * Method that close the connection with the db
      * @return void
      */
-    function closeConnection(): void{
+    function closeConnection(): void
+    {
         $this->mysqli_connection->close();
         $this->mysqli_connection = null;
     }

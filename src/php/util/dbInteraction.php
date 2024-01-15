@@ -4,41 +4,14 @@ require_once __DIR__ . "/DbManager.php";
 
 $SecureBookSellingDB = DbManager::getInstance();
 
-/************************************************ User Function ***************************************************/
+/************************************************** User Function *****************************************************/
 
-/** TESTING
- * This function get all data from all the users
- */
-function getUsers()
-{
-
-    global $SecureBookSellingDB;
-    global $logger;
-
-    try {
-        $query = "SELECT username, name, surname, email, date_of_birth, isAdmin FROM user;";
-
-        $result = $SecureBookSellingDB->performQuery("SELECT", $query);
-        $SecureBookSellingDB->closeConnection();
-        return $result;
-    } catch (Exception $e) {
-        $logger->writeLog('ERROR',
-            "Error performing the query to retrieve all the users",
-            $_SERVER['SCRIPT_NAME'],
-            "MySQL - Code: " . $e->getCode(),
-            $e->getMessage());
-        $SecureBookSellingDB->closeConnection();
-        return false;
-    }
-}
-
-/** This function retrieves all the personal data of a user
- * @param $username
- * @return values|false
+/**
+ * This function retrieves all the personal data of a user
+ * @param $username , is the username of the current user
  */
 function getUserData($username)
 {
-
     global $SecureBookSellingDB;
     global $logger;
 
@@ -48,9 +21,9 @@ function getUserData($username)
                           WHERE username = ?;";
 
         $result = $SecureBookSellingDB->performQuery("SELECT", $query, [$username], "s");
-
         $SecureBookSellingDB->closeConnection();
         return $result;
+
     } catch (Exception $e) {
         $logger->writeLog("ERROR",
             "Error performing the query to retrieve all the personal data of a user",
@@ -63,12 +36,11 @@ function getUserData($username)
 }
 
 
-/** Retrieve all customers' data
- * @return users_info|false
+/**
+ * This function retrieves all customers' data, the customer selected are not admin
  */
 function getAllCustomersData()
 {
-
     global $SecureBookSellingDB;
     global $logger;
 
@@ -79,9 +51,9 @@ function getAllCustomersData()
                           ORDER BY username;";
 
         $result = $SecureBookSellingDB->performQuery("SELECT", $query);
-
         $SecureBookSellingDB->closeConnection();
         return $result;
+
     } catch (Exception $e) {
         $logger->writeLog("ERROR",
             "Error performing the query to retrieve all customers' data",
@@ -93,13 +65,12 @@ function getAllCustomersData()
     }
 }
 
-/** This function inserts an user into the database
- * @param $userInfromation Array, are the following params in order: username, password, salt, email, name, surname, date_of_birth
- * @return true|false
+/**
+ * This function inserts a user into the database
+ * @param $userInformation , is an array with the user information
  */
-function insertUser($userInformation)
+function insertUser($userInformation): bool
 {
-
     global $SecureBookSellingDB;
     global $logger;
 
@@ -107,7 +78,7 @@ function insertUser($userInformation)
         $query = "INSERT INTO user (username, password, salt, email, name, surname, date_of_birth, isAdmin, failedAccesses, lastOtp) 
                         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW());";
 
-        $result = $SecureBookSellingDB->performQuery("INSERT", $query, $userInformation, "sssssssii");
+        $SecureBookSellingDB->performQuery("INSERT", $query, $userInformation, "sssssssii");
         $SecureBookSellingDB->closeConnection();
         return true;
 
@@ -122,14 +93,13 @@ function insertUser($userInformation)
     }
 }
 
-/** This function check if the credentials passed by the user are valid or not
- * @param $email string, is the email
- * @param $password string, is the password
- * @return values|false
+/**
+ * This function checks if the credentials passed by the user are valid or not
+ * @param $email , is the email inserted by the user
+ * @param $password , is the password inserted by the user
  */
 function authenticate($email, $password)
 {
-
     global $SecureBookSellingDB;
     global $logger;
 
@@ -142,6 +112,7 @@ function authenticate($email, $password)
         $result = $SecureBookSellingDB->performQuery("SELECT", $query, [$email, $password], "ss");
         $SecureBookSellingDB->closeConnection();
         return $result;
+
     } catch (Exception $e) {
         $logger->writeLog('ERROR',
             "Error during the authentication of the user: " . $email,
@@ -153,13 +124,12 @@ function authenticate($email, $password)
     }
 }
 
-/** This function get the salt, failedAccesses and blockedUntil of a given user
- * @param $email string, is the email to select the user
- * @return string|false
+/**
+ * This function gets the salt, failedAccesses and blockedUntil of a given user
+ * @param $email , is the email to select the user
  */
 function getAccessInformation(string $email)
 {
-
     global $SecureBookSellingDB;
     global $logger;
 
@@ -172,6 +142,7 @@ function getAccessInformation(string $email)
         $result = $SecureBookSellingDB->performQuery("SELECT", $query, [$email], "s");
         $SecureBookSellingDB->closeConnection();
         return $result;
+
     } catch (Exception $e) {
         $logger->writeLog('ERROR',
             "Error getting the salt for the user",
@@ -183,14 +154,13 @@ function getAccessInformation(string $email)
     }
 }
 
-/** This function increments or set to 0 the failed attempts of login of a user and eventually blocks it
- * @param $email string, is the email to select the user
- * @param $failedAccesses int, is the number of failed logins
- * @return true|false
+/**
+ * This function increments or set to 0 the failed attempts of login of a user and eventually blocks it
+ * @param $email , is the email to select the user
+ * @param $failedAccesses , is the number of failed logins
  */
-function updateFailedAccesses($email, $failedAccesses)
+function updateFailedAccesses($email, $failedAccesses): bool
 {
-
     global $SecureBookSellingDB;
     global $logger;
 
@@ -206,10 +176,10 @@ function updateFailedAccesses($email, $failedAccesses)
                         WHERE email = ?;";
         }
 
-
-        $result = $SecureBookSellingDB->performQuery("UPDATE", $query, [$failedAccesses, $email], "is");
+        $SecureBookSellingDB->performQuery("UPDATE", $query, [$failedAccesses, $email], "is");
         $SecureBookSellingDB->closeConnection();
         return true;
+
     } catch (Exception $e) {
         $logger->writeLog('ERROR',
             "Error incrementing the failed accesse of the user",
@@ -221,29 +191,24 @@ function updateFailedAccesses($email, $failedAccesses)
     }
 }
 
-/** This function get the Time of the last Otp generated
- * @param $email string, is the email to select the user
- * @return string|false
+/**
+ * This function gets the Time of the last OTP generated
+ * @param $email , is the email to select the user
  */
 function getOtpTimeInformation($email)
 {
-
     global $SecureBookSellingDB;
     global $logger;
 
     try {
-
         $query = "SELECT lastOtp
                         FROM user
                         WHERE email = ?;";
 
         $result = $SecureBookSellingDB->performQuery("SELECT", $query, [$email], "s");
-        if ($result->num_rows != 1) {
-            return null;
-        }
         $SecureBookSellingDB->closeConnection();
-        $result = $result->fetch_assoc();
-        return $result['lastOtp'];
+        return $result;
+
     } catch (Exception $e) {
         $logger->writeLog('ERROR',
             "Error getting the lastOtp for the user",
@@ -255,14 +220,13 @@ function getOtpTimeInformation($email)
     }
 }
 
-/** This function updates the user table with the new otp
- * @param $email string, is the email to select the user
- * @param $newOtp string, is the new Otp for the user
- * @return string|false
+/**
+ * This function sets the new otp in the user table
+ * @param $email , is the email to select the user
+ * @param $newOtp , is the new OTP for the user
  */
-function setOtp($email, $newOtp)
+function setOtp($email, $newOtp): bool
 {
-
     global $SecureBookSellingDB;
     global $logger;
 
@@ -272,12 +236,13 @@ function setOtp($email, $newOtp)
                         SET otp = ? , lastOtp = NOW()
                         WHERE email = ?;";
 
-        $result = $SecureBookSellingDB->performQuery("UPDATE", $query, [$newOtp, $email], "ss");
+        $SecureBookSellingDB->performQuery("UPDATE", $query, [$newOtp, $email], "ss");
         $SecureBookSellingDB->closeConnection();
         return true;
+
     } catch (Exception $e) {
         $logger->writeLog('ERROR',
-            "Error updating otp for the user",
+            "Error updating OTP for the user",
             $_SERVER['SCRIPT_NAME'],
             "MySQL - Code: " . $e->getCode(),
             $e->getMessage());
@@ -286,16 +251,14 @@ function setOtp($email, $newOtp)
     }
 }
 
-/** This function retrieves all the security information of a specific user
- * * @param $email string, is the email to select the user
- * @return values|false
+/**
+ * This function retrieves all the security information of a specific user
+ * @param $email , is the email to select the user
  */
 function getSecurityInfo($email)
 {
-
     global $SecureBookSellingDB;
     global $logger;
-    global $debug;
 
     try {
         $query = "SELECT otp, lastOtp
@@ -303,9 +266,9 @@ function getSecurityInfo($email)
                         WHERE email = ?;";
 
         $result = $SecureBookSellingDB->performQuery("SELECT", $query, [$email], "s");
-
         $SecureBookSellingDB->closeConnection();
         return $result;
+
     } catch (Exception $e) {
         $logger->writeLog("ERROR",
             "Error performing the query to retrieve security information of a user",
@@ -317,13 +280,12 @@ function getSecurityInfo($email)
     }
 }
 
-/** This function updates an user's password and all the other parameters linked to it
- * @param $userInfromation Array, are the following params in order: password, salt, $_POST['email']
- * @return true|false
+/**
+ * This function updates a user's password and all the other parameters linked to it
+ * @param $userInformation , is an array with the new password-related information
  */
-function updateUserPassword($userInformation)
+function updateUserPassword($userInformation): bool
 {
-
     global $SecureBookSellingDB;
     global $logger;
 
@@ -332,7 +294,7 @@ function updateUserPassword($userInformation)
                         SET password = ?, salt = ?, otp = NULL
                         WHERE email = ?;";
 
-        $result = $SecureBookSellingDB->performQuery("INSERT", $query, $userInformation, "sss");
+        $SecureBookSellingDB->performQuery("INSERT", $query, $userInformation, "sss");
         $SecureBookSellingDB->closeConnection();
         return true;
 
@@ -347,9 +309,12 @@ function updateUserPassword($userInformation)
     }
 }
 
+/**
+ * This function deletes a customer from the database
+ * @param $customerId , is the id of the customer
+ */
 function deleteCustomer($customerId): bool
 {
-
     global $SecureBookSellingDB;
     global $logger;
 
@@ -371,25 +336,23 @@ function deleteCustomer($customerId): bool
     }
 }
 
-/************************************************ Books Function **************************************************/
+/************************************************** Books Function ****************************************************/
 
-/** This function retrieves all the books in the database
- * @return values|false
+/**
+ * This function retrieves all the books in the database
  */
 function getBooks()
 {
-
     global $SecureBookSellingDB;
     global $logger;
-    global $debug;
 
     try {
         $query = "SELECT id, title, author, price FROM book;";
 
         $result = $SecureBookSellingDB->performQuery("SELECT", $query);
-
         $SecureBookSellingDB->closeConnection();
         return $result;
+
     } catch (Exception $e) {
         $logger->writeLog("ERROR",
             "Error performing the query to retrieve all the books",
@@ -401,16 +364,14 @@ function getBooks()
     }
 }
 
-/** This function retrieves the books that have a title like the one submitted
- * @param $title string, is the partial or full title of the book
- * @return values|false
+/**
+ * This function retrieves the books that have a title like the one submitted
+ * @param $title , is the partial or full title of the book
  */
 function searchBooks($title)
 {
-
     global $SecureBookSellingDB;
     global $logger;
-    global $debug;
 
     try {
         $query = "SELECT id, title, author, price FROM book WHERE title LIKE ?;";
@@ -418,9 +379,9 @@ function searchBooks($title)
         $titleParam = "%$title%";
 
         $result = $SecureBookSellingDB->performQuery("SELECT", $query, [$titleParam], "s");
-
         $SecureBookSellingDB->closeConnection();
         return $result;
+
     } catch (Exception $e) {
         $logger->writeLog("ERROR",
             "Error performing the query to retrieve a searched book",
@@ -432,13 +393,12 @@ function searchBooks($title)
     }
 }
 
-/** This function retrieves all the information about a book
- * @param $bookId smallint, is the id of the book
- * @return values|false
+/**
+ * This function retrieves all the information about a book
+ * @param $bookId , is the id of the book
  */
 function getBookDetails($bookId)
 {
-
     global $SecureBookSellingDB;
     global $logger;
 
@@ -446,9 +406,9 @@ function getBookDetails($bookId)
         $query = "SELECT id, title, author, publisher, price, category, stocks_number FROM book WHERE id = ?;";
 
         $result = $SecureBookSellingDB->performQuery("SELECT", $query, [$bookId], "s");
-
         $SecureBookSellingDB->closeConnection();
         return $result;
+
     } catch (Exception $e) {
         $logger->writeLog("ERROR",
             "Error performing the query to retrieve all the details of the book",
@@ -460,12 +420,11 @@ function getBookDetails($bookId)
     }
 }
 
-/** Retrieve all books' data
- * @return books|false
+/**
+ * This function retrieves all books' data
  */
 function getAllBooksData()
 {
-
     global $SecureBookSellingDB;
     global $logger;
 
@@ -474,11 +433,10 @@ function getAllBooksData()
                           FROM book
                           ORDER BY title;";
 
-        //$result = $SecureBookSellingDB->performQuery("SELECT", $query, [], "isssfsi");
         $result = $SecureBookSellingDB->performQuery("SELECT", $query);
-
         $SecureBookSellingDB->closeConnection();
         return $result;
+
     } catch (Exception $e) {
         $logger->writeLog("ERROR",
             "Error performing the query to retrieve all books' data",
@@ -490,13 +448,12 @@ function getAllBooksData()
     }
 }
 
-/** Insert new book into database
- * @param $bookInfo
- * @return bool
+/**
+ * This function inserts new book into database
+ * @param $bookInfo , is an array with all the book information
  */
 function insertBook($bookInfo): bool
 {
-
     global $SecureBookSellingDB;
     global $logger;
 
@@ -520,12 +477,11 @@ function insertBook($bookInfo): bool
 }
 
 /**
- * @param $bookId
- * @return bool
+ * This function deletes a book from the database
+ * @param $bookId , is the id of the book
  */
 function deleteBook($bookId): bool
 {
-
     global $SecureBookSellingDB;
     global $logger;
 
@@ -548,12 +504,11 @@ function deleteBook($bookId): bool
 }
 
 /**
- * @param $bookInfo
- * @return bool
+ * This function updates the info of a book
+ * @param $bookInfo , is an array with the book's information=
  */
 function updateBook($bookInfo): bool
 {
-
     global $SecureBookSellingDB;
     global $logger;
 
@@ -577,8 +532,14 @@ function updateBook($bookInfo): bool
     }
 }
 
-/******************************************** Shopping Cart Function **********************************************/
+/********************************************* Shopping Cart Function *************************************************/
 
+/**
+ * This function checks if a given book is in the database
+ * and if the quantity requested is lower than the stock number
+ * @param $bookId , is the id of the book
+ * @param $quantity , is the quantity requested by the user
+ */
 function checkBookAvailability($bookId, $quantity)
 {
     global $SecureBookSellingDB;
@@ -593,11 +554,9 @@ function checkBookAvailability($bookId, $quantity)
                                 ? <= book.stocks_number;";
 
         $result = $SecureBookSellingDB->performQuery("SELECT", $query, [$bookId, $quantity], "ii");
-        if ($result->num_rows != 1) {
-            return null;
-        }
         $SecureBookSellingDB->closeConnection();
         return $result;
+
     } catch (Exception $e) {
         $logger->writeLog('ERROR',
             "Error getting the price of the book",
@@ -609,7 +568,14 @@ function checkBookAvailability($bookId, $quantity)
     }
 }
 
-function insertOrUpdateItems($shoppingCartInformation, $email, $increment)
+/**
+ * This function inserts new books in the book table of the db
+ * @param $shoppingCartInformation , is an array with all books' information
+ * @param $email , is the email of the logged user
+ * @param $increment , if this variable is true the object is already in the cart and only the quantity needs
+ *                      to be increased
+ */
+function insertOrUpdateItems($shoppingCartInformation, $email, $increment): bool
 {
     global $SecureBookSellingDB;
     global $logger;
@@ -624,6 +590,7 @@ function insertOrUpdateItems($shoppingCartInformation, $email, $increment)
                        VALUES (?, ?, ?, ?, ?, ?, ?)
                        ON DUPLICATE KEY UPDATE quantity = VALUES(quantity);";
         }
+
         foreach ($shoppingCartInformation as $itemId => $itemDetails) {
             $parameters = array(
                 $email,
@@ -635,11 +602,11 @@ function insertOrUpdateItems($shoppingCartInformation, $email, $increment)
                 $itemDetails['quantity']
             );
 
-            $result = $SecureBookSellingDB->performQuery("INSERT", $query, $parameters, "sisssdi");
+            $SecureBookSellingDB->performQuery("INSERT", $query, $parameters, "sisssdi");
         }
-
         $SecureBookSellingDB->closeConnection();
         return true;
+
     } catch (Exception $e) {
         $logger->writeLog('ERROR',
             "Error performing the query to insert/update of the shopping cart",
@@ -651,7 +618,13 @@ function insertOrUpdateItems($shoppingCartInformation, $email, $increment)
     }
 }
 
-function removeItems($bookID, $quantity, $email)
+/**
+ * This function removes books or decreases the quantity of the given book
+ * @param $bookID , is the id of the given book
+ * @param $quantity , is used to determine if the book need to be deleted or only its quantity need to be decreased
+ * @param $email , is the email of the logged user
+ */
+function removeItems($bookID, $quantity, $email): bool
 {
     global $SecureBookSellingDB;
     global $logger;
@@ -659,17 +632,15 @@ function removeItems($bookID, $quantity, $email)
     try {
 
         if ($quantity <= 0) {
-            // Se la quantità è 0 o inferiore, elimina la riga corrispondente
             $deleteQuery = "DELETE FROM shopping_cart WHERE id_book = ? AND email = ?";
             $SecureBookSellingDB->performQuery("DELETE", $deleteQuery, [$bookID, $email], "is");
         } else {
-            // Altrimenti, decrementa la quantità
             $updateQuery = "UPDATE shopping_cart SET quantity = ? WHERE id_book = ? AND email = ?";
             $SecureBookSellingDB->performQuery("UPDATE", $updateQuery, [$quantity, $bookID, $email], "iis");
         }
-
         $SecureBookSellingDB->closeConnection();
         return true;
+
     } catch (Exception $e) {
         $logger->writeLog('ERROR',
             "Error performing the query to remove items from the shopping cart",
@@ -681,6 +652,10 @@ function removeItems($bookID, $quantity, $email)
     }
 }
 
+/**
+ * This function gets all the element in the shopping cart
+ * @param $email , is the mail of the logged user
+ */
 function getShoppingCartBooks($email)
 {
     global $SecureBookSellingDB;
@@ -689,13 +664,13 @@ function getShoppingCartBooks($email)
     try {
 
         $query = "SELECT *
-                            FROM shopping_cart
-                            WHERE email = ?;";
+                    FROM shopping_cart
+                    WHERE email = ?;";
 
         $result = $SecureBookSellingDB->performQuery("SELECT", $query, [$email], "s");
-
         $SecureBookSellingDB->closeConnection();
         return $result;
+
     } catch (Exception $e) {
         $logger->writeLog('ERROR',
             "Error getting the books from the shopping cart",
@@ -707,18 +682,16 @@ function getShoppingCartBooks($email)
     }
 }
 
-/************************************************ Orders Function *************************************************/
+/************************************************* Orders Function ****************************************************/
 
-/** This function retrieves all the orders of a user
- * @param $userId smallint, is the id of the user
- * @return values|false
+/**
+ * This function retrieves all the orders of a user
+ * @param $userId , is the id of the user
  */
 function getUserOrders($userId)
 {
-
     global $SecureBookSellingDB;
     global $logger;
-    global $debug;
 
     try {
         $query = "SELECT b.title, o.time, o.amount, o.quantity, o.payment_method, b.id AS id_book
@@ -727,9 +700,9 @@ function getUserOrders($userId)
                         ORDER BY o.time DESC";
 
         $result = $SecureBookSellingDB->performQuery("SELECT", $query, [$userId], "s");
-
         $SecureBookSellingDB->closeConnection();
         return $result;
+
     } catch (Exception $e) {
         $logger->writeLog("ERROR",
             "Error performing the query to retrieve all the orders of a user",
@@ -741,7 +714,14 @@ function getUserOrders($userId)
     }
 }
 
-function addItemToOrders($userId, $currentTime, $cartItems, $totalPrice)
+/**
+ * This function adds the bought books to the order table in the db
+ * @param $userId , is the id of the user
+ * @param $currentTime , is the timestamp of the instant of purchase
+ * @param $cartItems , is an array with all the books in the shopping cart
+ * @param $totalPrice , is the total price of the purchase
+ */
+function addItemToOrders($userId, $currentTime, $cartItems, $totalPrice): bool
 {
     global $SecureBookSellingDB;
     global $logger;
@@ -777,6 +757,7 @@ function addItemToOrders($userId, $currentTime, $cartItems, $totalPrice)
 
         $SecureBookSellingDB->closeConnection();
         return true;
+
     } catch (Exception $e) {
         $logger->writeLog('ERROR',
             "Error performing the query to insert into the orders",
@@ -788,16 +769,14 @@ function addItemToOrders($userId, $currentTime, $cartItems, $totalPrice)
     }
 }
 
-/** Retrieve all orders' data
- * @return orders_info|false
+/** This function retrieves all orders' data
  */
 function getAllOrdersData()
 {
-
     global $SecureBookSellingDB;
     global $logger;
 
-    try{
+    try {
         $query = "SELECT u.username as username, b.title, o.time, o.amount, o.quantity, o.payment_method, b.id AS id_book
                     FROM orders o INNER JOIN book b ON o.id_book = b.id
                                     INNER JOIN user u ON o.id_user = u.id
@@ -806,6 +785,7 @@ function getAllOrdersData()
         $result = $SecureBookSellingDB->performQuery("SELECT", $query);
         $SecureBookSellingDB->closeConnection();
         return $result;
+
     } catch (Exception $e) {
         $logger->writeLog("ERROR",
             "Error performing the query to retrieve all customers' data",
@@ -817,6 +797,11 @@ function getAllOrdersData()
     }
 }
 
+/**
+ * This function checks if the given book was bought by the current user
+ * @param $userId , is the id of the current user
+ * @param $bookId , is the id of the given book
+ */
 function checkBookPurchaseByBook($userId, $bookId)
 {
     global $SecureBookSellingDB;
@@ -829,11 +814,10 @@ function checkBookPurchaseByBook($userId, $bookId)
                         LIMIT ?";
 
         $limit = 1;
-
         $result = $SecureBookSellingDB->performQuery("SELECT", $query, [$userId, $bookId, $limit], "iii");
-
         $SecureBookSellingDB->closeConnection();
         return $result;
+
     } catch (Exception $e) {
         $logger->writeLog("ERROR",
             "Error performing the query to check the book purchase",

@@ -7,22 +7,25 @@ global $sessionHandler;
 global $shoppingCartHandler;
 global $accessControlManager;
 
-// This function checks if the user is anonymous or not
-// if in case, the user will be redirected to the login
+// Check path manipulation and broken access control
+// Check if the user is logged
 $accessControlManager->redirectIfAnonymous();
+// Check if an admin tries to access this page
+$accessControlManager->redirectIfAdmin();
 
 try {
     // If POST vars are set it means that a POST form has been submitted 
     if (checkFormData(['CardHolderName', 'CardNumber', 'Expire', 'CVV'])) {
-        // Protect against XSRF
-        $token = htmlspecialchars($_POST['token'], ENT_QUOTES, 'UTF-8');
+
         // Protect against XSS
+        $token = htmlspecialchars($_POST['token'], ENT_QUOTES, 'UTF-8');
         $cardHolderName = htmlspecialchars($_POST['CardHolderName'], ENT_QUOTES, 'UTF-8');
         $cardNumber = htmlspecialchars($_POST['CardNumber'], ENT_QUOTES, 'UTF-8');
         $expire = htmlspecialchars($_POST['Expire'], ENT_QUOTES, 'UTF-8');
         $CVV = htmlspecialchars($_POST['CVV'], ENT_QUOTES, 'UTF-8');
         $logger->writeLog('INFO', "Protection against XSS applied");
 
+        // Protect against XSRF
         if (!$token || $token !== $_SESSION['token']) {
             // return 405 http status code
             $accessControlManager ->redirectIfXSRFAttack();
@@ -30,14 +33,13 @@ try {
             $logger->writeLog('INFO', "XSRF control passed");
             // Save card information in $_SESSION and redirect depending on $_SESSION vars set
             $sessionHandler->saveCreditCardInfo($cardHolderName, $cardNumber, $expire, $CVV);
-            $logger->writeLog('INFO', "User: " . $_SESSION['email'] . " succesfully set his payment info");
+            $logger->writeLog('INFO', "User: " . $_SESSION['email'] . " successfully set his payment info");
             $accessControlManager->routeMultiStepCheckout();
         }
     }
 }
 catch (Exception $e) {
-    $logger->writeLog('ERROR',
-    "Failed to set the payment method for the user: " . $_SESSION['email']);
+    $logger->writeLog('ERROR', $e->getMessage());
     $errorHandler->handleException($e);
 }
 ?>

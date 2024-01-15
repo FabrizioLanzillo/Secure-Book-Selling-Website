@@ -30,19 +30,22 @@ function login($email, $password, $failedAccesses): ?bool
                 $dataQuery = $result->fetch_assoc();
                 if ($dataQuery !== null && $result->num_rows === 1) {
                     //Resets the failed accesses counter
-                    updateFailedAccesses($email, 0);
-                    // creation of the session variables of a logged user
-                    $sessionHandler->setSession($dataQuery['id'], $dataQuery['username'], $email, $dataQuery['name'], $dataQuery['isAdmin']);
-                    // generation of a new php session id in order to avoid the session fixation attack
-                    session_regenerate_id(true);
-                    $logger->writeLog('INFO', "SessionID changed in order to avoid Session Fixation attacks");
-                    return true;
+                    if (updateFailedAccesses($email, 0)) {
+                        // creation of the session variables of a logged user
+                        $sessionHandler->setSession($dataQuery['id'], $dataQuery['username'], $email, $dataQuery['name'], $dataQuery['isAdmin']);
+                        // generation of a new php session id in order to avoid the session fixation attack
+                        session_regenerate_id(true);
+                        $logger->writeLog('INFO', "SessionID changed in order to avoid SESSION FIXATION Attacks");
+                        return true;
+                    } else {
+                        throw new Exception('Something went wrong during the update.');
+                    }
                 } else {
                     $failedAccesses = $failedAccesses + 1;
                     if (updateFailedAccesses($email, $failedAccesses)) {
                         throw new Exception('Email and/or password are not valid.', $failedAccesses);
                     } else {
-                        throw new Exception('Something went wrong.');
+                        throw new Exception('Something went wrong during the update.');
                     }
                 }
             } else {
@@ -55,7 +58,7 @@ function login($email, $password, $failedAccesses): ?bool
         $errorHandler->handleException($e);
         $errorCode = $e->getCode();
         if ($errorCode > 0) {
-            $logger->writeLog('ERROR',
+            $logger->writeLog('WARNING',
                 "Failed Login for the user: " . $email,
                 $_SERVER['SCRIPT_NAME'],
                 "LoginFunc",
@@ -84,7 +87,6 @@ if (checkFormData(['email', 'password'])) {
     $token = htmlspecialchars($_POST['token'], ENT_QUOTES, 'UTF-8');
     $email = htmlspecialchars($_POST['email'], ENT_QUOTES, 'UTF-8');
     $submittedPassword = htmlspecialchars($_POST['password'], ENT_QUOTES, 'UTF-8');
-  
     $logger->writeLog('INFO', "Protection against XSS applied");
 
     // Protect against XSRF
@@ -130,6 +132,10 @@ if (checkFormData(['email', 'password'])) {
             }
         } catch (Exception $e) {
             $errorHandler->handleException($e);
+            $logger->writeLog('ERROR',
+                "Failed Login for the user: " . $email,
+                $_SERVER['SCRIPT_NAME'],
+                $e->getMessage());
         }
     }
 }

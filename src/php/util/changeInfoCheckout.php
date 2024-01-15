@@ -6,25 +6,28 @@ global $errorHandler;
 global $sessionHandler;
 global $accessControlManager;
 
-// This function checks if the user is anonymous or not
-// if in case, the user will be redirected to the login
+// Check if the user is logged
 $accessControlManager->redirectIfAnonymous();
+// Check if an admin tries to access this page
+$accessControlManager->redirectIfAdmin();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         if (checkFormData(['editInfo'])) {
-
+            // Protect against XSS
             $token = htmlspecialchars($_POST['token'], ENT_QUOTES, 'UTF-8');
             $editInfo = htmlspecialchars($_POST['editInfo'], ENT_QUOTES, 'UTF-8');
 
+            // Protect against XSRF
             if (!$token || $token !== $_SESSION['token']) {
                 // return 405 http status code
-                header($_SERVER['SERVER_PROTOCOL'] . ' 405 Method Not Allowed');
-                exit;
+                $accessControlManager->redirectIfXSRFAttack();
             } else {
+                // redirection to the shippingInfo that needs to be edited
                 if ($editInfo === 'shippingInfo') {
                     $sessionHandler->clearCheckoutInfo('shippingInfo');
                 }
+                // redirection to the paymentInfo that needs to be edited
                 elseif ($editInfo === 'paymentInfo'){
                     $sessionHandler->clearCheckoutInfo('paymentInfo');
                 }

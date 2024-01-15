@@ -7,17 +7,24 @@ global $shoppingCartHandler;
 global $errorHandler;
 global $accessControlManager;
 
+if($sessionHandler->isLogged()){
+    // Check path manipulation and broken access control
+    // Check if an admin tries to access this page
+    $accessControlManager->redirectIfAdmin();
+}
+
 $items = $shoppingCartHandler->getBooks();
 $totalPrice = 0;
 
 // If a form has been submitted and the itemId is set
-if (isset($_POST['itemId'])){
-    // Protect against XSRF
-    $token = htmlspecialchars($_POST['token'], ENT_QUOTES, 'UTF-8');
+if (checkFormData(['itemId'])) {
+
     // Protect against XSS
+    $token = htmlspecialchars($_POST['token'], ENT_QUOTES, 'UTF-8');
     $bookId = htmlspecialchars($_POST['itemId'], ENT_QUOTES, 'UTF-8');
     $logger->writeLog('INFO', "Protection against XSS applied");
 
+    // Protect against XSRF
     if (!$token || $token !== $_SESSION['token']) {
         // return 405 http status code
         $accessControlManager ->redirectIfXSRFAttack();
@@ -26,6 +33,7 @@ if (isset($_POST['itemId'])){
         try{
             // Remove item from the cart using its book_id
             if($shoppingCartHandler->removeItem($bookId)){
+                $logger->writeLog('INFO', "Book Successfully removed from the shopping cart");
                 // Redirect to itself to update visual graphic
                 header('Location: //' . SERVER_ROOT . '/php/user/shoppingCart.php');
                 exit;
@@ -129,6 +137,8 @@ if (isset($_POST['itemId'])){
                     <div class="float-right">
                         <a href="../../" class="btn btn-lg btn-default md-btn-flat mt-2 mr-3">Back to shopping</a>
                         <?php
+                        // if the user is logged and has books in the cart the checkout button appears and
+                        // is the next step of the checkout is taken
                         if ($items !== null) {
                             if ($sessionHandler->isLogged()) {
                                 $pathNextStepToCheckout = $accessControlManager->getNextStepToCheckout();

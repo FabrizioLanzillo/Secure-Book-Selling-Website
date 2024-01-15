@@ -1,13 +1,18 @@
 <?php
 require_once __DIR__ . "/../../config.php";
 
+global $logger;
 global $sessionHandler;
+global $accessControlManager;
 
 // Checks if the user is logged
-if ($sessionHandler->isLogged()) {
-    $performedOrders = getUserOrders($_SESSION['userId']);
-    $logger->writeLog('INFO', "user " . $_SESSION['userId'] . " requested his orders");
-}
+$accessControlManager->redirectIfAnonymous();
+// Checks if an admin tries to access this page
+$accessControlManager->redirectIfAdmin();
+
+$result = getUserOrders($_SESSION['userId']);
+$logger->writeLog('INFO', "user " . $_SESSION['email'] . " requested his orders");
+
 
 ?>
 
@@ -24,16 +29,13 @@ if ($sessionHandler->isLogged()) {
 
 <?php
 include "./../layout/header.php";
-
-// Checks if the user is logged
-if ($sessionHandler->isLogged()) {
 ?>
 
 <div class="container bg-secondary mt-4 p-4">
     <h1 class="text-white">Your Orders</h1>
 
     <?php
-    if ($performedOrders) {
+    if ($result) {
         ?>
         <table class="table table-light table-striped mt-4">
             <thead>
@@ -49,9 +51,9 @@ if ($sessionHandler->isLogged()) {
             <tbody>
             <?php
             $previousTime = null;
-            // Checks if the user has performed more than 0 orders
-            if ($performedOrders->num_rows > 0) {
-                while ($order = $performedOrders->fetch_assoc()) {
+            // check if the query returned a result and more than 1 row
+            if ($result->num_rows >= 1) {
+                while ($order = $result->fetch_assoc()) {
                     ?>
                     <tr>
                         <?php
@@ -91,7 +93,7 @@ if ($sessionHandler->isLogged()) {
                 }
             } else {
                 ?>
-                <p>No orders found.</p>
+                <div class='alert alert-danger mt-4'>No orders found.</div>
                 <?php
             }
             ?>
@@ -100,13 +102,7 @@ if ($sessionHandler->isLogged()) {
         <?php
     } else {
         ?>
-        <p>No orders found.</p>
-        <?php
-    }
-    }
-    else {
-        ?>
-        <div class='error-message'>No user logged</div>
+        <div class='alert alert-danger mt-4'>Error retrieving orders details</div>
         <?php
     }
     ?>

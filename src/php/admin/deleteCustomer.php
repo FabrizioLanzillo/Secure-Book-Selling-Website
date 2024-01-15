@@ -4,28 +4,31 @@ require_once __DIR__ . "/../../config.php";
 global $logger;
 global $errorHandler;
 global $sessionHandler;
+global $accessControlManager;
 
-if ($sessionHandler->isLogged() and $sessionHandler->isAdmin()) {
+// Check path manipulation and broken access control
+// Check if the user is logged
+$accessControlManager->redirectIfAnonymous();
+// Check if a normal user tries to access this page
+$accessControlManager->redirectIfNormalUser();
 
-    // Sanitize user input
-    $customerId = isset($_GET['user_id']) ? htmlspecialchars($_GET['user_id'], ENT_QUOTES, 'UTF-8') : null;
+// Sanitize user input
+$customerId = isset($_GET['user_id']) ? htmlspecialchars($_GET['user_id'], ENT_QUOTES, 'UTF-8') : null;
 
-    try {
+try {
+    if ($customerId !== null) {
         // try to remove user from database
-        $success = deleteCustomer($customerId);
-
-        if ($success) {
-            $message = "Book: " . $customerId . " removed from database";
-            $logger->writeLog('INFO', $message);
+        if (deleteCustomer($customerId)) {
+            $logger->writeLog('INFO', "Book: " . $customerId . " removed from database");
             header('Location: ./customerList.php');
             exit;
         } else {
             throw new Exception('Could not remove the customer');
         }
-    } catch (Exception $e) {
-        $errorHandler->handleException($e);
+    } else {
+        throw new Exception('Customer to delete is not selected');
+
     }
-} else {
-    header('Location: //' . SERVER_ROOT . '/');
-    exit;
+} catch (Exception $e) {
+    $errorHandler->handleException($e);
 }

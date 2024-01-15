@@ -24,7 +24,6 @@ header(
     "frame-ancestors 'self';"
 );
 
-
     $debug = true;
     $lifetime = 10800;
     $path = '/';
