@@ -104,7 +104,8 @@ catch (Exception $e) {
                                                        pattern="\d{2}/\d{2}"
                                                        title="Please Insert this format MM/YY"
                                                        maxlength="5"
-                                                       oninput="formatExpirationDate(event)" required>
+                                                       oninput="formatExpirationDate(event)"
+                                                       onblur="checkExpirationDate(event.target.value)" required>
                                             </div>
                                         </div>
                                         <div class="col-2">
@@ -121,7 +122,7 @@ catch (Exception $e) {
                                     </div>
                                     <!-- Hidden token to protect against XSRF -->
                                     <input type="hidden" name="token" value="<?php echo htmlspecialchars($_SESSION['token'] ?? ''); ?>">
-                                    <button type="submit" class="btn btn-success btn-lg btn-block">Continue to Shipping Info</button>
+                                    <button type="submit" class="btn btn-primary btn-lg btn-block">Continue to Shipping Info</button>
                                 </div>
                             </form>
                         </div>

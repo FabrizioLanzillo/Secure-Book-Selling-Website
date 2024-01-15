@@ -141,7 +141,7 @@ catch (Exception $e) {
 
                                 <!-- Hidden token to protect against CSRF -->
                                 <input type="hidden" name="token" value="<?php echo htmlspecialchars($_SESSION['token'] ?? ''); ?>">
-                                <button type="submit" class="btn btn-success btn-lg btn-block">Continue to Payment</button>
+                                <button type="submit" class="btn btn-primary btn-lg btn-block">Continue to Payment</button>
                             </form>
 
                         </div>

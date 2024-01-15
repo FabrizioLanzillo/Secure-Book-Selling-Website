@@ -24,7 +24,6 @@ try {
             header('Location: ./homeAdmin.php');
             exit;
         } else {
-            $logger->writeLog('ERROR', 'Admin: ' . $_SESSION['email'] . ' could not remove the book');
             throw new Exception('Could not remove the book');
         }
     } else {
@@ -34,8 +33,6 @@ try {
 } catch (Exception $e) {
     $errorHandler->handleException($e);
 }
-
-
 
 
 

@@ -23,7 +23,6 @@ try {
             header('Location: ./customerList.php');
             exit;
         } else {
-            $logger->writeLog('ERROR', 'Admin: ' . $_SESSION['email'] . ' could not remove the book');
             throw new Exception('Could not remove the customer');
         }
     } else {
