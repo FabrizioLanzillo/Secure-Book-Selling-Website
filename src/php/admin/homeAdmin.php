@@ -65,7 +65,7 @@ include "./../layout/header.php";
         <hr>
     </aside>
 
-    <main class="container bg-secondary mt-4 p-4">
+    <main class="container bg-secondary mt-4 p-4" style="max-width: 1440px">
 
         <div class="d-flex justify-content-between">
             <h1 class="text-white">Books</h1>
