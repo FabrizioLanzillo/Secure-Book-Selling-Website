@@ -5,6 +5,13 @@ global $shoppingCartHandler;
 global $errorHandler;
 global $accessControlManager;
 global $logger;
+global $sessionHandler;
+
+if($sessionHandler->isLogged()){
+    // Check path manipulation and broken access control
+    // Check if an admin tries to access this page
+    $accessControlManager->redirectIfAdmin();
+}
 
 $result = false;
 // Sanitize user input
@@ -29,6 +36,7 @@ try {
             $logger->writeLog('INFO', "XSRF control passed");
             // Adds n of the specified books to the cart of the user
             if ($shoppingCartHandler->addItem($book, $quantity)) {
+                $logger->writeLog('INFO', "Book Successfully added to the shopping cart");
                 showInfoMessage("Book Successfully added to the shopping cart!");
             }
         }

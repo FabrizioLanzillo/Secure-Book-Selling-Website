@@ -1,12 +1,21 @@
 <?php
-class SessionManager {
-    private static ?SessionManager $instance = null;
-    private $lifetime = null;
-    private $path = null;
-    private $secure = null;
-    private $httponly = null;
 
-    private function __construct($lifetime, $path, $secure, $httponly) {
+/**
+ * This class manages the session variable and checks the type of the current user
+ */
+class SessionManager
+{
+    private static ?SessionManager $instance = null;
+    private $lifetime;
+    private $path;
+    private $secure;
+    private $httponly;
+
+    /**
+     * In the constructor the session cookie params are set and the session is started
+     */
+    private function __construct($lifetime, $path, $secure, $httponly)
+    {
         $this->lifetime = $lifetime;
         $this->path = $path;
         $this->secure = $secure;
@@ -14,7 +23,13 @@ class SessionManager {
         $this->startSession();
     }
 
-    public static function getInstance($lifetime, $path, $secure, $httponly): ?SessionManager{
+    /**
+     * This method returns the singleton instance of SessionManager.
+     * If the instance doesn't exist, it creates one; otherwise, it returns the existing instance.
+     * @return SessionManager
+     */
+    public static function getInstance($lifetime, $path, $secure, $httponly): ?SessionManager
+    {
         if (self::$instance == null) {
             self::$instance = new SessionManager($lifetime, $path, $secure, $httponly);
         }
@@ -22,7 +37,13 @@ class SessionManager {
         return self::$instance;
     }
 
-    private function startSession(): void{
+    /**
+     * This method sets the session cookie params and start the session
+     * It also set the session token to avoid XSRF on login form
+     * @return void
+     */
+    private function startSession(): void
+    {
 
         session_set_cookie_params([
             'lifetime' => $this->lifetime,
@@ -34,13 +55,24 @@ class SessionManager {
 
         session_start();
 
-        //Need to set the session token to avoid CSRF on login form!
-        if (!isset($_SESSION['token'])){
+        // Need to set the session token to avoid XSRF on login form
+        if (!isset($_SESSION['token'])) {
             $_SESSION['token'] = md5(uniqid(mt_rand(), true));
         }
     }
 
-    public function setSession($userId, $username, $email, $name, $isAdmin): void {
+    /**
+     * This method sets the session variables of the user after the login,
+     * they are used to identify the current user
+     * @param $userId , is the id of the current user
+     * @param $username , is the username of the current user
+     * @param $email , is the email of the current user
+     * @param $name , is the name of the current user
+     * @param $isAdmin , indicate if the current user is an admin or not
+     * @return void
+     */
+    public function setSession($userId, $username, $email, $name, $isAdmin): void
+    {
         $_SESSION['userId'] = $userId;
         $_SESSION['username'] = $username;
         $_SESSION['email'] = $email;
@@ -49,7 +81,17 @@ class SessionManager {
         $_SESSION['token'] = md5(uniqid(mt_rand(), true));
     }
 
-    public function saveCreditCardInfo($cardHolderName, $cardNumber, $Expire, $cvv): void {
+    /**
+     * This method saves the credit card information of the current user as array
+     * inside the paymentInfo session variable
+     * @param $cardHolderName , is the name of the credit card holder
+     * @param $cardNumber , is the credit card number
+     * @param $Expire , is the expiration date of the card
+     * @param $cvv , is the secure code of the credit card
+     * @return void
+     */
+    public function saveCreditCardInfo($cardHolderName, $cardNumber, $Expire, $cvv): void
+    {
         $_SESSION['paymentInfo'] = array(
             'cardHolderName' => $cardHolderName,
             'cardNumber' => $cardNumber,
@@ -58,13 +100,32 @@ class SessionManager {
         );
     }
 
-    public function clearCheckoutInfo($checkoutInfo): void {
+    /**
+     * This method clear the shippingInfo session variable or the paymentInfo session variable
+     * it depends on the given variable
+     * @param $checkoutInfo , is the name of the variable to clear
+     * @return void
+     */
+    public function clearCheckoutInfo($checkoutInfo): void
+    {
         if (isset($_SESSION[$checkoutInfo])) {
             unset($_SESSION[$checkoutInfo]);
         }
     }
 
-    public function saveShippingInfo($fullName, $address, $city, $province, $cap, $country): void {
+    /**
+     * This method saves the shipping information of the current user as array
+     * inside the shippingInfo session variable
+     * @param $fullName , is the full name at the domicile
+     * @param $address , is the address of the current user
+     * @param $city , is the city of the user
+     * @param $province , is the province of the user
+     * @param $cap , is the cap of the user
+     * @param $country , is the country of the user
+     * @return void
+     */
+    public function saveShippingInfo($fullName, $address, $city, $province, $cap, $country): void
+    {
         $_SESSION['shippingInfo'] = array(
             'fullName' => $fullName,
             'address' => $address,
@@ -75,8 +136,13 @@ class SessionManager {
         );
     }
 
-
-    public function unsetSession(): bool {
+    /**
+     * This method is called on the logout and clears all session data
+     * and also regenerates the session id, in order to provide a safe logout.
+     * @return bool
+     */
+    public function unsetSession(): bool
+    {
         try {
             // this function frees all session variables currently registered.
             session_unset();
@@ -92,8 +158,13 @@ class SessionManager {
         }
     }
 
-    public function isLogged(): int {
-        $loggedFields = ['userId', 'username', 'email', 'name', 'isAdmin'];
+    /**
+     * This function checks id the user is anonymous or not
+     * @return int
+     */
+    public function isLogged(): int
+    {
+        $loggedFields = ['userId', 'username', 'email', 'name', 'isAdmin', 'token'];
         foreach ($loggedFields as $field) {
             if (!isset($_SESSION[$field])) {
                 return 0;
@@ -102,7 +173,12 @@ class SessionManager {
         return 1;
     }
 
-    public function isAdmin(): bool {
+    /**
+     * This function checks if the user is admin or not
+     * @return bool
+     */
+    public function isAdmin(): bool
+    {
         return $_SESSION['isAdmin'] === 1;
     }
 

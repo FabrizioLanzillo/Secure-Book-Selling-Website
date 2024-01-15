@@ -4,14 +4,17 @@ require_once __DIR__ . "/config.php";
 global $errorHandler;
 global $accessControlManager;
 global $sessionHandler;
+global $logger;
 
-if ($sessionHandler->isLogged() and $sessionHandler->isAdmin()) {
-    header('Location: //' . SERVER_ROOT . '/php/admin/homeAdmin.php');
-    exit;
+if($sessionHandler->isLogged()){
+    // Check path manipulation and broken access control
+    // Check if an admin tries to access this page
+    $accessControlManager->redirectIfAdmin();
 }
 
+
 try {
-    // Sanitize user input
+    // Sanitize get parameters, this parameter is set after the user makes a purchase, in order to show the outcome
     $paymentResponse = isset($_GET['paymentResponse']) ? htmlspecialchars($_GET['paymentResponse'], ENT_QUOTES, 'UTF-8') : null;
     if ($paymentResponse !== null) {
         if ($paymentResponse === "OK") {
@@ -20,7 +23,7 @@ try {
             throw new Exception($paymentResponse);
         }
     }
-
+    // Sanitize get parameters, this parameter is set after the user download, in order to show the outcome
     $downloadBookError = isset($_GET['downloadBookError']) ? htmlspecialchars($_GET['downloadBookError'], ENT_QUOTES, 'UTF-8') : null;
     if ($downloadBookError !== null) {
         throw new Exception($downloadBookError);
@@ -32,6 +35,7 @@ try {
 
 // Check if the search form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST" && checkFormData(['search_query'])) {
+
     // Protect against XSS
     $token = htmlspecialchars($_POST['token'], ENT_QUOTES, 'UTF-8');
     $searchQuery = htmlspecialchars($_POST["search_query"], ENT_QUOTES, 'UTF-8');
@@ -41,6 +45,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && checkFormData(['search_query'])) {
         // return 405 http status code
         $accessControlManager->redirectIfXSRFAttack();
     } else {
+        $logger->writeLog('INFO', "XSRF control passed");
         $result = searchBooks($searchQuery);
     }
 } else {

@@ -7,13 +7,14 @@ global $emailSender;
 global $accessControlManager;
 
 // If one of POST vars is set it means that a POST form has been submitted
-if (isset($_POST['email'])) {
-    // Protect against XSRF
-    $token = htmlspecialchars($_POST['token'], ENT_QUOTES, 'UTF-8');
+if (checkFormData(['email'])) {
+
     // Protect against XSS
+    $token = htmlspecialchars($_POST['token'], ENT_QUOTES, 'UTF-8');
     $email = htmlspecialchars($_POST['email'], ENT_QUOTES, 'UTF-8');
     $logger->writeLog('INFO', "Protection against XSS applied");
 
+    // Protect against XSRF
     if (!$token || $token !== $_SESSION['token']) {
         // return 405 http status code
         $accessControlManager->redirectIfXSRFAttack();
@@ -44,25 +45,22 @@ if (isset($_POST['email'])) {
                                 header('Location: //' . SERVER_ROOT . '/php/password_recovery.php');
                                 exit;
                             } else {
-                                $logger->writeLog('ERROR',
-                                    "Couldn't send email to user: " . $email);
-                                throw new Exception("Couldn't send an email to the specified email address");
+                                throw new Exception("Couldn't send an email to the specified email address: ". $email);
                             }
                         } else {
-                            throw new Exception("Error during the creation of the OTP");
+                            throw new Exception("Error during the creation of the OTP for the email: ". $email);
                         }
                     } else {
-                        $logger->writeLog('ERROR',
-                            "User: " . $email . " requested an Otp before the 5 minutes deadline");
-                        throw new Exception('You already received an Otp recently');
+                        throw new Exception('OTP recently sent for the mail: '. $email);
                     }
                 } else {
-                    throw new Exception('No Account found for the given email');
+                    throw new Exception('No Account found for the given email: '. $email);
                 }
             } else {
-                throw new Exception('Error retrieving the last OTP generated');
+                throw new Exception('Error retrieving the last OTP generated for the given mail: '. $email);
             }
         } catch (Exception $e) {
+            $logger->writeLog('ERROR', $e->getMessage());
             $errorHandler->handleException($e);
         }
     }

@@ -6,12 +6,13 @@ global $sessionHandler;
 global $accessControlManager;
 
 // Checks if the user is logged
-if ($sessionHandler->isLogged()) {
-    $result = getUserOrders($_SESSION['userId']);
-    $logger->writeLog('INFO', "user " . $_SESSION['userId'] . " requested his orders");
-} else {
-    $accessControlManager->redirectToHome();
-}
+$accessControlManager->redirectIfAnonymous();
+// Checks if an admin tries to access this page
+$accessControlManager->redirectIfAdmin();
+
+$result = getUserOrders($_SESSION['userId']);
+$logger->writeLog('INFO', "user " . $_SESSION['userId'] . " requested his orders");
+
 
 ?>
 

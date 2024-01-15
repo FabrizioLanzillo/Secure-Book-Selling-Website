@@ -2,15 +2,15 @@
 require_once __DIR__ . "/../config.php";
 
 global $sessionHandler;
+global $accessControlManager;
 
-// Checks if user is logged
-if ($sessionHandler->isLogged()) {
-    // Retrieves user's data from the db
-    $result = getUserData($_SESSION['username']);
-    if ($result){
-        $user = $result->fetch_assoc();
-    }
-}
+// Check path manipulation and broken access control
+// Check if the user is logged
+$accessControlManager->redirectIfAnonymous();
+
+// Retrieves user's data from the db
+$result = getUserData($_SESSION['username']);
+
 ?>
 
 <!DOCTYPE html>
@@ -74,32 +74,37 @@ include "./layout/header.php";
                 <img src="<?php echo htmlspecialchars($imagePath); ?>" alt="Profile Picture"
                      class="img-fluid rounded-circle img-thumbnail">
             </div>
+            <?php
+            if ($result) {
+                $user = $result->fetch_assoc();
+                if ($user !== null && $result->num_rows === 1) {
+            ?>
             <div class="col-md-4">
                 <form>
                     <div class="form-group">
                         <label for="name">Name:</label>
                         <input type="text" class="form-control" id="name" readonly="readonly"
-                               placeholder="<?php echo htmlspecialchars(isset($user['name']) ? $user['name'] : ''); ?>">
+                               placeholder="<?php echo htmlspecialchars($user['name']); ?>">
                     </div>
                     <div class="form-group">
                         <label for="surname">Surname:</label>
                         <input type="text" class="form-control" id="surname" readonly="readonly"
-                               placeholder="<?php echo htmlspecialchars(isset($user['surname']) ? $user['surname'] : ''); ?>">
+                               placeholder="<?php echo htmlspecialchars($user['surname']); ?>">
                     </div>
                     <div class="form-group">
                         <label for="username">Username:</label>
                         <input type="text" class="form-control" id="username" readonly="readonly"
-                               placeholder="<?php echo htmlspecialchars(isset($user['username']) ? $user['username'] : ''); ?>">
+                               placeholder="<?php echo htmlspecialchars($user['username']); ?>">
                     </div>
                     <div class="form-group">
                         <label for="date_birth">Date of birth:</label>
                         <input type="text" class="form-control" id="date_birth" readonly="readonly"
-                               placeholder="<?php echo htmlspecialchars(isset($user['date_of_birth']) ? $user['date_of_birth'] : ''); ?>">
+                               placeholder="<?php echo htmlspecialchars($user['date_of_birth']); ?>">
                     </div>
                     <div class="form-group">
                         <label for="email">Email:</label>
                         <input type="email" class="form-control" id="email" readonly="readonly"
-                               placeholder="<?php echo htmlspecialchars(isset($user['email']) ? $user['email'] : ''); ?>">
+                               placeholder="<?php echo htmlspecialchars($user['email']); ?>">
                     </div>
                     <div class="form-group">
                         <label for="password">Password:</label>
@@ -113,6 +118,18 @@ include "./layout/header.php";
                     </a>
                 </form>
             </div>
+                    <?php
+                } else {
+                    ?>
+                    <div class='alert alert-danger mt-4'>User not found in the database</div>
+                    <?php
+                }
+            } else {
+                ?>
+                <div class='alert alert-danger mt-4'>Error retrieving user details</div>
+                <?php
+            }
+        ?>
         </div>
     </main>
 

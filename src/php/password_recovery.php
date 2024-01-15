@@ -41,9 +41,7 @@ if (checkFormData(['email', 'otp', 'password', 'repeat_password'])) {
 
                             // Checks OTP inserted with the one in the db
                             if (($currentTime - $lastOtpTime) > 90 or $otpData['otp'] !== $otp) {
-                                $logger->writeLog('ERROR',
-                                    "The OTP used by the user: " . $email . " is expired or wrong");
-                                throw new Exception('The OTP is incorrect and/or expired');
+                                throw new Exception('The OTP is incorrect and/or expired for the user: ' . $email);
                             }
 
                             // Generates new vars to insert in the db
@@ -58,26 +56,25 @@ if (checkFormData(['email', 'otp', 'password', 'repeat_password'])) {
 
                             // Update user's password
                             if (updateUserPassword($userData)) {
-                                $logger->writeLog('INFO', "The password update of the user: " . $userData[2] . ", Succeeded");
+                                $logger->writeLog('INFO', "The password update of the user: " . $email . ", Succeeded");
                                 header('Location: //' . SERVER_ROOT . '/php/login.php');
                                 exit;
                             } else {
                                 // No need to send a logger because it enters here only if db fails
-                                throw new Exception('Couldn\'t update the user\'s password');
+                                throw new Exception('Could not update the password of the user: ' . $email);
                             }
                         } else {
-                            $logger->writeLog('ERROR',
-                                "The OTP for the user: " . $email . " is null");
-                            throw new Exception('No OTP was generated for this account');
+                            throw new Exception('No OTP was generated for this user: ' . $email);
                         }
                     } else {
-                        throw new Exception('No Account found for the given email');
+                        throw new Exception('No Account found for the given email: ' . $email);
                     }
                 } else {
-                    throw new Exception('Error retrieving the last OTP generated');
+                    throw new Exception('Error retrieving the last OTP generated for the given email: ' . $email);
                 }
             }
         } catch (Exception $e) {
+            $logger->writeLog('ERROR', $e->getMessage());
             $errorHandler->handleException($e);
         }
     }
@@ -109,15 +106,15 @@ include "./layout/header.php";
                 </div>
 
                 <div class="mb-3">
-                    <label for="otp" class="form-label"><b>Otp</b></label>
-                    <input class="form-control" type="text" placeholder="Otp code" name="otp" required>
+                    <label for="otp" class="form-label"><b>OTP</b></label>
+                    <input class="form-control" type="text" placeholder="OTP code" name="otp" required>
                 </div>
 
                 <div class="mb-3">
                     <label for="password" class="form-label"><b>Password</b></label>
                     <input class="form-control" type="password" placeholder="Password" name="password" id="password"
                            pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{9,}"
-                           title="Deve contenere almeno un numero, una lettera maiuscola, una lettera minuscola e almeno 8 o più caratteri"
+                           title="Must contain at least one number, one uppercase letter, one lowercase letter, and at least 8 or more characters"
                            required oninput="checkPasswordStrength('change_psw_button')">
                     <meter max="4" id="password-strength-meter"></meter>
                     <p id="password-strength-text"></p>
