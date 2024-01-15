@@ -18,6 +18,9 @@ It is also **Protected** against **several categories of vulnerabilities**, such
 - ***Information leakage***
 - ***Cross-site request forgery (XSRF)***
 
+## System Architecture
+
+![System Architecture](./docs/System_Architecture.png)
 
 ## System Configuration
 
@@ -66,6 +69,9 @@ localhost:8800
 ```
 host: localhost
 port: 9906
+user: root or the one in the .env file
+password: in the .env file
+database: in the .env file
 ```
 ## SSL/TLS Certificates Generation
 
