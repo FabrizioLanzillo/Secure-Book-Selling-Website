@@ -11,7 +11,7 @@ $accessControlManager->redirectIfAnonymous();
 $accessControlManager->redirectIfAdmin();
 
 $result = getUserOrders($_SESSION['userId']);
-$logger->writeLog('INFO', "user " . $_SESSION['email'] . " requested his orders");
+$logger->writeLog('INFO', "User " . $_SESSION['email'] . " requested his orders");
 
 
 ?>

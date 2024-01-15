@@ -14,7 +14,7 @@ try{
     // Call of the method that clears all session data, regenerates the session id, and destroy the session
     // in order to provide a safe logout.
     if($sessionHandler->unsetSession()){
-        $logger->writeLog('INFO', "SessionID changed in order to avoid SESSION FIXATION attacks ");
+        $logger->writeLog('INFO', "SessionID changed after the logout, in order to avoid SESSION FIXATION attacks ");
         $logger->writeLog('INFO', "Logout of the user succeeded");
         $accessControlManager->redirectToHome();
     }

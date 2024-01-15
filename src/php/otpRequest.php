@@ -42,7 +42,7 @@ if (checkFormData(['email'])) {
                                     "This is the otp: $newOtp requested.", "It will last only for 90 seconds.") !== false) {
 
                                 $logger->writeLog('INFO', "2FA check for the user: " . $email . " OTP has been created successfully");
-                                header('Location: //' . SERVER_ROOT . '/php/password_recovery.php');
+                                header('Location: //' . SERVER_ROOT . '/php/passwordRecovery.php');
                                 exit;
                             } else {
                                 throw new Exception("Couldn't send an email to the specified email address: ". $email);
@@ -85,7 +85,7 @@ include "./layout/header.php";
             <div class="p-4 border rounded">
                 <h2 class="text-center mb-5">Insert your email to receive an OTP</h2>
                 <form name="otp_request"
-                      action="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/otp_request.php'); ?>" method="POST">
+                      action="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/otpRequest.php'); ?>" method="POST">
                     <div class="form-group m-auto w-75 ">
                         <label for="email" class="sr-only">Email</label>
                         <input class="form-control mb-4" type="email" placeholder="Email" name="email" required>
@@ -96,7 +96,7 @@ include "./layout/header.php";
                         <button class="btn btn-primary btn-block" type="submit">Generate OTP</button>
                     </div>
                 </form>
-                <a href="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/password_recovery.php'); ?>"
+                <a href="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/passwordRecovery.php'); ?>"
                    class="btn btn-link btn-block mt-3">I already have an OTP</a>
             </div>
         </div>

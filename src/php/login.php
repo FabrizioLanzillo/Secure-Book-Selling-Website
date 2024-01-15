@@ -35,7 +35,7 @@ function login($email, $password, $failedAccesses): ?bool
                         $sessionHandler->setSession($dataQuery['id'], $dataQuery['username'], $email, $dataQuery['name'], $dataQuery['isAdmin']);
                         // generation of a new php session id in order to avoid the session fixation attack
                         session_regenerate_id(true);
-                        $logger->writeLog('INFO', "SessionID changed in order to avoid SESSION FIXATION Attacks");
+                        $logger->writeLog('INFO', "SessionID changed after the login, in order to avoid SESSION FIXATION Attacks");
                         return true;
                     } else {
                         throw new Exception('Something went wrong during the update.');
@@ -175,7 +175,7 @@ include "./layout/header.php";
 
                     <button class="btn btn-primary btn-block" type="submit">Login</button>
                 </form>
-                <a href="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/otp_request.php') ?>"
+                <a href="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/otpRequest.php') ?>"
                    class="forgot-pwd d-block text-center mt-3">Forgot Password?</a>
             </div>
         </div>

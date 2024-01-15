@@ -36,7 +36,7 @@ try {
             $logger->writeLog('INFO', "XSRF control passed");
             // Adds n of the specified books to the cart of the user
             if ($shoppingCartHandler->addItem($book, $quantity)) {
-                $logger->writeLog('INFO', "Book Successfully added to the shopping cart");
+                $logger->writeLog('INFO', "Book with id=".$book." Successfully added to the shopping cart");
                 showInfoMessage("Book Successfully added to the shopping cart!");
             }
         }
@@ -101,7 +101,7 @@ include "./layout/header.php";
                                     stock:</strong> <?php echo htmlspecialchars($bookDetails['stocks_number']); ?></p>
 
                             <div class="mb-4">
-                                <form action="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/book_details.php?book_id=' . $bookId) ?>"
+                                <form action="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/bookDetails.php?book_id=' . $bookId) ?>"
                                       method="POST" class="d-inline">
                                     <div class="d-flex flex-row">
                                         <input type="hidden" name="bookId"

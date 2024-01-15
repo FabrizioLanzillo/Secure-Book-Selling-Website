@@ -50,8 +50,6 @@ class ErrorHandler
      */
     public function handleException($exception): void
     {
-        echo '<script>
-                 alert("' . htmlspecialchars($exception->getMessage()) . '");
-              </script>';
+        echo '<script>alert("' . htmlspecialchars($exception->getMessage()) . '");</script>';
     }
 }

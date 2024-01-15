@@ -33,7 +33,7 @@ if (checkFormData(['itemId'])) {
         try{
             // Remove item from the cart using its book_id
             if($shoppingCartHandler->removeItem($bookId)){
-                $logger->writeLog('INFO', "Book Successfully removed from the shopping cart");
+                $logger->writeLog('INFO', "Book with id=".$bookId." Successfully removed from the shopping cart");
                 // Redirect to itself to update visual graphic
                 header('Location: //' . SERVER_ROOT . '/php/user/shoppingCart.php');
                 exit;
@@ -92,7 +92,7 @@ if (checkFormData(['itemId'])) {
                                             <div class="media align-items-center">
                                                 <img src="../../img/books/<?php echo htmlspecialchars( $itemId);?>.jpg" class="d-block ui-w-40 ui-bordered mr-4" alt="Book Image">
                                                 <div class="media-body">
-                                                    <a href="//<?php echo htmlspecialchars(SERVER_ROOT. '/php/book_details.php?book_id='. $itemId);?>" class="d-block text-dark"><?= htmlspecialchars($itemDetails['title']) ?></a>
+                                                    <a href="//<?php echo htmlspecialchars(SERVER_ROOT. '/php/bookDetails.php?book_id='. $itemId);?>" class="d-block text-dark"><?= htmlspecialchars($itemDetails['title']) ?></a>
                                                     <small>
                                                         <span class="text-muted">Author: </span> <?= htmlspecialchars($itemDetails['author']) ?> &nbsp;
                                                         <span class="text-muted">Publisher: </span> <?= htmlspecialchars($itemDetails['publisher']) ?> &nbsp;

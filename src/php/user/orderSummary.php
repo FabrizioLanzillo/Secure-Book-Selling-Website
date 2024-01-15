@@ -120,7 +120,7 @@ include "./../layout/header.php";
                                                      class="d-block ui-w-40 ui-bordered mr-4"
                                                      style="width: 20%; height: auto;" alt="Book Image">
                                                 <div class="media-body">
-                                                    <a href="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/book_details.php?book_id=' . $bookId); ?>"
+                                                    <a href="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/bookDetails.php?book_id=' . $bookId); ?>"
                                                        class="d-block text-dark"><?= $bookDetails['title'] ?></a>
                                                     <small>
                                                         <span class="text-muted">Author: </span> <?= $bookDetails['author'] ?>

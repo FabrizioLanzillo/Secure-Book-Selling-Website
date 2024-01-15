@@ -99,7 +99,7 @@ include "./layout/header.php";
         <div class="col-md-6">
             <h2 class="text-center mb-4">Password Recovery</h2>
             <form class="pwd-recovery-form"
-                  action="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/password_recovery.php') ?>" method="POST">
+                  action="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/passwordRecovery.php') ?>" method="POST">
                 <div class="mb-3">
                     <label for="email" class="form-label"><b>Email</b></label>
                     <input class="form-control" type="email" placeholder="Email" name="email" required>
@@ -132,7 +132,7 @@ include "./layout/header.php";
 
                 <button class="btn btn-primary" id="change_psw_button" type="submit">Change Password</button>
             </form>
-            <p class="mt-3 text-center"><a href="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/otp_request.php') ?>"
+            <p class="mt-3 text-center"><a href="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/otpRequest.php') ?>"
                                            class="no-otp">I don't have an Otp</a></p>
         </div>
     </div>

@@ -108,7 +108,7 @@ include "./layout/header.php";
                     </div>
                     <!-- Hidden token to protect against CSRF -->
                     <input type="hidden" name="token" value="<?php echo htmlspecialchars($_SESSION['token'] ?? ''); ?>">
-                    <a href="otp_request.php">
+                    <a href="otpRequest.php">
                         <button id="change-pwd" type="button" class="btn btn-primary">Change Password</button>
                     </a>
                 </form>

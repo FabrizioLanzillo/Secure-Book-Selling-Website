@@ -1,6 +1,15 @@
 <?php
 global $sessionHandler;
+global $shoppingCartHandler;
+
 $currentFile = htmlspecialchars(SERVER_ROOT . $_SERVER['SCRIPT_NAME']);
+
+$books = $shoppingCartHandler->getBooks();
+if($books !== null)
+    $booksCount = count($books);
+else
+    $booksCount = '';
+
 ?>
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-5">
@@ -45,12 +54,13 @@ $currentFile = htmlspecialchars(SERVER_ROOT . $_SERVER['SCRIPT_NAME']);
                     <?php } ?>
                     <!-- The cart Button for every page of the user and for the anonymous user -->
                     <?php if ((!$sessionHandler->isLogged() and (strcmp($currentFile, htmlspecialchars(SERVER_ROOT . '/index.php')) == 0)) or
-                        (!$sessionHandler->isLogged() and (strcmp($currentFile, htmlspecialchars(SERVER_ROOT . '/php/book_details.php')) == 0)) or
+                        (!$sessionHandler->isLogged() and (strcmp($currentFile, htmlspecialchars(SERVER_ROOT . '/php/bookDetails.php')) == 0)) or
                         (($sessionHandler->isLogged()) and (!$sessionHandler->isAdmin()))) { ?>
                         <li class="nav-item">
                             <a class="nav-link"
-                               href="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/user/shoppingCart.php') ?>">Shopping
-                                Cart</a>
+                                href="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/user/shoppingCart.php') ?>">Shopping Cart
+                                <div class="badge badge-danger"><?php echo htmlspecialchars($booksCount); ?></div>
+                            </a>
                         </li>
                     <?php } ?>
                     <!-- The login Button for every page of an anonymous user, with the exception for the login page -->
