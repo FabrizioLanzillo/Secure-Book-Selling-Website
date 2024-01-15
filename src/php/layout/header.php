@@ -1,119 +1,97 @@
 <?php
-    $currentFile = SERVER_ROOT.$_SERVER['SCRIPT_NAME'];
+global $sessionHandler;
+global $shoppingCartHandler;
+
+$currentFile = htmlspecialchars(SERVER_ROOT . $_SERVER['SCRIPT_NAME']);
+
+$books = $shoppingCartHandler->getBooks();
+if($books !== null)
+    $booksCount = count($books);
+else
+    $booksCount = '';
+
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <link rel="stylesheet" type="text/css" href="./../../css/header.css">
-        <title>Book Selling Header</title>
-    </head>
-    <body>
-        <header>
-            <!-- This is the container for the first button and it can be: -->
-            <!-- The Profile button for every page of a logged user/admin-->
-            <div class="container button-container">
-<?php
-                if(isLogged()){
-?>
-                    <a href="//<?php echo SERVER_ROOT. '/php/profile.php'?>">
-                        <button class="button_header">
-                            Hello, <?php echo $_SESSION['name']?>
-                        </button>
-                    </a>
-<?php
-                }
-?>
-            </div>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-5">
+    <div class="container">
 
-            <!-- This is the container for the second button and it can be: -->
-            <!-- The Orders Button for all the user pages -->
-            <div class="container button-container">
-<?php
-                if(isLogged() and $_SESSION['isAdmin'] == 0){
-?>
-                        <a href="//<?php echo SERVER_ROOT. '/php/user/orders.php'?>">
-                            <button class="button_header">
-                                Orders
-                            </button>
-                        </a>
-<?php
-                }
-?>
-            </div>
-            <div class="container flex-container"></div>
-            <div class="container logo-container">
-<?php
-                if(isLogged() and ($_SESSION['isAdmin'] == 1)){
-?>
-                    <a href="//<?php echo SERVER_ROOT. '/php/admin/homeAdmin.php'?>">
-<?php
-                }
-                else{
-?>
-                    <a href="//<?php echo SERVER_ROOT. '/'?>">
-<?php
-                }
-?>
-                        <img src="./../../img/book_selling_logo.png" alt="logo">
-                    </a>
-            </div>
-            <div class="container flex-container"></div>
+        <?php if ($sessionHandler->isLogged() and $sessionHandler->isAdmin()){ ?>
+        <a class="navbar-brand" href="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/admin/homeAdmin.php') ?>">
+            <?php }else{ ?>
+            <a class="navbar-brand" href="//<?php echo htmlspecialchars(SERVER_ROOT . '/') ?>">
+                <?php } ?>
+                <img src="./../../img/bookselling.png" alt="logo" class="img-fluid" style="width: 200px; height: auto;">
+            </a>
 
-            <!-- This is the container for the third button and it can be: -->
-            <!-- The cart Button for every page of the user and for the anonymous user -->
-            <div class="container button-container">
-<?php
-                if((!isLogged() and (strcmp($currentFile, SERVER_ROOT.'/index.php') == 0)) or
-                    ((isLogged()) and ($_SESSION['isAdmin'] == 0))){
-?>
-                        <a href="//<?php echo SERVER_ROOT. '/php/user/shoppingCart.php'?>">
-                            <button class="button_header">
-                                Shopping Cart
-                            </button>
-                        </a>
-<?php
-                }
-?>
-            </div>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
 
-            <!-- This is the container for the fourth button and it can be: -->
-            <!-- The login Button for every page of an anonymous user, with the exception for the login page -->
-            <!-- The signup Button for the login page -->
-            <!-- The logout Button for every other page -->
-            <div class="container button-container">
-<?php
-                if(!isLogged()){
-                    if(strcmp($currentFile, SERVER_ROOT.'/php/login.php') != 0){
-?>
-                        <a href="//<?php echo SERVER_ROOT. '/php/login.php'?>">
-                            <button class="button_header">
-                                Log In
-                            </button>
-                        </a>
-<?php
-                    }
-                    else{
-?>
-                        <a href="//<?php echo SERVER_ROOT. '/php/signup.php'?>">
-                            <button class="button_header">
-                                Sign Up
-                            </button>
-                        </a>
-<?php                        
-                    }
-                }
-                else{
-?>
-                    <a href="//<?php echo SERVER_ROOT. '/php/logout.php'?>">
-                        <button class="button_header">
-                            Log Out
-                        </button>
-                    </a>
-<?php
-                }
-?>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <!-- The Profile button for every page of a logged user/admin-->
+                    <?php if ($sessionHandler->isLogged()) { ?>
+                        <li class="nav-item">
+                            <a class="nav-link"
+                               href="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/profile.php') ?>">Hello, <?php echo htmlspecialchars($_SESSION['name']) ?></a>
+                        </li>
+                    <?php } ?>
+                    <li class="nav-item">
+                        <?php if ($sessionHandler->isLogged() and $sessionHandler->isAdmin()) { ?>
+                            <a class="nav-link"
+                               href="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/admin/homeAdmin.php') ?>">Homepage</a>
+                        <?php } else { ?>
+                            <a class="nav-link" href="//<?php echo htmlspecialchars(SERVER_ROOT . '/') ?>">Homepage</a>
+                        <?php } ?>
+                    </li>
+                    <!-- The Orders Button for all the user pages -->
+                    <?php if ($sessionHandler->isLogged() and !$sessionHandler->isAdmin()) { ?>
+                        <li class="nav-item">
+                            <a class="nav-link"
+                               href="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/user/orders.php') ?>">Orders</a>
+                        </li>
+                    <?php } ?>
+                    <!-- The cart Button for every page of the user and for the anonymous user -->
+                    <?php if ((!$sessionHandler->isLogged() and (strcmp($currentFile, htmlspecialchars(SERVER_ROOT . '/index.php')) == 0)) or
+                        (!$sessionHandler->isLogged() and (strcmp($currentFile, htmlspecialchars(SERVER_ROOT . '/php/bookDetails.php')) == 0)) or
+                        (($sessionHandler->isLogged()) and (!$sessionHandler->isAdmin()))) { ?>
+                        <li class="nav-item">
+                            <a class="nav-link"
+                                href="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/user/shoppingCart.php') ?>">Shopping Cart
+                                <div class="badge badge-danger"><?php echo htmlspecialchars($booksCount); ?></div>
+                            </a>
+                        </li>
+                    <?php } ?>
+                    <!-- The login Button for every page of an anonymous user, with the exception for the login page -->
+                    <!-- The signup Button for the login page -->
+                    <!-- The logout Button for every other page -->
+                    <?php if (!$sessionHandler->isLogged()) {
+                        if (strcmp($currentFile, htmlspecialchars(SERVER_ROOT . '/php/login.php')) != 0) { ?>
+                            <li class="nav-item">
+                                <a class="nav-link"
+                                   href="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/login.php') ?>">Log In</a>
+                            </li>
+                        <?php } else { ?>
+                            <li class="nav-item">
+                                <a class="nav-link"
+                                   href="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/signup.php') ?>">Sign Up</a>
+                            </li>
+                        <?php }
+                    } else { ?>
+                        <li class="nav-item">
+                            <a class="nav-link"
+                               href="//<?php echo htmlspecialchars(SERVER_ROOT . '/php/logout.php') ?>">Log Out</a>
+                        </li>
+                    <?php } ?>
+                </ul>
             </div>
-        </header>
-    </body>
-</html>
+    </div>
+</nav>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
+

@@ -6,12 +6,19 @@ services:
         restart: always
         depends_on:
             - mysql-server
+        env_file:
+            - .env
         volumes:
+            # base directory of the website
             - ./src:/var/www/html/
+            # storage of the e-books
+            - ./apache_conf/e-books:/home/bookselling/e-books-mounted
+            # https config files
             - ./apache_conf/ssl_conf/certificates/bookselling:/etc/ssl/ssl_certificates
             - ./apache_conf/ssl_conf/sites-available:/etc/apache2/sites-available
-            - ./apache_conf/config_system.sh:/config_system.sh
-        command: /bin/bash -c "/config_system.sh"
+            # web server configuration files
+            - ./apache_conf/config_system.sh:/home/bookselling/config_system.sh
+        command: /bin/bash -c "/home/bookselling/config_system.sh"
         ports:         
         - "127.0.0.1:443:443"
         networks:
@@ -22,10 +29,10 @@ services:
         image: mysql
         restart: always
         environment:
-            MYSQL_ROOT_PASSWORD: password
-            MYSQL_DATABASE: secure_book_selling_db
-            MYSQL_USER: SNH
-            MYSQL_PASSWORD: password
+            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+            MYSQL_DATABASE: ${MYSQL_DATABASE}
+            MYSQL_USER: ${MYSQL_USER}
+            MYSQL_PASSWORD: ${MYSQL_PASSWORD}
         ports:
             - "127.0.0.1:9906:3306"
         volumes:

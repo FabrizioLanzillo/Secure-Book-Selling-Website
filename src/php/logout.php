@@ -1,12 +1,29 @@
 <?php
-    require_once __DIR__ . "./../config.php";
+require_once __DIR__ . "/../config.php";
 
-    global $logger;
+global $logger;
+global $errorHandler;
+global $sessionHandler;
+global $accessControlManager;
 
-    unsetSession();
+// Check path manipulation and broken access control
+// Check if the user is logged
+$accessControlManager->redirectIfAnonymous();
 
-    session_regenerate_id(true);
-    $logger->writeLog('INFO', "SessionID changed in order to avoid Session Fixation attacks ");
-    $logger->writeLog('INFO', "Logout of the user succeeded");
+try{
+    // Call of the method that clears all session data, regenerates the session id, and destroy the session
+    // in order to provide a safe logout.
+    if($sessionHandler->unsetSession()){
+        $logger->writeLog('INFO', "SessionID changed after the logout, in order to avoid SESSION FIXATION attacks ");
+        $logger->writeLog('INFO', "Logout of the user succeeded");
+        $accessControlManager->redirectToHome();
+    }
+    else{
+        throw new Exception('Error during the logout');
+    }
+}
+catch (Exception $e) {
+    $logger->writeLog('ERROR', "Logout of the user failed");
+    $errorHandler->handleException($e);
+}
 
-	header("Location: ./../");
