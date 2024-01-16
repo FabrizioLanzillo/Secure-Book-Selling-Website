@@ -1,1 +1,18 @@
 WEB-SERVER LOGS:
++[INFO] 2024-01-16 14:48:00 = Book with id=2 Successfully added to the shopping cart
++[ERROR] 2024-01-16 14:49:09 = [File: /php/login.php] - Failed Login for the user: g.marrucci4@studenti.unipi.it - [Error: Undefined variable $submittedPassword]
++[INFO] 2024-01-16 14:49:42 = SessionID changed after the login, in order to avoid SESSION FIXATION Attacks
++[INFO] 2024-01-16 14:49:42 = Login of the user: g.marrucci4@studenti.unipi.it, Succeeded
++[INFO] 2024-01-16 14:49:46 = Protection against XSS applied
++[INFO] 2024-01-16 14:49:46 = Book with id=2 Successfully removed from the shopping cart
++[INFO] 2024-01-16 16:24:55 = SessionID changed after the logout, in order to avoid SESSION FIXATION attacks 
++[INFO] 2024-01-16 16:24:55 = Logout of the user succeeded
++[ERROR] 2024-01-16 16:26:12 = [File: /php/login.php] - Error getting the salt for the user - [Error: MySQL - Code: 1054] [Details: Unknown column 'lastFailedAccess' in 'field list']
++[ERROR] 2024-01-16 16:26:12 = [File: /php/login.php] - Failed Login for the user: g.marrucci4@studenti.unipi.it - [Error: Error retrieving access information]
++[ERROR] 2024-01-16 16:27:19 = [File: /php/login.php] - Error incrementing the failed accesse of the user - [Error: MySQL - Code: 0] [Details: Undefined variable $failedAccesses]
++[ERROR] 2024-01-16 16:28:48 = [File: /php/login.php] - Error incrementing the failed accesse of the user - [Error: MySQL - Code: 0] [Details: Undefined variable $failedAccesses]
++[ERROR] 2024-01-16 16:32:52 = [File: /php/login.php] - Failed Login for the user: g.marrucci4@studenti.unipi.it - [Error: LoginFunc] [Details: strtotime(): Passing null to parameter #1 ($datetime) of type string is deprecated]
++[ERROR] 2024-01-16 16:37:43 = [File: /php/login.php] - Error incrementing the failed accesse of the user - [Error: MySQL - Code: 0] [Details: Undefined variable $failedAccesses]
++[ERROR] 2024-01-16 16:40:45 = [File: /php/login.php] - Error incrementing the failed accesse of the user - [Error: MySQL - Code: 0] [Details: Undefined variable $failedAccesses]
++[ERROR] 2024-01-16 16:41:39 = [File: /php/login.php] - Error incrementing the failed accesse of the user - [Error: MySQL - Code: 0] [Details: Undefined variable $failedAccesses]
++[ERROR] 2024-01-16 16:42:04 = [File: /php/login.php] - Error incrementing the failed accesse of the user - [Error: MySQL - Code: 0] [Details: Undefined variable $failedAccesses]

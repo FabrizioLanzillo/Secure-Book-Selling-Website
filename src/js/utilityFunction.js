@@ -28,6 +28,5 @@ function checkPasswordStrength() {
             break;
     }
 
-    // Protect against DOM based XSS
     document.getElementById("password-strength-text").textContent = text;
 }

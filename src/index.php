@@ -36,8 +36,8 @@ try {
 if ($_SERVER["REQUEST_METHOD"] == "POST" && checkFormData(['search_query'])) {
 
     // Protect against XSS
-    $token = htmlspecialchars($_POST['token'], ENT_QUOTES, 'UTF-8');
-    $searchQuery = htmlspecialchars($_POST["search_query"], ENT_QUOTES, 'UTF-8');
+    $token = filter_input(INPUT_POST, 'token', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $searchQuery = filter_input(INPUT_POST, "search_query", FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 
     // Protect against XSRF
     if (!$token || $token !== $_SESSION['token']) {
