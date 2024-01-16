@@ -165,12 +165,12 @@ function updateFailedAccesses($information): bool
     global $logger;
 
     try {
-
-        if ($failedAccesses >= 10) {
+        // In the first case the firstFailedAccess is set such that can be used for the timeout
+        if ($information[0] >= 3) {
             $query = "UPDATE user
-                        SET firstFailedAccess = NULL, failedAccesses = 0, blockedTime = ?
+                        SET firstFailedAccess = NOW(), failedAccesses = 0, blockedTime = ?
                         WHERE email = ?;";
-        } else if ($failedAccesses === 1){
+        } else if ($information[0] === 1){
             $query = "UPDATE user
                         SET firstFailedAccess = NOW(), failedAccesses = ?
                         WHERE email = ?;";

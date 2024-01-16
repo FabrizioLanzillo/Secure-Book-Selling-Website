@@ -46,10 +46,10 @@ function login($email, $password, $firstfailedAccess, $failedAccesses, $blockedT
                     }
                 } else {
                     $firstfailedAccess = ($firstfailedAccess === null) ? 0 : strtotime($firstfailedAccess);
-                    if ($firstfailedAccess + 30 > time() or $firstfailedAccess === 0){
+                    if ($firstfailedAccess + 30 > time() or $firstfailedAccess === 0 or $failedAccesses === 0){
                         $failedAccesses = $failedAccesses + 1;
-                        if ($failedAccesses >= 10) {
-                            $blockedTime = ($blockedTime === 0) ? 30 : $blockedTime;
+                        if ($failedAccesses >= 3) {
+                            $blockedTime = ($blockedTime === 0) ? 30 : $blockedTime * 2;
                             $information = array(
                                 $blockedTime,
                                 $email,
@@ -122,7 +122,7 @@ if (checkFormData(['email', 'password'])) {
                 if ($dataQuery !== null && $result->num_rows === 1) {
 
                     // check if the user account is blocked, due to a suspect of brute force attack
-                    if ($dataQuery['blockedTime'] !== 0 and $dataQuery['firstFailedAccess'] == NULL) {
+                    if ($dataQuery['blockedTime'] !== 0 and $dataQuery['failedAccesses'] === 0) {
                         $blockedTime = $dataQuery['blockedTime'] + strtotime($dataQuery['firstFailedAccess']);
                         $currentTime = time();
                         // check if the account is still blocked or enough time is passed
