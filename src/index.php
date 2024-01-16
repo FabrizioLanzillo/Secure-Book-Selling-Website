@@ -44,7 +44,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && checkFormData(['search_query'])) {
         // return 405 http status code
         $accessControlManager->redirectIfXSRFAttack();
     } else {
-        $logger->writeLog('INFO', "XSRF control passed");
         $result = searchBooks($searchQuery);
     }
 } else {

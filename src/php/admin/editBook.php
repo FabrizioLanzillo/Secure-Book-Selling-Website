@@ -38,7 +38,6 @@ if (checkFormData(['id', 'title', 'author', 'publisher', 'price', 'category', 's
         $accessControlManager->redirectIfXSRFAttack();
     } else {
         try {
-            $logger->writeLog('INFO', "XSRF control passed");
             $book = array(
                 $title,
                 $author,

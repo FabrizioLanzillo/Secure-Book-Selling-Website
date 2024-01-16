@@ -29,7 +29,6 @@ if (checkFormData(['itemId'])) {
         // return 405 http status code
         $accessControlManager ->redirectIfXSRFAttack();
     } else {
-        $logger->writeLog('INFO', "XSRF control passed");
         try{
             // Remove item from the cart using its book_id
             if($shoppingCartHandler->removeItem($bookId)){

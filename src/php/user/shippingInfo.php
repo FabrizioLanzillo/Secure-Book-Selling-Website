@@ -32,7 +32,6 @@ try{
             // return 405 http status code
             $accessControlManager ->redirectIfXSRFAttack();
         } else {
-            $logger->writeLog('INFO', "XSRF control passed");
             // Save cart information in $_SESSION and redirect depending on $_SESSION vars set
             $sessionHandler->saveShippingInfo($fullName, $address, $city, $province, $cap, $country);
             $logger->writeLog('INFO', "User: " . $_SESSION['email'] . " successfully set his shipping info");

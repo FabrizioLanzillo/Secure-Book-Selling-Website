@@ -95,7 +95,6 @@ if (checkFormData(['email', 'password'])) {
         $accessControlManager->redirectIfXSRFAttack();
     } else {
         try {
-            $logger->writeLog('INFO', "XSRF control passed");
             // retrieve from the db the salt of the user, and the blockAccess information
             $result = getAccessInformation($email);
             // check if an error occurred while performing the query

@@ -27,7 +27,6 @@ if (checkFormData(['title', 'author', 'publisher', 'price', 'category', 'stock']
         // return 405 http status code
         $accessControlManager->redirectIfXSRFAttack();
     } else {
-        $logger->writeLog('INFO', "XSRF control passed");
         try {
             $book = array(
                 $title,

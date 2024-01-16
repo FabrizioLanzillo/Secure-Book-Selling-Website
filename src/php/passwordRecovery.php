@@ -22,7 +22,6 @@ if (checkFormData(['email', 'otp', 'password', 'repeat_password'])) {
         // return 405 http status code
         $accessControlManager->redirectIfXSRFAttack();
     } else {
-        $logger->writeLog('INFO', "XSRF control passed");
         try {
             // Checks if passwords are the same
             if ($passwordSubmitted !== $repeatPassword) {

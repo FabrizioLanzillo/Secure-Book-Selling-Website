@@ -33,7 +33,6 @@ try {
             // return 405 http status code
             $accessControlManager->redirectIfXSRFAttack();
         } else {
-            $logger->writeLog('INFO', "XSRF control passed");
             // Adds n of the specified books to the cart of the user
             if ($shoppingCartHandler->addItem($book, $quantity)) {
                 $logger->writeLog('INFO', "Book with id=".$book." Successfully added to the shopping cart");

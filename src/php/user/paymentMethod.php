@@ -30,7 +30,6 @@ try {
             // return 405 http status code
             $accessControlManager ->redirectIfXSRFAttack();
         } else {
-            $logger->writeLog('INFO', "XSRF control passed");
             // Save card information in $_SESSION and redirect depending on $_SESSION vars set
             $sessionHandler->saveCreditCardInfo($cardHolderName, $cardNumber, $expire, $CVV);
             $logger->writeLog('INFO', "User: " . $_SESSION['email'] . " successfully set his payment info");

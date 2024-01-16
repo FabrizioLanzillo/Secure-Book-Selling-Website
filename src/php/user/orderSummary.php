@@ -33,7 +33,6 @@ try {
             // return 405 http status code
             $accessControlManager->redirectIfXSRFAttack();
         } else {
-            $logger->writeLog('INFO', "XSRF control passed");
             //Set the time and userId for the order's rows
             $currentTime = date('Y-m-d H:i:s');
             $userId = $_SESSION['userId'];

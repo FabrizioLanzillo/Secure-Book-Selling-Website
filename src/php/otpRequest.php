@@ -19,7 +19,6 @@ if (checkFormData(['email'])) {
         // return 405 http status code
         $accessControlManager->redirectIfXSRFAttack();
     } else {
-        $logger->writeLog('INFO', "XSRF control passed");
         try {
             // Check when the last otp has been requested
             $result = getOtpTimeInformation($email);
