@@ -193,14 +193,13 @@ class SessionManager
     {
         global $logger;
 
-        if($this->isLogged()){
+        if ($this->isLogged()) {
             $currentInteraction = time();
             if (($currentInteraction - $_SESSION['lastInteraction']) > $this->lifetime) {
-                $logger->writeLog('INFO', "the session for the user: ".$_SESSION['email']." is expired");
+                $logger->writeLog('INFO', "the session for the user: " . $_SESSION['email'] . " is expired");
                 header('Location: //' . SERVER_ROOT . '/php/logout.php');
                 exit;
-            }
-            else{
+            } else {
                 $_SESSION['lastInteraction'] = $currentInteraction;
             }
         }

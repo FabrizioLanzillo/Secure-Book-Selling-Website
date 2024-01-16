@@ -12,7 +12,9 @@ if (checkFormData(['email', 'otp', 'password', 'repeat_password'])) {
     // Protect against XSS
     $token = htmlspecialchars($_POST['token'], ENT_QUOTES, 'UTF-8');
     $email = htmlspecialchars($_POST['email'], ENT_QUOTES, 'UTF-8');
-    $otp = htmlspecialchars($_POST['otp'], ENT_QUOTES, 'UTF-8');
+    // In the db is stored the hash of the OTP,
+    // so the OTP given by the user needs to be hashed in order to be checked
+    $otp = hash('sha256', htmlspecialchars($_POST['otp'], ENT_QUOTES, 'UTF-8'));
     $passwordSubmitted = htmlspecialchars($_POST['password'], ENT_QUOTES, 'UTF-8');
     $repeatPassword = htmlspecialchars($_POST['repeat_password'], ENT_QUOTES, 'UTF-8');
     $logger->writeLog('INFO', "Protection against XSS applied");

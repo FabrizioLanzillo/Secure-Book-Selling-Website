@@ -32,31 +32,33 @@ if (checkFormData(['email'])) {
                     if (($currentTime - $lastOtpTime) > 90) {     // 1 minute and 30 sec
                         // we generate a new OTP
                         // Generates a random string of 8 chars
-                        $newOtp = generateRandomString(8);
+                        $newOTP = generateRandomString(8);
+                        // In the db the OTP is stored hashed
+                        $hashedNewOTP = hash('sha256', $newOTP);
                         // save in the db the OPT for the specified user
-                        if (setOtp($email, $newOtp)) {
+                        if (setOtp($email, $hashedNewOTP)) {
                             if ($emailSender->sendEmail($email,
                                     "BookSelling - Your OTP code",
                                     "OTP Request",
-                                    "This is the otp: $newOtp requested.", "It will last only for 90 seconds.") !== false) {
+                                    "This is the otp: $newOTP requested.", "It will last only for 90 seconds.") !== false) {
 
-                                $logger->writeLog('INFO', "2FA check for the user: " . $email . " OTP has been created successfully");
+                                $logger->writeLog('INFO', "The OTP was successfully created and sent to the user: " . $email);
                                 header('Location: //' . SERVER_ROOT . '/php/passwordRecovery.php');
                                 exit;
                             } else {
-                                throw new Exception("Couldn't send an email to the specified email address: ". $email);
+                                throw new Exception("Couldn't send an email to the specified email address: " . $email);
                             }
                         } else {
-                            throw new Exception("Error during the creation of the OTP for the email: ". $email);
+                            throw new Exception("Error during the creation of the OTP for this email: " . $email);
                         }
                     } else {
-                        throw new Exception('OTP recently sent for the mail: '. $email);
+                        throw new Exception('OTP already sent recently to this e-mail address: ' . $email);
                     }
                 } else {
-                    throw new Exception('No Account found for the given email: '. $email);
+                    throw new Exception('No Account found for the given email: ' . $email);
                 }
             } else {
-                throw new Exception('Error retrieving the last OTP generated for the given mail: '. $email);
+                throw new Exception('Error retrieving the last OTP generated for the given mail: ' . $email);
             }
         } catch (Exception $e) {
             $logger->writeLog('ERROR', $e->getMessage());
