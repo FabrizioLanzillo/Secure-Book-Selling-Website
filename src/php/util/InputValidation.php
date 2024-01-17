@@ -24,9 +24,9 @@ class InputValidation
     /**
      * Retrieves the singleton instance of the InputValidation class.
      * If the instance does not exist, creates a new one.
-     * @return InputValidation|self|null
+     * @return InputValidation
      */
-    public static function getInstance()
+    public static function getInstance(): ?InputValidation
     {
         if (self::$instance === null) {
             self::$instance = new self();
@@ -40,46 +40,69 @@ class InputValidation
      * Validates the strength of a password based on specified criteria and checks for the presence
      * of personal information such as username, email, name, and surname within the password.
      *
-     * @param string $password The password to be validated.
-     * @param string $email The email associated with the user.
-     * @param string $username The username associated with the user.
-     * @param string|null $name The name associated with the user (nullable).
-     * @param string|null $surname The surname associated with the user (nullable).
+     * @param $password , The password to be validated.
+     * @param $email , The email associated with the user.
+     * @param $username , The username associated with the user.
+     * @param $name , The name associated with the user (nullable).
+     * @param $surname , The surname associated with the user (nullable).
      *
      * @return bool Returns true if the password meets the strength criteria and does not contain
      *              personal information; otherwise, returns false.
+     * @throws Exception
      */
     private function regexControl($password, $email, $username, $name, $surname): bool
     {
         // Password length and characteristics check
-        $isPasswordStrong = strlen($password) >= 9
+        if (!(strlen($password) >= 9
             && preg_match('/[A-Z]/', $password)
             && preg_match('/[a-z]/', $password)
             && preg_match('/[0-9]/', $password)
-            && preg_match('/[!@#$%^&*(),.?":{}|<>]/', $password);
+            && preg_match('/[!@#$%^&*(),.?":{}|<>]/', $password))) {
+
+            throw new Exception("User: " . $email . " The password is too weak. Please choose a stronger password.");
+        }
 
         // Check if the password contains personal information
-        $containsPersonalInfo = stripos($password, $username) !== false
+        if (stripos($password, $username) !== false
             || stripos($password, $email) !== false
             || stripos($password, $name) !== false
-            || stripos($password, $surname) !== false;
+            || stripos($password, $surname) !== false) {
 
-        return $isPasswordStrong && !$containsPersonalInfo;
+            throw new Exception('Password cannot contain information of user: ' . $email);
+        }
+        return true;
     }
 
     /**
-     * Validates the strength of a password using a two-step process:
-     * 1. Performs a regular expression check on the password length and characteristics,
-     *    ensuring it meets specific criteria such as minimum length, uppercase, lowercase,
-     *    numeric, and special character requirements. Additionally, checks for the presence
-     *    of personal information within the password (username, email, name, surname).
-     * 2. Utilizes the zxcvbn library to assess the password strength and provides a score.
+     * Validates the strength of a password using the zxcvbn library
+     * to assess the password strength and provides a score.
+     * @throws Exception
+     */
+    private function zxcvbnControl($password, $email): bool
+    {
+
+        $strengthResult = $this->zxcvbn->passwordStrength($password);
+
+        if ($strengthResult['score'] < 3) {
+
+            throw new Exception('User: ' . $email . ' Password Score: ' . $strengthResult['score'] .
+                ' Feedback: ' . implode(', ', $strengthResult['feedback']['suggestions']));
+        }
+
+        return true;
+    }
+
+    /**
+     * Performs a regular expression check on the password length and characteristics,
+     * ensuring it meets specific criteria such as minimum length, uppercase, lowercase,
+     * numeric, and special character requirements. Additionally, checks for the presence
+     * of personal information within the password (username, email, name, surname).
      *
-     * @param string $password The password to be validated.
-     * @param string $email The email associated with the user.
-     * @param string $username The username associated with the user.
-     * @param string|null $name The name associated with the user (nullable).
-     * @param string|null $surname The surname associated with the user (nullable).
+     * @param $password , The password to be validated.
+     * @param $email , The email associated with the user.
+     * @param $username , The username associated with the user.
+     * @param $name , The name associated with the user (nullable).
+     * @param $surname , The surname associated with the user (nullable).
      *
      * @return bool Returns true if the password passes both the regular expression and zxcvbn checks,
      *              indicating it is strong and not easily guessable. Otherwise, throws an Exception
@@ -91,27 +114,13 @@ class InputValidation
      */
     public function checkPasswordStrength($password, $email, $username, $name, $surname): bool
     {
-        global $logger;
 
-        // check password regex
-        if ($this->regexControl($password, $email, $username, $name, $surname)) {
+        $isRegexValid = $this->regexControl($password, $email, $username, $name, $surname);
 
-            // check zxcvbn password strengh function
-            $strengthResult = $this->zxcvbn->passwordStrength($password);
+        $isZxcvbnValid = $this->zxcvbnControl($password, $email);
 
-            if ($strengthResult['score'] < 3) {
-                $logger->writeLog('WARNING', 'Password: ' . $password . ' Score: ' . $strengthResult['score'] .
-                    ' Feedback: ' . implode(', ', $strengthResult['feedback']['suggestions']));
+        return $isRegexValid && $isZxcvbnValid;
 
-                throw new Exception('The password is too weak. Please choose a stronger password.');
-            }
-            // all checks passed
-            return true;
-
-        } else {
-            $logger->writeLog('WARNING', "Password does not pass the regex test");
-            throw new Exception('The password is too weak. Please choose a stronger password.');
-        }
     }
 
 
@@ -120,7 +129,7 @@ class InputValidation
     /**
      * Identifies the type of credit card based on its prefix.
      *
-     * @param string $creditCardNumber The credit card number to analyze.
+     * @param $creditCardNumber , The credit card number to analyze.
      *
      * @return string Returns the type of credit card (e.g., VISA, MasterCard, American Express, or Other).
      */
@@ -149,7 +158,7 @@ class InputValidation
     /**
      * Validates a credit card number using the Luhn Algorithm (mod-10) and checks its length and prefix.
      *
-     * @param string $creditCardNumber The credit card number to be validated.
+     * @param $creditCardNumber , The credit card number to be validated.
      *
      * @return bool Returns true if the credit card number is valid, considering length, Luhn Algorithm, and prefix;
      *              otherwise, returns false.
@@ -194,7 +203,7 @@ class InputValidation
     /**
      * Validates a CVV (Card Verification Value) to ensure it is a 3 or 4-digit numeric value.
      *
-     * @param string $cvv The CVV to be validated.
+     * @param $cvv , The CVV to be validated.
      * @return bool Returns true if the CVV is valid; otherwise, returns false.
      */
     private function validateCVV($cvv): bool
@@ -206,7 +215,7 @@ class InputValidation
     /**
      * Validates the format of a cardholder's name, allowing only letters and spaces.
      *
-     * @param string $cardholderName The cardholder's name to be validated.
+     * @param $cardholderName , The cardholder's name to be validated.
      * @return bool Returns true if the cardholder's name has a correct format; otherwise, returns false.
      */
     private function validateCardholderName($cardholderName): bool
@@ -218,18 +227,23 @@ class InputValidation
     /**
      * Validates the format and expiration date of a credit card.
      *
-     * @param string $expirationDate The expiration date of the credit card in MM/YY format.
+     * @param $expirationDate , The expiration date of the credit card in MM/YY format.
      * @return bool Returns true if the expiration date is valid and in the future; otherwise, returns false.
      */
     private function validateExpirationDate($expirationDate): bool
     {
-        // Check if the expiration date is in the MM/YY format
-        if (!preg_match('/^(0[1-9]|1[0-2])\/\d{2}$/', $expirationDate)) {
+        // Check if the expiration date is in the MMYY format
+        if (!preg_match('/^\d{4}$/', $expirationDate)) {
             return false;
         }
 
         // Extract month and year from the expiration date
-        list($expiryMonth, $expiryYear) = explode('/', $expirationDate);
+        $expiryMonth = substr($expirationDate, 0, 2);
+        $expiryYear = substr($expirationDate, 2, 2);
+
+        if ($expiryMonth > 12 || $expiryMonth < 1) {
+            return false;
+        }
 
         // Convert to integers for comparison
         $currentMonth = (int)date('m');
@@ -243,10 +257,10 @@ class InputValidation
      * Validates a set of payment method details, including cardholder name, credit card number,
      * expiration date, and CVV.
      *
-     * @param string $cardholder The cardholder's name.
-     * @param string $card The credit card number.
-     * @param string $expire The expiration date in MM/YY format.
-     * @param string $cvv The CVV (Card Verification Value).
+     * @param $cardholder , The cardholder's name.
+     * @param $card , The credit card number.
+     * @param $expire , The expiration date in MM/YY format.
+     * @param $cvv , The CVV (Card Verification Value).
      *
      * @return bool Returns true if all payment method details are valid; otherwise, throws an exception.
      * @throws Exception Throws an exception with an error message for any validation failure.
@@ -254,19 +268,19 @@ class InputValidation
     public function validatePaymentMethod($cardholder, $card, $expire, $cvv): bool
     {
         if (!$this->validateCardholderName($cardholder)) {
-            throw new Exception('Invalid cardholder name.');
+            throw new Exception('User: ' . $_SESSION['email'] . ' Invalid cardholder name.');
         }
 
         if (!$this->validateCreditCard($card)) {
-            throw new Exception('Invalid credit card number.');
+            throw new Exception('User: ' . $_SESSION['email'] . ' Invalid credit card number.');
         }
 
         if (!$this->validateExpirationDate($expire)) {
-            throw new Exception('Invalid expiration date.');
+            throw new Exception('User: ' . $_SESSION['email'] . ' Invalid expiration date.');
         }
 
         if (!$this->validateCVV($cvv)) {
-            throw new Exception('Invalid CVV.');
+            throw new Exception('User: ' . $_SESSION['email'] . ' Invalid CVV.');
         }
 
         return true;
@@ -277,7 +291,7 @@ class InputValidation
     /**
      * Validates the format of a name for shipping, allowing only letters and spaces.
      *
-     * @param string $name The name to be validated for shipping.
+     * @param $name , The name to be validated for shipping.
      * @return void
      * @throws Exception Throws an exception with an error message for an invalid name.
      */
@@ -285,15 +299,15 @@ class InputValidation
     {
         // Check if the name has a correct format (only letters and spaces)
         if (!preg_match('/^[A-Za-z\s]+$/', $name)) {
-            throw new Exception('Invalid name for shipping.');
+            throw new Exception('User: ' . $_SESSION['email'] . ' Invalid name for shipping.');
         }
     }
 
     /**
      * Validates a common format for location parameters in shipping information, checking for valid characters and length.
      *
-     * @param string $value The value to be validated.
-     * @param string $errorMessage The error message to be thrown for invalid values.
+     * @param $value , The value to be validated.
+     * @param $errorMessage , The error message to be thrown for invalid values.
      * @return void
      * @throws Exception Throws an exception with the specified error message for an invalid value.
      */
@@ -309,7 +323,7 @@ class InputValidation
     /**
      * Validates the format of a CAP (postal code) for shipping, ensuring it is exactly 5 digits.
      *
-     * @param string $cap The CAP (postal code) to be validated for shipping.
+     * @param $cap , The CAP (postal code) to be validated for shipping.
      * @return void
      * @throws Exception Throws an exception with an error message for an invalid CAP.
      */
@@ -317,30 +331,45 @@ class InputValidation
     {
         // Check if CAP is exactly 5 digits
         if (!preg_match('/^\d{5}$/', $cap)) {
-            throw new Exception('Invalid CAP for shipping.');
+            throw new Exception('User: ' . $_SESSION['email'] . ' Invalid CAP for shipping.');
+        }
+    }
+
+    /**
+     * Validates the format of a CAP (postal code) for shipping, ensuring it is exactly 5 digits.
+     *
+     * @param $province , The Province  to be validated for shipping.
+     * @return void
+     * @throws Exception Throws an exception with an error message for an invalid Province.
+     */
+    private function validateProvince($province): void
+    {
+        // Check if Province is exactly 2 capital letters
+        if (!preg_match('/^[A-Z]{2}$/', $province)) {
+            throw new Exception('User: ' . $_SESSION['email'] . ' Invalid Province for shipping.');
         }
     }
 
     /**
      * Validates shipping information, including name, address, city, province, CAP, and country.
      *
-     * @param string $name The name for shipping.
-     * @param string $address The address for shipping.
-     * @param string $city The city for shipping.
-     * @param string $province The province for shipping.
-     * @param string $cap The CAP (postal code) for shipping.
-     * @param string $country The country for shipping.
+     * @param $name , The name for shipping.
+     * @param $address , The address for shipping.
+     * @param $city , The city for shipping.
+     * @param $province , The province for shipping.
+     * @param $cap , The CAP (postal code) for shipping.
+     * @param $country , The country for shipping.
      * @return bool Returns true if all validations pass; otherwise, throws an exception.
      * @throws Exception Throws an exception with an error message for any validation failure.
      */
     public function validateShippingInformation($name, $address, $city, $province, $cap, $country): bool
     {
         $this->validateName($name);
-        $this->validateCommonFormat($address, 'Invalid address for shipping.');
-        $this->validateCommonFormat($city, 'Invalid city for shipping.');
-        $this->validateCommonFormat($country, 'Invalid country for shipping.');
+        $this->validateCommonFormat($address, 'User: ' . $_SESSION['email'] . ' Invalid address for shipping.');
+        $this->validateCommonFormat($city, 'User: ' . $_SESSION['email'] . ' Invalid city for shipping.');
+        $this->validateCommonFormat($country, 'User: ' . $_SESSION['email'] . ' Invalid country for shipping.');
         $this->validateCap($cap);
-        $this->validateCommonFormat($province, 'Invalid province for shipping.');
+        $this->validateProvince($province);
 
         return true; // All validations passed
     }

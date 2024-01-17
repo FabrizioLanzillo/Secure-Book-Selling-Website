@@ -45,7 +45,7 @@ if (checkFormData(['email'])) {
                                 header('Location: //' . SERVER_ROOT . '/php/passwordRecovery.php');
                                 exit;
                             } else {
-                                throw new Exception("Couldn't send an email to the specified email address: " . $email);
+                                throw new Exception("Could not send an email to the specified email address: " . $email);
                             }
                         } else {
                             throw new Exception("Error during the creation of the OTP for this email: " . $email);

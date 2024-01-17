@@ -19,7 +19,7 @@ try {
     if ($customerId !== null && $customerId !== "") {
         // try to remove user from database
         if (deleteCustomer($customerId)) {
-            $logger->writeLog('INFO', "Book: " . $customerId . " removed from database");
+            $logger->writeLog('INFO', "Customer: " . $customerId . " removed from database");
             header('Location: ./customerList.php');
             exit;
         } else {

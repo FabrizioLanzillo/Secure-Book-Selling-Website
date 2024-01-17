@@ -135,7 +135,7 @@ function getAccessInformation(string $email)
 
     try {
 
-        $query = "SELECT salt, firstFailedAccess, failedAccesses, blockedTime
+        $query = "SELECT salt, timestampAccess, failedAccesses, blockedTime
                         FROM user
                         WHERE email = ?;";
 
@@ -163,28 +163,26 @@ function updateFailedAccesses($information): bool
 {
     global $SecureBookSellingDB;
     global $logger;
+    global $numberLoginAttempt;
 
     try {
-        // In the first case the firstFailedAccess is set such that can be used for the timeout
-        if ($information[0] >= 3) {
+        // If is the first failed access failedAccessesCounter ($information[0]) == 1
+        // or the number of failed access in the time windows is greater than 3
+        // the timestamp of the timestampAccess is set
+        // the timestamp of the timestampAccess is set also in the case where the number of failed access
+        // in the time windows is greater than $numberLoginAttempt because that timestamp is used to check that the duration
+        // of the block on an account has ended
+        if ($information[0] <= 1 or $information[0] >= $numberLoginAttempt) {
             $query = "UPDATE user
-                        SET firstFailedAccess = NOW(), failedAccesses = 0, blockedTime = ?
+                        SET timestampAccess = NOW(), failedAccesses = ?, blockedTime = ?
                         WHERE email = ?;";
-        } else if ($information[0] === 1){
+        } else {
             $query = "UPDATE user
-                        SET firstFailedAccess = NOW(), failedAccesses = ?
-                        WHERE email = ?;";
-        } else if ($information[0] === 0){
-            $query = "UPDATE user
-                        SET failedAccesses = ?, blockedTime = 0
-                        WHERE email = ?;";
-        }else {
-            $query = "UPDATE user
-                        SET failedAccesses = ?
+                        SET failedAccesses = ?, blockedTime = ?
                         WHERE email = ?;";
         }
 
-        $SecureBookSellingDB->performQuery("UPDATE", $query, $information, "is");
+        $SecureBookSellingDB->performQuery("UPDATE", $query, $information, "iis");
         $SecureBookSellingDB->closeConnection();
         return true;
 

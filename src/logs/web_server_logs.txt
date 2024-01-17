@@ -1,17 +1,1 @@
 WEB-SERVER LOGS:
-+[WARNING] 2024-01-17 10:53:20 = [File: /php/login.php] - Failed Login for the user: g.marrucci4@studenti.unipi.it - [Error: LoginFunc] [Details: Email and/or password are not valid. The user failed login 1 times]
-+[WARNING] 2024-01-17 10:53:23 = [File: /php/login.php] - Failed Login for the user: g.marrucci4@studenti.unipi.it - [Error: LoginFunc] [Details: Email and/or password are not valid. The user failed login 2 times]
-+[WARNING] 2024-01-17 10:53:28 = [File: /php/login.php] - Failed Login for the user: g.marrucci4@studenti.unipi.it - [Error: LoginFunc] [Details: Email and/or password are not valid. The user failed login 3 times]
-+[ERROR] 2024-01-17 10:53:32 = [File: /php/login.php] - Failed Login for the user: g.marrucci4@studenti.unipi.it - [Error: Your account is currently blocked]
-+[WARNING] 2024-01-17 10:54:04 = [File: /php/login.php] - Failed Login for the user: g.marrucci4@studenti.unipi.it - [Error: LoginFunc] [Details: Email and/or password are not valid. The user failed login 1 times]
-+[WARNING] 2024-01-17 10:54:09 = [File: /php/login.php] - Failed Login for the user: g.marrucci4@studenti.unipi.it - [Error: LoginFunc] [Details: Email and/or password are not valid. The user failed login 2 times]
-+[WARNING] 2024-01-17 10:54:13 = [File: /php/login.php] - Failed Login for the user: g.marrucci4@studenti.unipi.it - [Error: LoginFunc] [Details: Email and/or password are not valid. The user failed login 3 times]
-+[ERROR] 2024-01-17 10:54:16 = [File: /php/login.php] - Failed Login for the user: g.marrucci4@studenti.unipi.it - [Error: Your account is currently blocked]
-+[ERROR] 2024-01-17 10:54:35 = [File: /php/login.php] - Failed Login for the user: g.marrucci4@studenti.unipi.it - [Error: Your account is currently blocked]
-+[INFO] 2024-01-17 10:54:42 = SessionID changed after the login, in order to avoid SESSION FIXATION Attacks
-+[INFO] 2024-01-17 10:54:42 = Login of the user: f.lanzillo@studenti.unipi.it, Succeeded
-+[INFO] 2024-01-17 10:54:51 = SessionID changed after the logout, in order to avoid SESSION FIXATION attacks 
-+[INFO] 2024-01-17 10:54:51 = Logout of the user succeeded
-+[ERROR] 2024-01-17 10:55:00 = [File: /php/login.php] - Failed Login for the user: g.marrucci4@studenti.unipi.it - [Error: Your account is currently blocked]
-+[INFO] 2024-01-17 10:55:18 = SessionID changed after the login, in order to avoid SESSION FIXATION Attacks
-+[INFO] 2024-01-17 10:55:18 = Login of the user: g.marrucci4@studenti.unipi.it, Succeeded

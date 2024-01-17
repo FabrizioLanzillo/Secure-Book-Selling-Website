@@ -15,7 +15,7 @@ if (checkFormData(['email', 'otp', 'password', 'repeat_password'])) {
     $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     // In the db is stored the hash of the OTP,
     // so the OTP given by the user needs to be hashed in order to be checked
-    $otp = hash('sha256', filter_input(INPUT_POST, 'otp', FILTER_SANITIZE_FULL_SPECIAL_CHARS););
+    $otp = hash('sha256', filter_input(INPUT_POST, 'otp', FILTER_SANITIZE_FULL_SPECIAL_CHARS));
     $passwordSubmitted = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     $repeatPassword = filter_input(INPUT_POST, 'repeat_password', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 
@@ -27,7 +27,7 @@ if (checkFormData(['email', 'otp', 'password', 'repeat_password'])) {
         try {
             // Checks if passwords are the same
             if ($passwordSubmitted !== $repeatPassword) {
-                throw new Exception('The inserted passwords don\'t match');
+                throw new Exception('The inserted passwords do not match');
             } else {
                 // Get all security info from db to verify user
                 $result = getSecurityInfo($email);
@@ -46,7 +46,7 @@ if (checkFormData(['email', 'otp', 'password', 'repeat_password'])) {
                             }
 
                             // check new password validation
-                            if($validator->checkPasswordStrength($passwordSubmitted, $email, $userSecurityInfo['username'], $userSecurityInfo['name'], $userSecurityInfo['surname'])) {
+                            if ($validator->checkPasswordStrength($passwordSubmitted, $email, $userSecurityInfo['username'], $userSecurityInfo['name'], $userSecurityInfo['surname'])) {
 
                                 // Generates new vars to insert in the db
                                 $salt = bin2hex(random_bytes(32));

@@ -35,7 +35,7 @@ if (checkFormData(['name', 'surname', 'email', 'username', 'password', 'repeat_p
         try {
             // Checks if passwords are the same
             if ($password !== $repeatPassword) {
-                throw new Exception('The inserted passwords don\'t match');
+                throw new Exception('The inserted passwords do not match');
             } else {
                 if($validator->checkPasswordStrength($password, $email, $username, $name, $surname)) {
 
@@ -71,6 +71,7 @@ if (checkFormData(['name', 'surname', 'email', 'username', 'password', 'repeat_p
                 }
             }
         } catch (Exception $e) {
+            $logger->writeLog('ERROR', $e->getMessage());
             $errorHandler->handleException($e);
         }
     }
@@ -81,8 +82,8 @@ if (checkFormData(['name', 'surname', 'email', 'username', 'password', 'repeat_p
 <html lang="en">
 <head>
     <link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css">
-<!--    <script src="../js/utilityFunction.js"></script>-->
-<!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/zxcvbn/4.4.2/zxcvbn.js"></script>-->
+    <script src="../js/utilityFunction.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/zxcvbn/4.4.2/zxcvbn.js"></script>
     <title>Book Selling - Sign Up</title>
 </head>
 <body>
