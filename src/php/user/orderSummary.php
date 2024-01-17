@@ -24,9 +24,8 @@ try {
     if (checkFormData(['totalPrice'])) {
 
         // Protect against XSS
-        $token = htmlspecialchars($_POST['token'], ENT_QUOTES, 'UTF-8');
-        $totalPriceOrder = htmlspecialchars($_POST['totalPrice'], ENT_QUOTES, 'UTF-8');
-        $logger->writeLog('INFO', "Protection against XSS applied");
+        $token = filter_input(INPUT_POST, 'token', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $totalPriceOrder = filter_input(INPUT_POST, 'totalPrice', FILTER_SANITIZE_NUMBER_INT);
 
         // Protect against XSRF
         if (!$token || $token !== $_SESSION['token']) {

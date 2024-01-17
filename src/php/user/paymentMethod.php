@@ -19,11 +19,11 @@ try {
     if (checkFormData(['CardHolderName', 'CardNumber', 'Expire', 'CVV'])) {
 
         // Protect against XSS
-        $token = htmlspecialchars($_POST['token'], ENT_QUOTES, 'UTF-8');
-        $cardHolderName = htmlspecialchars($_POST['CardHolderName'], ENT_QUOTES, 'UTF-8');
-        $cardNumber = htmlspecialchars($_POST['CardNumber'], ENT_QUOTES, 'UTF-8');
-        $expire = htmlspecialchars($_POST['Expire'], ENT_QUOTES, 'UTF-8');
-        $CVV = htmlspecialchars($_POST['CVV'], ENT_QUOTES, 'UTF-8');
+        $token = filter_input(INPUT_POST, 'token', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $cardHolderName = filter_input(INPUT_POST, 'CardHolderName', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $cardNumber = filter_input(INPUT_POST, 'CardNumber', FILTER_SANITIZE_NUMBER_INT);
+        $expire = filter_input(INPUT_POST, 'Expire', FILTER_SANITIZE_NUMBER_INT);
+        $CVV = filter_input(INPUT_POST, 'CVV', FILTER_SANITIZE_NUMBER_INT);
 
         // Protect against XSRF
         if (!$token || $token !== $_SESSION['token']) {
