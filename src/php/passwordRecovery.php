@@ -12,7 +12,9 @@ if (checkFormData(['email', 'otp', 'password', 'repeat_password'])) {
     // Protect against XSS
     $token = filter_input(INPUT_POST, 'token', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-    $otp = filter_input(INPUT_POST, 'otp', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    // In the db is stored the hash of the OTP,
+    // so the OTP given by the user needs to be hashed in order to be checked
+    $otp = hash('sha256', filter_input(INPUT_POST, 'otp', FILTER_SANITIZE_FULL_SPECIAL_CHARS););
     $passwordSubmitted = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     $repeatPassword = filter_input(INPUT_POST, 'repeat_password', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 
