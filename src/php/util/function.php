@@ -42,3 +42,11 @@ function checkFormData($requiredFields): bool
     return true;
 }
 
+function updateBlockLoginInformation($failedAccessesCounter, $blockedTime, $email): array
+{
+    return array(
+        $failedAccessesCounter,
+        $blockedTime,
+        $email,
+    );
+}

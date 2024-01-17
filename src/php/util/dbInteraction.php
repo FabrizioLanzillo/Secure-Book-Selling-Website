@@ -75,10 +75,10 @@ function insertUser($userInformation): bool
     global $logger;
 
     try {
-        $query = "INSERT INTO user (username, password, salt, email, name, surname, isAdmin, failedAccesses, lastOtp) 
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW());";
+        $query = "INSERT INTO user (username, password, salt, email, name, surname, isAdmin) 
+                        VALUES (?, ?, ?, ?, ?, ?, ?);";
 
-        $SecureBookSellingDB->performQuery("INSERT", $query, $userInformation, "ssssssii");
+        $SecureBookSellingDB->performQuery("INSERT", $query, $userInformation, "ssssssi");
         $SecureBookSellingDB->closeConnection();
         return true;
 
@@ -135,7 +135,7 @@ function getAccessInformation(string $email)
 
     try {
 
-        $query = "SELECT salt, failedAccesses, blockedUntil
+        $query = "SELECT salt, timestampAccess, failedAccesses, blockedTime
                         FROM user
                         WHERE email = ?;";
 
@@ -159,24 +159,30 @@ function getAccessInformation(string $email)
  * @param $email , is the email to select the user
  * @param $failedAccesses , is the number of failed logins
  */
-function updateFailedAccesses($email, $failedAccesses): bool
+function updateFailedAccesses($information): bool
 {
     global $SecureBookSellingDB;
     global $logger;
+    global $numberLoginAttempt;
 
     try {
-
-        if ($failedAccesses >= 5) {
+        // If is the first failed access failedAccessesCounter ($information[0]) == 1
+        // or the number of failed access in the time windows is greater than 3
+        // the timestamp of the timestampAccess is set
+        // the timestamp of the timestampAccess is set also in the case where the number of failed access
+        // in the time windows is greater than $numberLoginAttempt because that timestamp is used to check that the duration
+        // of the block on an account has ended
+        if ($information[0] <= 1 or $information[0] >= $numberLoginAttempt) {
             $query = "UPDATE user
-                        SET failedAccesses = ? , blockedUntil = DATE_ADD(NOW(),interval 30 minute)
+                        SET timestampAccess = NOW(), failedAccesses = ?, blockedTime = ?
                         WHERE email = ?;";
         } else {
             $query = "UPDATE user
-                        SET failedAccesses = ?
+                        SET failedAccesses = ?, blockedTime = ?
                         WHERE email = ?;";
         }
 
-        $SecureBookSellingDB->performQuery("UPDATE", $query, [$failedAccesses, $email], "is");
+        $SecureBookSellingDB->performQuery("UPDATE", $query, $information, "iis");
         $SecureBookSellingDB->closeConnection();
         return true;
 
@@ -261,7 +267,7 @@ function getSecurityInfo($email)
     global $logger;
 
     try {
-        $query = "SELECT otp, lastOtp
+        $query = "SELECT otp, lastOtp, username, name, surname
                         FROM user
                         WHERE email = ?;";
 

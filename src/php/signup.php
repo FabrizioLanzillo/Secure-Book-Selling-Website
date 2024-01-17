@@ -6,6 +6,8 @@ global $errorHandler;
 global $accessControlManager;
 global $emailSender;
 global $sessionHandler;
+global $validator;
+
 
 // check if the user is logged or not, if the user is logged the access to the signup page is forbidden
 // and the user will be redirected to the home page
@@ -17,14 +19,13 @@ if ($sessionHandler->isLogged()) {
 if (checkFormData(['name', 'surname', 'email', 'username', 'password', 'repeat_password'])) {
 
     // Protect against XSS
-    $token = htmlspecialchars($_POST['token'], ENT_QUOTES, 'UTF-8');
-    $name = htmlspecialchars($_POST['name'], ENT_QUOTES, 'UTF-8');
-    $surname = htmlspecialchars($_POST['surname'], ENT_QUOTES, 'UTF-8');
-    $email = htmlspecialchars($_POST['email'], ENT_QUOTES, 'UTF-8');
-    $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
-    $password = htmlspecialchars($_POST['password'], ENT_QUOTES, 'UTF-8');
-    $repeatPassword = htmlspecialchars($_POST['repeat_password'], ENT_QUOTES, 'UTF-8');
-    $logger->writeLog('INFO', "Protection against XSS applied");
+    $token = filter_input(INPUT_POST, 'token', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $name = filter_input(INPUT_POST, 'name', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $surname = filter_input(INPUT_POST, 'surname', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
+    $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $password = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $repeatPassword = filter_input(INPUT_POST, 'repeat_password', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 
     // Protect against XSRF
     if (!$token || $token !== $_SESSION['token']) {
@@ -34,42 +35,44 @@ if (checkFormData(['name', 'surname', 'email', 'username', 'password', 'repeat_p
         try {
             // Checks if passwords are the same
             if ($password !== $repeatPassword) {
-                throw new Exception('The inserted passwords don\'t match');
+                throw new Exception('The inserted passwords do not match');
             } else {
-                // Generates new vars to insert in the db
-                $salt = bin2hex(random_bytes(32));
-                $hashedPassword = hash('sha256', $password . $salt);
+                if($validator->checkPasswordStrength($password, $email, $username, $name, $surname)) {
 
-                $userData = array(
-                    $username,
-                    $hashedPassword,
-                    $salt,
-                    $email,
-                    $name,
-                    $surname,
-                    0,
-                    0,
-                );
+                    // Generates new vars to insert in the db
+                    $salt = bin2hex(random_bytes(32));
+                    $hashedPassword = hash('sha256', $password . $salt);
 
-                // Inserts user's info in the db
-                if (insertUser($userData)) {
-                    $logger->writeLog('INFO', "Signup of the user: " . $email . ", Succeeded");
-                    if ($emailSender->sendEmail($email,
-                            "BookSelling - Welcome",
-                            "Signup is successfully completed",
-                            "Welcome in the bookselling community.", "Thank you for your support!") === false) {
-                        $logger->writeLog('ERROR', "Error during the send of the Signup Email");
+                    $userData = array(
+                        $username,
+                        $hashedPassword,
+                        $salt,
+                        $email,
+                        $name,
+                        $surname,
+                        0,
+                    );
+
+                    // Inserts user's info in the db
+                    if (insertUser($userData)) {
+                        $logger->writeLog('INFO', "Signup of the user: " . $email . ", Succeeded");
+                        if ($emailSender->sendEmail($email,
+                                "BookSelling - Welcome",
+                                "Signup is successfully completed",
+                                "Welcome in the bookselling community.", "Thank you for your support!") === false) {
+                            $logger->writeLog('ERROR', "Error during the send of the Signup Email");
+                        }
+                        header('Location: //' . SERVER_ROOT . '/php/login.php');
+                        exit;
+                    } else {
+                        // No need to send a logger because it enters here only if db fails
+                        throw new Exception('Could not register the user');
                     }
-                    header('Location: //' . SERVER_ROOT . '/php/login.php');
-                    exit;
-                } else {
-                    // No need to send a logger because it enters here only if db fails
-                    throw new Exception('Could not register the user');
                 }
             }
         } catch (Exception $e) {
+            $logger->writeLog('ERROR', $e->getMessage());
             $errorHandler->handleException($e);
-            $accessControlManager->redirectToHome();
         }
     }
 }
@@ -119,7 +122,7 @@ include "./layout/header.php";
                         <label for="password"><b>Password</b></label>
                         <input class="form-control" type="password" placeholder="Password" name="password" id="password"
                                pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{9,}"
-                               title="Must contain at least one number, one uppercase letter, one lowercase letter, and at least 8 or more characters"
+                               title="Must contain at least one number, one uppercase letter, one lowercase letter, and at least 9 or more characters"
                                required oninput="checkPasswordStrength()">
                         <meter max="4" id="password-strength-meter"></meter>
                         <p id="password-strength-text"></p>

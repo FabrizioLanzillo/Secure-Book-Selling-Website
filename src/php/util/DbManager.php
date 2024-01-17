@@ -56,7 +56,7 @@ class DbManager
                     $this->mysqli_connection->connect_error);
             }
             $this->mysqli_connection->select_db($this->dbName) or
-            throw new Exception('Can\'t use the database: ' . $this->mysqli_connection->error);
+            throw new Exception('Can not use the database: ' . $this->mysqli_connection->error);
         }
     }
 

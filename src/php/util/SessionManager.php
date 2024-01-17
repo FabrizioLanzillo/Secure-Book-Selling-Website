@@ -1,4 +1,5 @@
 <?php
+global $logger;
 
 /**
  * This class manages the session variable and checks the type of the current user
@@ -44,9 +45,7 @@ class SessionManager
      */
     private function startSession(): void
     {
-
         session_set_cookie_params([
-            'lifetime' => $this->lifetime,
             'path' => $this->path,
             'domain' => $_SERVER['HTTP_HOST'],
             'secure' => $this->secure,
@@ -79,6 +78,7 @@ class SessionManager
         $_SESSION['name'] = $name;
         $_SESSION['isAdmin'] = $isAdmin;
         $_SESSION['token'] = md5(uniqid(mt_rand(), true));
+        $_SESSION['lastInteraction'] = time();
     }
 
     /**
@@ -180,6 +180,29 @@ class SessionManager
     public function isAdmin(): bool
     {
         return $_SESSION['isAdmin'] === 1;
+    }
+
+    /**
+     * This method handles the lifetime of the session, when is called it compares
+     * the timestamp value of the last interaction with the current timestamp,
+     * if it has passed more time than the lifetime value (specified in the configuration file),
+     * then logout is called, otherwise the value of the last iteration is updated
+     * @return void
+     */
+    public function checkSessionLifetime(): void
+    {
+        global $logger;
+
+        if ($this->isLogged()) {
+            $currentInteraction = time();
+            if (($currentInteraction - $_SESSION['lastInteraction']) > $this->lifetime) {
+                $logger->writeLog('INFO', "the session for the user: " . $_SESSION['email'] . " is expired");
+                header('Location: //' . SERVER_ROOT . '/php/logout.php');
+                exit;
+            } else {
+                $_SESSION['lastInteraction'] = $currentInteraction;
+            }
+        }
     }
 
 }

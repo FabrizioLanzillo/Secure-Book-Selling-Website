@@ -6,6 +6,7 @@ global $errorHandler;
 global $sessionHandler;
 global $shoppingCartHandler;
 global $accessControlManager;
+global $validator;
 
 // Check path manipulation and broken access control
 // Check if the user is logged
@@ -18,24 +19,26 @@ try{
     if(checkFormData(['fullName', 'address', 'city', 'province', 'cap', 'country'])){
 
         // Protect against XSS
-        $token = htmlspecialchars($_POST['token'], ENT_QUOTES, 'UTF-8');
-        $fullName = htmlspecialchars($_POST['fullName'], ENT_QUOTES, 'UTF-8');
-        $address = htmlspecialchars($_POST['address'], ENT_QUOTES, 'UTF-8');
-        $city = htmlspecialchars($_POST['city'], ENT_QUOTES, 'UTF-8');
-        $province = htmlspecialchars($_POST['province'], ENT_QUOTES, 'UTF-8');
-        $cap = htmlspecialchars($_POST['cap'], ENT_QUOTES, 'UTF-8');
-        $country = htmlspecialchars($_POST['country'], ENT_QUOTES, 'UTF-8');
-        $logger->writeLog('INFO', "Protection against XSS applied");
+        $token = filter_input(INPUT_POST, 'token', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $fullName = filter_input(INPUT_POST, 'fullName', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $address = filter_input(INPUT_POST, 'address', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $city = filter_input(INPUT_POST, 'city', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $province = filter_input(INPUT_POST, 'province', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $cap = filter_input(INPUT_POST, 'cap', FILTER_SANITIZE_NUMBER_INT);
+        $country = filter_input(INPUT_POST, 'country', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 
         // Protect against XSRF
         if (!$token || $token !== $_SESSION['token']) {
             // return 405 http status code
             $accessControlManager ->redirectIfXSRFAttack();
         } else {
-            // Save cart information in $_SESSION and redirect depending on $_SESSION vars set
-            $sessionHandler->saveShippingInfo($fullName, $address, $city, $province, $cap, $country);
-            $logger->writeLog('INFO', "User: " . $_SESSION['email'] . " successfully set his shipping info");
-            $accessControlManager->routeMultiStepCheckout();
+            // check data validation
+            if($validator->validateShippingInformation($fullName, $address, $city, $province, $cap, $country)) {
+                // Save cart information in $_SESSION and redirect depending on $_SESSION vars set
+                $sessionHandler->saveShippingInfo($fullName, $address, $city, $province, $cap, $country);
+                $logger->writeLog('INFO', "User: " . $_SESSION['email'] . " successfully set his shipping info");
+                $accessControlManager->routeMultiStepCheckout();
+            }
         }
     }
 }
