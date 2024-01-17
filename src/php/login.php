@@ -13,7 +13,7 @@ global $accessControlManager;
  * @param $failedAccesses , is a counter of the failed access of the user
  * @return bool|null
  */
-function login($email, $password, $failedAccesses): ?bool
+function login($email, $password, $firstfailedAccess, $failedAccesses, $blockedTime): ?bool
 {
 
     global $logger;
@@ -30,7 +30,11 @@ function login($email, $password, $failedAccesses): ?bool
                 $dataQuery = $result->fetch_assoc();
                 if ($dataQuery !== null && $result->num_rows === 1) {
                     //Resets the failed accesses counter
-                    if (updateFailedAccesses($email, 0)) {
+                    $information = array(
+                        0,
+                        $email,
+                    );
+                    if (updateFailedAccesses($information)) {
                         // creation of the session variables of a logged user
                         $sessionHandler->setSession($dataQuery['id'], $dataQuery['username'], $email, $dataQuery['name'], $dataQuery['isAdmin']);
                         // generation of a new php session id in order to avoid the session fixation attack
@@ -41,11 +45,26 @@ function login($email, $password, $failedAccesses): ?bool
                         throw new Exception('Something went wrong during the update.');
                     }
                 } else {
-                    $failedAccesses = $failedAccesses + 1;
-                    if (updateFailedAccesses($email, $failedAccesses)) {
-                        throw new Exception('Email and/or password are not valid.', $failedAccesses);
-                    } else {
-                        throw new Exception('Something went wrong during the update.');
+                    $firstfailedAccess = ($firstfailedAccess === null) ? 0 : strtotime($firstfailedAccess);
+                    if ($firstfailedAccess + 30 > time() or $firstfailedAccess === 0 or $failedAccesses === 0){
+                        $failedAccesses = $failedAccesses + 1;
+                        if ($failedAccesses >= 3) {
+                            $blockedTime = ($blockedTime === 0) ? 30 : $blockedTime * 2;
+                            $information = array(
+                                $blockedTime,
+                                $email,
+                            );
+                        } else {
+                            $information = array(
+                                $failedAccesses,
+                                $email,
+                            );
+                        }
+                        if (updateFailedAccesses($information)) {
+                            throw new Exception('Email and/or password are not valid.', $failedAccesses);
+                        } else {
+                            throw new Exception('Something went wrong during the update.');
+                        }
                     }
                 }
             } else {
@@ -84,10 +103,9 @@ if ($sessionHandler->isLogged()) {
 if (checkFormData(['email', 'password'])) {
 
     // Protect against XSS
-    $token = htmlspecialchars($_POST['token'], ENT_QUOTES, 'UTF-8');
-    $email = htmlspecialchars($_POST['email'], ENT_QUOTES, 'UTF-8');
-    $submittedPassword = htmlspecialchars($_POST['password'], ENT_QUOTES, 'UTF-8');
-    $logger->writeLog('INFO', "Protection against XSS applied");
+    $token = filter_input(INPUT_POST, 'token', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $submittedPassword = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 
     // Protect against XSRF
     if (!$token || $token !== $_SESSION['token']) {
@@ -104,8 +122,8 @@ if (checkFormData(['email', 'password'])) {
                 if ($dataQuery !== null && $result->num_rows === 1) {
 
                     // check if the user account is blocked, due to a suspect of brute force attack
-                    if ($dataQuery['blockedUntil'] !== null) {
-                        $blockedTime = strtotime($dataQuery['blockedUntil']);
+                    if ($dataQuery['blockedTime'] !== 0 and $dataQuery['failedAccesses'] === 0) {
+                        $blockedTime = $dataQuery['blockedTime'] + strtotime($dataQuery['firstFailedAccess']);
                         $currentTime = time();
                         // check if the account is still blocked or enough time is passed
                         if (($currentTime - $blockedTime) < 0)
@@ -116,7 +134,7 @@ if (checkFormData(['email', 'password'])) {
                     // the password provided by the user and the salt taken from the db
                     $hashedPassword = hash('sha256', $submittedPassword . $dataQuery['salt']);
 
-                    if (login($email, $hashedPassword, $dataQuery['failedAccesses'])) {
+                    if (login($email, $hashedPassword, $dataQuery['firstFailedAccess'], $dataQuery['failedAccesses'], $dataQuery['blockedTime'])) {
                         $logger->writeLog('INFO', "Login of the user: " . $email . ", Succeeded");
                         // the shopping cart in the db is updated if the user has insert something in it
                         // while he was anonymous

@@ -10,12 +10,11 @@ global $accessControlManager;
 if (checkFormData(['email', 'otp', 'password', 'repeat_password'])) {
 
     // Protect against XSS
-    $token = htmlspecialchars($_POST['token'], ENT_QUOTES, 'UTF-8');
-    $email = htmlspecialchars($_POST['email'], ENT_QUOTES, 'UTF-8');
-    $otp = htmlspecialchars($_POST['otp'], ENT_QUOTES, 'UTF-8');
-    $passwordSubmitted = htmlspecialchars($_POST['password'], ENT_QUOTES, 'UTF-8');
-    $repeatPassword = htmlspecialchars($_POST['repeat_password'], ENT_QUOTES, 'UTF-8');
-    $logger->writeLog('INFO', "Protection against XSS applied");
+    $token = filter_input(INPUT_POST, 'token', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $otp = filter_input(INPUT_POST, 'otp', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $passwordSubmitted = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $repeatPassword = filter_input(INPUT_POST, 'repeat_password', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 
     // Protect against XSRF
     if (!$token || $token !== $_SESSION['token']) {
