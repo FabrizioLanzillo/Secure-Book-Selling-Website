@@ -174,7 +174,11 @@ function updateFailedAccesses($information): bool
             $query = "UPDATE user
                         SET firstFailedAccess = NOW(), failedAccesses = ?
                         WHERE email = ?;";
-        } else {
+        } else if ($information[0] === 0){
+            $query = "UPDATE user
+                        SET failedAccesses = ?, blockedTime = 0
+                        WHERE email = ?;";
+        }else {
             $query = "UPDATE user
                         SET failedAccesses = ?
                         WHERE email = ?;";
