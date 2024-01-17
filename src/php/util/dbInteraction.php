@@ -269,7 +269,7 @@ function getSecurityInfo($email)
     global $logger;
 
     try {
-        $query = "SELECT otp, lastOtp
+        $query = "SELECT otp, lastOtp, username, name, surname
                         FROM user
                         WHERE email = ?;";
 

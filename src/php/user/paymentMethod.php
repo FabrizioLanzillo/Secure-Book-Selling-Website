@@ -6,6 +6,7 @@ global $errorHandler;
 global $sessionHandler;
 global $shoppingCartHandler;
 global $accessControlManager;
+global $validator;
 
 // Check path manipulation and broken access control
 // Check if the user is logged
@@ -29,10 +30,13 @@ try {
             // return 405 http status code
             $accessControlManager ->redirectIfXSRFAttack();
         } else {
-            // Save card information in $_SESSION and redirect depending on $_SESSION vars set
-            $sessionHandler->saveCreditCardInfo($cardHolderName, $cardNumber, $expire, $CVV);
-            $logger->writeLog('INFO', "User: " . $_SESSION['email'] . " successfully set his payment info");
-            $accessControlManager->routeMultiStepCheckout();
+            // check validation of credit card
+            if($validator->validatePaymentMethod($cardHolderName, $cardNumber, $expire, $CVV)) {
+                // Save card information in $_SESSION and redirect depending on $_SESSION vars set
+                $sessionHandler->saveCreditCardInfo($cardHolderName, $cardNumber, $expire, $CVV);
+                $logger->writeLog('INFO', "User: " . $_SESSION['email'] . " successfully set his payment info");
+                $accessControlManager->routeMultiStepCheckout();
+            }
         }
     }
 }
@@ -48,7 +52,7 @@ catch (Exception $e) {
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Payment Method</title>
-        <script type="text/javascript" src="../../js/payment.js"></script>
+<!--        <script type="text/javascript" src="../../js/payment.js"></script>-->
         <link rel="stylesheet" href="../../css/bootstrap.css">
 
     </head>

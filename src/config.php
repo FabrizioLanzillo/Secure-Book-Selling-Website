@@ -8,6 +8,7 @@ require_once __DIR__ . "/php/util/ShoppingCartHandler.php";
 require_once __DIR__ . "/php/util/function.php";
 require_once __DIR__ . "/php/util/dbInteraction.php";
 require_once __DIR__ . "/php/util/AccessControlManager.php";
+require_once __DIR__ . "/php/util/InputValidation.php";
 
 define("PROJECT_ROOT", $_SERVER["DOCUMENT_ROOT"]);
 define("SERVER_ROOT", $_SERVER["SERVER_NAME"]);
@@ -49,6 +50,7 @@ $emailSender = EmailSender::getInstance();
 $sessionHandler = SessionManager::getInstance($lifetime, $path, $secure, $httponly);
 $shoppingCartHandler = ShoppingCartHandler::getInstance();
 $accessControlManager = AccessControlManager::getInstance();
+$validator = InputValidation::getInstance();
 
 // If the page is different from the logout, this method is invoked in order to check if the session is expired
 // if the session is expired then logout is called.

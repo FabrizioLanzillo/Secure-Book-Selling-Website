@@ -6,6 +6,7 @@ global $errorHandler;
 global $sessionHandler;
 global $shoppingCartHandler;
 global $accessControlManager;
+global $validator;
 
 // Check path manipulation and broken access control
 // Check if the user is logged
@@ -31,10 +32,13 @@ try{
             // return 405 http status code
             $accessControlManager ->redirectIfXSRFAttack();
         } else {
-            // Save cart information in $_SESSION and redirect depending on $_SESSION vars set
-            $sessionHandler->saveShippingInfo($fullName, $address, $city, $province, $cap, $country);
-            $logger->writeLog('INFO', "User: " . $_SESSION['email'] . " successfully set his shipping info");
-            $accessControlManager->routeMultiStepCheckout();
+            // check data validation
+            if($validator->validateShippingInformation($fullName, $address, $city, $province, $cap, $country)) {
+                // Save cart information in $_SESSION and redirect depending on $_SESSION vars set
+                $sessionHandler->saveShippingInfo($fullName, $address, $city, $province, $cap, $country);
+                $logger->writeLog('INFO', "User: " . $_SESSION['email'] . " successfully set his shipping info");
+                $accessControlManager->routeMultiStepCheckout();
+            }
         }
     }
 }
