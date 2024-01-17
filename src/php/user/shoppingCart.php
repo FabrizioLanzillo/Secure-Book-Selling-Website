@@ -20,9 +20,8 @@ $totalPrice = 0;
 if (checkFormData(['itemId'])) {
 
     // Protect against XSS
-    $token = htmlspecialchars($_POST['token'], ENT_QUOTES, 'UTF-8');
-    $bookId = htmlspecialchars($_POST['itemId'], ENT_QUOTES, 'UTF-8');
-    $logger->writeLog('INFO', "Protection against XSS applied");
+    $token = filter_input(INPUT_POST, 'token', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $bookId = filter_input(INPUT_POST, 'itemId', FILTER_SANITIZE_NUMBER_INT);
 
     // Protect against XSRF
     if (!$token || $token !== $_SESSION['token']) {

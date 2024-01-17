@@ -75,10 +75,10 @@ function insertUser($userInformation): bool
     global $logger;
 
     try {
-        $query = "INSERT INTO user (username, password, salt, email, name, surname, isAdmin, failedAccesses, lastOtp) 
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW());";
+        $query = "INSERT INTO user (username, password, salt, email, name, surname, isAdmin) 
+                        VALUES (?, ?, ?, ?, ?, ?, ?);";
 
-        $SecureBookSellingDB->performQuery("INSERT", $query, $userInformation, "ssssssii");
+        $SecureBookSellingDB->performQuery("INSERT", $query, $userInformation, "ssssssi");
         $SecureBookSellingDB->closeConnection();
         return true;
 
@@ -135,7 +135,7 @@ function getAccessInformation(string $email)
 
     try {
 
-        $query = "SELECT salt, failedAccesses, blockedUntil
+        $query = "SELECT salt, firstFailedAccess, failedAccesses, blockedTime
                         FROM user
                         WHERE email = ?;";
 
@@ -159,24 +159,32 @@ function getAccessInformation(string $email)
  * @param $email , is the email to select the user
  * @param $failedAccesses , is the number of failed logins
  */
-function updateFailedAccesses($email, $failedAccesses): bool
+function updateFailedAccesses($information): bool
 {
     global $SecureBookSellingDB;
     global $logger;
 
     try {
-
-        if ($failedAccesses >= 5) {
+        // In the first case the firstFailedAccess is set such that can be used for the timeout
+        if ($information[0] >= 3) {
             $query = "UPDATE user
-                        SET failedAccesses = ? , blockedUntil = DATE_ADD(NOW(),interval 30 minute)
+                        SET firstFailedAccess = NOW(), failedAccesses = 0, blockedTime = ?
                         WHERE email = ?;";
-        } else {
+        } else if ($information[0] === 1){
+            $query = "UPDATE user
+                        SET firstFailedAccess = NOW(), failedAccesses = ?
+                        WHERE email = ?;";
+        } else if ($information[0] === 0){
+            $query = "UPDATE user
+                        SET failedAccesses = ?, blockedTime = 0
+                        WHERE email = ?;";
+        }else {
             $query = "UPDATE user
                         SET failedAccesses = ?
                         WHERE email = ?;";
         }
 
-        $SecureBookSellingDB->performQuery("UPDATE", $query, [$failedAccesses, $email], "is");
+        $SecureBookSellingDB->performQuery("UPDATE", $query, $information, "is");
         $SecureBookSellingDB->closeConnection();
         return true;
 

@@ -17,14 +17,13 @@ if ($sessionHandler->isLogged()) {
 if (checkFormData(['name', 'surname', 'email', 'username', 'password', 'repeat_password'])) {
 
     // Protect against XSS
-    $token = htmlspecialchars($_POST['token'], ENT_QUOTES, 'UTF-8');
-    $name = htmlspecialchars($_POST['name'], ENT_QUOTES, 'UTF-8');
-    $surname = htmlspecialchars($_POST['surname'], ENT_QUOTES, 'UTF-8');
-    $email = htmlspecialchars($_POST['email'], ENT_QUOTES, 'UTF-8');
-    $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
-    $password = htmlspecialchars($_POST['password'], ENT_QUOTES, 'UTF-8');
-    $repeatPassword = htmlspecialchars($_POST['repeat_password'], ENT_QUOTES, 'UTF-8');
-    $logger->writeLog('INFO', "Protection against XSS applied");
+    $token = filter_input(INPUT_POST, 'token', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $name = filter_input(INPUT_POST, 'name', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $surname = filter_input(INPUT_POST, 'surname', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
+    $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $password = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $repeatPassword = filter_input(INPUT_POST, 'repeat_password', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 
     // Protect against XSRF
     if (!$token || $token !== $_SESSION['token']) {
@@ -47,7 +46,6 @@ if (checkFormData(['name', 'surname', 'email', 'username', 'password', 'repeat_p
                     $email,
                     $name,
                     $surname,
-                    0,
                     0,
                 );
 

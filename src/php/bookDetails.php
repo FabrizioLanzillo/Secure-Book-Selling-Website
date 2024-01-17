@@ -22,11 +22,11 @@ if ($bookId !== null) {
 
 try {
     if (checkFormData(['bookId'])) {
+
         // Protect against XSS
-        $token = htmlspecialchars($_POST['token'], ENT_QUOTES, 'UTF-8');
-        $book = htmlspecialchars($_POST['bookId'], ENT_QUOTES, 'UTF-8');
-        $quantity = htmlspecialchars($_POST['quantity'], ENT_QUOTES, 'UTF-8');
-        $logger->writeLog('INFO', "Protection against XSS applied");
+        $token = filter_input(INPUT_POST, 'token', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $book = filter_input(INPUT_POST, 'bookId', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $quantity = filter_input(INPUT_POST, 'quantity', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 
         // Protect against XSRF
         if (!$token || $token !== $_SESSION['token']) {
