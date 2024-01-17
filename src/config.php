@@ -31,6 +31,10 @@ header(
 $debug = true;
 // The lifetime variable sets the lifetime of the session to 7200 seconds (2 hours)
 $lifetime = 7200;
+// Set of number of attempt for the login function before being blocked
+$numberLoginAttempt = 10;
+// Set of the duration in seconds of the time window for the login brute force check
+$timeWindowDuration = 30;
 
 // --- Session Cookie Params ---
 // The path variable sets the domain where the session cookie will work.

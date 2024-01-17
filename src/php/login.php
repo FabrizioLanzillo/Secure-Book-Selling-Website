@@ -6,19 +6,26 @@ global $errorHandler;
 global $sessionHandler;
 global $shoppingCartHandler;
 global $accessControlManager;
+global $numberLoginAttempt;
+global $timeWindowDuration;
 
 /**
+ * Login function that checks the credential and checks if brute force attack on access credentials
  * @param $email , is the email to select the user
  * @param $password , is the hashed password
+ * @param $timestampAccess , timestamp of the first failed access or the last successful access
  * @param $failedAccesses , is a counter of the failed access of the user
+ * @param $blockedTime , Time in seconds while the user is blocked
  * @return bool|null
  */
-function login($email, $password, $firstfailedAccess, $failedAccesses, $blockedTime): ?bool
+function login($email, $password, $timestampAccess, $failedAccesses, $blockedTime): ?bool
 {
 
     global $logger;
     global $errorHandler;
     global $sessionHandler;
+    global $numberLoginAttempt;
+    global $timeWindowDuration;
 
     try {
         if ($email != null && $password != null) {
@@ -30,10 +37,7 @@ function login($email, $password, $firstfailedAccess, $failedAccesses, $blockedT
                 $dataQuery = $result->fetch_assoc();
                 if ($dataQuery !== null && $result->num_rows === 1) {
                     //Resets the failed accesses counter
-                    $information = array(
-                        0,
-                        $email,
-                    );
+                    $information = updateBlockLoginInformation(0, 0, $email);
                     if (updateFailedAccesses($information)) {
                         // creation of the session variables of a logged user
                         $sessionHandler->setSession($dataQuery['id'], $dataQuery['username'], $email, $dataQuery['name'], $dataQuery['isAdmin']);
@@ -45,27 +49,28 @@ function login($email, $password, $firstfailedAccess, $failedAccesses, $blockedT
                         throw new Exception('Something went wrong during the update.');
                     }
                 } else {
-                    $firstfailedAccess = ($firstfailedAccess === null) ? 0 : strtotime($firstfailedAccess);
-                    if ($firstfailedAccess + 30 > time() or $firstfailedAccess === 0 or $failedAccesses === 0){
+                    // In this case the credentials given by the user are incorrect, however, it must be checked that
+                    // no brute force attack attempt is in progress.
+                    // To verify and defend against a possible brute force attack attempt on login credentials,
+                    // it is required that the number of failed logins, in a 30-second time window, must not exceed $numberLoginAttempt.
+
+                    // Check if there is a timestamp of the first failed access
+                    $timestampAccess = ($timestampAccess === null) ? 0 : strtotime($timestampAccess);
+                    // if we are in the 30-sec time window OR
+                    // this is the first failed access because there is not a timestamp of a first failed access
+                    // the counter of the failed access is checked
+                    if (time() - $timestampAccess < $timeWindowDuration or $timestampAccess === 0 or $failedAccesses === 0) {
                         $failedAccesses = $failedAccesses + 1;
-                        if ($failedAccesses >= 3) {
-                            $blockedTime = ($blockedTime === 0) ? 30 : $blockedTime * 2;
-                            $information = array(
-                                $blockedTime,
-                                $email,
-                            );
+                        if ($failedAccesses >= $numberLoginAttempt) {
+                            $information = updateBlockLoginInformation(0, ($blockedTime === 0) ? 30 : $blockedTime * 2, $email);
                         } else {
-                            $information = array(
-                                $failedAccesses,
-                                $email,
-                            );
+                            $information = updateBlockLoginInformation($failedAccesses, $blockedTime, $email);
                         }
-                        if (updateFailedAccesses($information)) {
-                            throw new Exception('Email and/or password are not valid.', $failedAccesses);
-                        } else {
-                            throw new Exception('Something went wrong during the update.');
+                        if (!updateFailedAccesses($information)) {
+                            throw new Exception('Something went wrong during the update of the security access information.');
                         }
                     }
+                    throw new Exception('Email and/or password are not valid.', $failedAccesses);
                 }
             } else {
                 throw new Exception("Error performing the authentication.");
@@ -123,7 +128,7 @@ if (checkFormData(['email', 'password'])) {
 
                     // check if the user account is blocked, due to a suspect of brute force attack
                     if ($dataQuery['blockedTime'] !== 0 and $dataQuery['failedAccesses'] === 0) {
-                        $blockedTime = $dataQuery['blockedTime'] + strtotime($dataQuery['firstFailedAccess']);
+                        $blockedTime = $dataQuery['blockedTime'] + strtotime($dataQuery['timestampAccess']);
                         $currentTime = time();
                         // check if the account is still blocked or enough time is passed
                         if (($currentTime - $blockedTime) < 0)
@@ -134,7 +139,7 @@ if (checkFormData(['email', 'password'])) {
                     // the password provided by the user and the salt taken from the db
                     $hashedPassword = hash('sha256', $submittedPassword . $dataQuery['salt']);
 
-                    if (login($email, $hashedPassword, $dataQuery['firstFailedAccess'], $dataQuery['failedAccesses'], $dataQuery['blockedTime'])) {
+                    if (login($email, $hashedPassword, $dataQuery['timestampAccess'], $dataQuery['failedAccesses'], $dataQuery['blockedTime'])) {
                         $logger->writeLog('INFO', "Login of the user: " . $email . ", Succeeded");
                         // the shopping cart in the db is updated if the user has insert something in it
                         // while he was anonymous

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: mysql-server
--- Creato il: Gen 09, 2024 alle 18:35
+-- Creato il: Gen 17, 2024 alle 15:24
 -- Versione del server: 8.2.0
 -- Versione PHP: 8.2.8
 
@@ -20,8 +20,12 @@ SET time_zone = "+00:00";
 --
 -- Database: `secure_book_selling_db`
 --
-CREATE DATABASE IF NOT EXISTS `secure_book_selling_db` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
-USE `secure_book_selling_db`;
+CREATE DATABASE IF NOT EXISTS secure_book_selling_db;
+-- CREATE USER 'SNH'@'%' IDENTIFIED BY 'password';
+GRANT ALL PRIVILEGES ON *.* TO 'SNH'@'%' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
+
+use secure_book_selling_db;
 
 -- --------------------------------------------------------
 
@@ -75,7 +79,7 @@ CREATE TABLE IF NOT EXISTS `orders` (
   `amount` float NOT NULL,
   `quantity` int NOT NULL,
   `payment_method` varchar(50) NOT NULL,
-  PRIMARY KEY (`id_user`, `id_book`, `time`),
+  PRIMARY KEY (`id_user`,`id_book`,`time`),
   KEY `orders_book_id_fk` (`id_book`),
   KEY `orders_user_id_fk` (`id_user`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -84,11 +88,11 @@ CREATE TABLE IF NOT EXISTS `orders` (
 -- Dump dei dati per la tabella `orders`
 --
 
-INSERT INTO `orders` ( `id_user`, `id_book`, `time`, `amount`, `quantity`, `payment_method`) VALUES
-(1, 2, now(), 24.99, 1, 'Card'),
-(1, 3, now(), 3.95, 1, 'Card'),
-(2, 3, now(), 4.25, 1, 'Card'),
-(3, 1, now(), 19.99, 1, 'Card');
+INSERT INTO `orders` (`id_user`, `id_book`, `time`, `amount`, `quantity`, `payment_method`) VALUES
+(1, 2, '2024-01-17 15:22:49', 24.99, 1, 'Card'),
+(1, 3, '2024-01-17 15:22:49', 3.95, 1, 'Card'),
+(2, 3, '2024-01-17 15:22:49', 4.25, 1, 'Card'),
+(3, 1, '2024-01-17 15:22:49', 19.99, 1, 'Card');
 
 -- --------------------------------------------------------
 
@@ -123,10 +127,11 @@ CREATE TABLE IF NOT EXISTS `user` (
   `name` varchar(64) NOT NULL,
   `surname` varchar(64) NOT NULL,
   `isAdmin` tinyint(1) NOT NULL,
-  `failedAccesses` smallint NOT NULL,
-  `blockedUntil` timestamp NULL DEFAULT NULL,
+  `timestampAccess` timestamp NULL DEFAULT NULL,
+  `failedAccesses` smallint NOT NULL DEFAULT '0',
+  `blockedTime` int NOT NULL DEFAULT '0',
   `otp` varchar(64) DEFAULT NULL,
-  `lastOtp` timestamp NULL DEFAULT NULL,
+  `lastOtp` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `user_unique_email` (`email`),
   UNIQUE KEY `user_unique_username` (`username`)
@@ -136,11 +141,11 @@ CREATE TABLE IF NOT EXISTS `user` (
 -- Dump dei dati per la tabella `user`
 --
 
-INSERT INTO `user` (`id`, `username`, `password`, `salt`, `email`, `name`, `surname`, `isAdmin`, `failedAccesses`, `blockedUntil`, `otp`, `lastOtp`) VALUES
-(1, 'Fablan', 'fc698653e8a0556f417fd5edb6b195126b152ec6c87dd1da70cc0db00d55dbb8', '5f1d635bb003ac40556ed6e9518984b081a011dadc1c1570d6bd32ad9e82584b', 'f.lanzillo@studenti.unipi.it', 'Fabrizio', 'Lanzillo', 0, 0, NULL, NULL, '2024-01-09 18:29:29'),
-(2, 'Tommib', 'd0dc8824d9f9464e031c1081fa1f6abb85f8b2b27f53b5f2ca7cf80f15cb22f5', 'ecbada38d5adabc2dc3dc308888a8005ada39c4b693e80c2a42e07c7009c960b', 't.bertini4@studenti.unipi.it', 'Tommaso ', 'Bertini', 0, 0, NULL, NULL, '2024-01-09 18:29:29'),
-(3, 'Hfjqpowfjpq', 'ae3460e953a01a24c393f0a2b0742c4353c72c1a87cb379130903566904a62c2', '616762931bda4395cf7b3f211496224f299fa05cabb020b97e2da943717d2ad7', 'g.marrucci4@studenti.unipi.it', 'Giovanni', 'Marrucci', 0, 0, NULL, NULL, '2024-01-09 18:29:29'),
-(4, 'NperNedo', 'ecb961192524aefc85a70d169cf5dfa33aa44796de670bb034907ff64bd23074', '0ec28037a19b7098460a560dc3ebc6e171584eeba7ec092ec7f250f5f94a1114', 'f.montini1@studenti.unipi.it', 'Federico', 'Montini', 1, 0, NULL, NULL, '2024-01-09 18:29:29');
+INSERT INTO `user` (`id`, `username`, `password`, `salt`, `email`, `name`, `surname`, `isAdmin`, `timestampAccess`, `failedAccesses`, `blockedTime`, `otp`, `lastOtp`) VALUES
+(1, 'Fablan', 'fc698653e8a0556f417fd5edb6b195126b152ec6c87dd1da70cc0db00d55dbb8', '5f1d635bb003ac40556ed6e9518984b081a011dadc1c1570d6bd32ad9e82584b', 'f.lanzillo@studenti.unipi.it', 'Fabrizio', 'Lanzillo', 0, NULL, 0, 0, NULL, '2024-01-17 15:22:49'),
+(2, 'Tommib', 'd0dc8824d9f9464e031c1081fa1f6abb85f8b2b27f53b5f2ca7cf80f15cb22f5', 'ecbada38d5adabc2dc3dc308888a8005ada39c4b693e80c2a42e07c7009c960b', 't.bertini4@studenti.unipi.it', 'Tommaso ', 'Bertini', 0, NULL, 0, 0, NULL, '2024-01-17 15:22:49'),
+(3, 'Hfjqpowfjpq', 'ae3460e953a01a24c393f0a2b0742c4353c72c1a87cb379130903566904a62c2', '616762931bda4395cf7b3f211496224f299fa05cabb020b97e2da943717d2ad7', 'g.marrucci4@studenti.unipi.it', 'Giovanni', 'Marrucci', 0, NULL, 0, 0, NULL, '2024-01-17 15:22:49'),
+(4, 'NperNedo', 'ecb961192524aefc85a70d169cf5dfa33aa44796de670bb034907ff64bd23074', '0ec28037a19b7098460a560dc3ebc6e171584eeba7ec092ec7f250f5f94a1114', 'f.montini1@studenti.unipi.it', 'Federico', 'Montini', 1, NULL, 0, 0, NULL, '2024-01-17 15:22:49');
 
 --
 -- Limiti per le tabelle scaricate
