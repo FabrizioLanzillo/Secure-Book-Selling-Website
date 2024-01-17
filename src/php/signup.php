@@ -6,6 +6,8 @@ global $errorHandler;
 global $accessControlManager;
 global $emailSender;
 global $sessionHandler;
+global $validator;
+
 
 // check if the user is logged or not, if the user is logged the access to the signup page is forbidden
 // and the user will be redirected to the home page
@@ -36,40 +38,43 @@ if (checkFormData(['name', 'surname', 'email', 'username', 'password', 'repeat_p
             if ($password !== $repeatPassword) {
                 throw new Exception('The inserted passwords don\'t match');
             } else {
-                // Generates new vars to insert in the db
-                $salt = bin2hex(random_bytes(32));
-                $hashedPassword = hash('sha256', $password . $salt);
 
-                $userData = array(
-                    $username,
-                    $hashedPassword,
-                    $salt,
-                    $email,
-                    $name,
-                    $surname,
-                    0,
-                    0,
-                );
+                if($validator->checkPasswordStrength($password, $email, $username, $name, $surname)) {
 
-                // Inserts user's info in the db
-                if (insertUser($userData)) {
-                    $logger->writeLog('INFO', "Signup of the user: " . $email . ", Succeeded");
-                    if ($emailSender->sendEmail($email,
-                            "BookSelling - Welcome",
-                            "Signup is successfully completed",
-                            "Welcome in the bookselling community.", "Thank you for your support!") === false) {
-                        $logger->writeLog('ERROR', "Error during the send of the Signup Email");
+                    // Generates new vars to insert in the db
+                    $salt = bin2hex(random_bytes(32));
+                    $hashedPassword = hash('sha256', $password . $salt);
+
+                    $userData = array(
+                        $username,
+                        $hashedPassword,
+                        $salt,
+                        $email,
+                        $name,
+                        $surname,
+                        0,
+                        0,
+                    );
+
+                    // Inserts user's info in the db
+                    if (insertUser($userData)) {
+                        $logger->writeLog('INFO', "Signup of the user: " . $email . ", Succeeded");
+                        if ($emailSender->sendEmail($email,
+                                "BookSelling - Welcome",
+                                "Signup is successfully completed",
+                                "Welcome in the bookselling community.", "Thank you for your support!") === false) {
+                            $logger->writeLog('ERROR', "Error during the send of the Signup Email");
+                        }
+                        header('Location: //' . SERVER_ROOT . '/php/login.php');
+                        exit;
+                    } else {
+                        // No need to send a logger because it enters here only if db fails
+                        throw new Exception('Could not register the user');
                     }
-                    header('Location: //' . SERVER_ROOT . '/php/login.php');
-                    exit;
-                } else {
-                    // No need to send a logger because it enters here only if db fails
-                    throw new Exception('Could not register the user');
                 }
             }
         } catch (Exception $e) {
             $errorHandler->handleException($e);
-            $accessControlManager->redirectToHome();
         }
     }
 }
@@ -79,8 +84,8 @@ if (checkFormData(['name', 'surname', 'email', 'username', 'password', 'repeat_p
 <html lang="en">
 <head>
     <link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css">
-    <script src="../js/utilityFunction.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/zxcvbn/4.4.2/zxcvbn.js"></script>
+<!--    <script src="../js/utilityFunction.js"></script>-->
+<!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/zxcvbn/4.4.2/zxcvbn.js"></script>-->
     <title>Book Selling - Sign Up</title>
 </head>
 <body>
@@ -119,7 +124,7 @@ include "./layout/header.php";
                         <label for="password"><b>Password</b></label>
                         <input class="form-control" type="password" placeholder="Password" name="password" id="password"
                                pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{9,}"
-                               title="Must contain at least one number, one uppercase letter, one lowercase letter, and at least 8 or more characters"
+                               title="Must contain at least one number, one uppercase letter, one lowercase letter, and at least 9 or more characters"
                                required oninput="checkPasswordStrength()">
                         <meter max="4" id="password-strength-meter"></meter>
                         <p id="password-strength-text"></p>

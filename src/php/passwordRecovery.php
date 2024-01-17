@@ -5,6 +5,7 @@ global $logger;
 global $errorHandler;
 global $sessionHandler;
 global $accessControlManager;
+global $validator;
 
 // If POST vars are set it means that a POST form has been submitted 
 if (checkFormData(['email', 'otp', 'password', 'repeat_password'])) {
@@ -30,37 +31,41 @@ if (checkFormData(['email', 'otp', 'password', 'repeat_password'])) {
                 // Get all security info from db to verify user
                 $result = getSecurityInfo($email);
                 if ($result) {
-                    $otpData = $result->fetch_assoc();
-                    if ($otpData !== null && $result->num_rows === 1) {
+                    $userSecurityInfo = $result->fetch_assoc();
+                    if ($userSecurityInfo !== null && $result->num_rows === 1) {
                         // Checks OTP retrieved from db
-                        if ($otpData['otp'] !== null and $otpData['lastOtp'] !== null) {
+                        if ($userSecurityInfo['otp'] !== null and $userSecurityInfo['lastOtp'] !== null) {
                             // Convert time for comparison
-                            $lastOtpTime = strtotime($otpData['lastOtp']);
+                            $lastOtpTime = strtotime($userSecurityInfo['lastOtp']);
                             $currentTime = time();
 
                             // Checks OTP inserted with the one in the db
-                            if (($currentTime - $lastOtpTime) > 90 or $otpData['otp'] !== $otp) {
+                            if (($currentTime - $lastOtpTime) > 90 or $userSecurityInfo['otp'] !== $otp) {
                                 throw new Exception('The OTP is incorrect and/or expired for the user: ' . $email);
                             }
 
-                            // Generates new vars to insert in the db
-                            $salt = bin2hex(random_bytes(32));
-                            $hashedPassword = hash('sha256', $passwordSubmitted . $salt);
+                            // check new password validation
+                            if($validator->checkPasswordStrength($passwordSubmitted, $email, $userSecurityInfo['username'], $userSecurityInfo['name'], $userSecurityInfo['surname'])) {
 
-                            $userData = array(
-                                $hashedPassword,
-                                $salt,
-                                $email,
-                            );
+                                // Generates new vars to insert in the db
+                                $salt = bin2hex(random_bytes(32));
+                                $hashedPassword = hash('sha256', $passwordSubmitted . $salt);
 
-                            // Update user's password
-                            if (updateUserPassword($userData)) {
-                                $logger->writeLog('INFO', "The password update of the user: " . $email . ", Succeeded");
-                                header('Location: //' . SERVER_ROOT . '/php/login.php');
-                                exit;
-                            } else {
-                                // No need to send a logger because it enters here only if db fails
-                                throw new Exception('Could not update the password of the user: ' . $email);
+                                $userData = array(
+                                    $hashedPassword,
+                                    $salt,
+                                    $email,
+                                );
+
+                                // Update user's password
+                                if (updateUserPassword($userData)) {
+                                    $logger->writeLog('INFO', "The password update of the user: " . $email . ", Succeeded");
+                                    header('Location: //' . SERVER_ROOT . '/php/login.php');
+                                    exit;
+                                } else {
+                                    // No need to send a logger because it enters here only if db fails
+                                    throw new Exception('Could not update the password of the user: ' . $email);
+                                }
                             }
                         } else {
                             throw new Exception('No OTP was generated for this user: ' . $email);
@@ -113,7 +118,7 @@ include "./layout/header.php";
                     <label for="password" class="form-label"><b>Password</b></label>
                     <input class="form-control" type="password" placeholder="Password" name="password" id="password"
                            pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{9,}"
-                           title="Must contain at least one number, one uppercase letter, one lowercase letter, and at least 8 or more characters"
+                           title="Must contain at least one number, one uppercase letter, one lowercase letter, and at least 9 or more characters"
                            required oninput="checkPasswordStrength()">
                     <meter max="4" id="password-strength-meter"></meter>
                     <p id="password-strength-text"></p>

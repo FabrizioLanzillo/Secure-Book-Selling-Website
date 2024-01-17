@@ -8,6 +8,7 @@
     require_once __DIR__ . "/php/util/function.php";
     require_once __DIR__ . "/php/util/dbInteraction.php";
     require_once __DIR__ . "/php/util/AccessControlManager.php";
+    require_once __DIR__ . "/php/util/InputValidation.php";
 
     define("PROJECT_ROOT", $_SERVER["DOCUMENT_ROOT"]);
     define("SERVER_ROOT", $_SERVER["SERVER_NAME"]);
@@ -36,6 +37,7 @@
     $sessionHandler = SessionManager::getInstance($lifetime, $path, $secure, $httponly);
     $shoppingCartHandler = ShoppingCartHandler::getInstance();
     $accessControlManager = AccessControlManager::getInstance();
+    $validator = InputValidation::getInstance();
 
 
 
