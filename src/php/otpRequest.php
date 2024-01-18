@@ -33,7 +33,7 @@ if (checkFormData(['email'])) {
                         // Generates a random string of 8 chars
                         $newOTP = generateRandomString(8);
                         // In the db the OTP is stored hashed
-                        $hashedNewOTP = hash('sha256', $newOTP);
+                        $hashedNewOTP = hash('sha256', $newOTP . $dataQuery['salt']);
                         // save in the db the OPT for the specified user
                         if (setOtp($email, $hashedNewOTP)) {
                             if ($emailSender->sendEmail($email,

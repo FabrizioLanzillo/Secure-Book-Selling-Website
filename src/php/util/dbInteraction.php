@@ -207,7 +207,7 @@ function getOtpTimeInformation($email)
     global $logger;
 
     try {
-        $query = "SELECT lastOtp
+        $query = "SELECT lastOtp, salt
                         FROM user
                         WHERE email = ?;";
 
@@ -267,7 +267,7 @@ function getSecurityInfo($email)
     global $logger;
 
     try {
-        $query = "SELECT otp, lastOtp, username, name, surname
+        $query = "SELECT otp, lastOtp, username, name, surname, salt
                         FROM user
                         WHERE email = ?;";
 
