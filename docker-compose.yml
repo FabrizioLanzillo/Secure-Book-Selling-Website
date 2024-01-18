@@ -36,8 +36,8 @@ services:
         ports:
             - "127.0.0.1:9906:3306"
         volumes:
-            # - ./mysql_conf/mysql_volume:/var/lib/mysql/
             - ./mysql_conf/my/custom:/etc/mysql/conf.d
+            - ./mysql_conf/secure_book_selling_db.sql:/docker-entrypoint-initdb.d/secure_book_selling_db.sql
         networks:
             network:
                 ipv4_address: 10.5.0.5
